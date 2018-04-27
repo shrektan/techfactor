@@ -26,6 +26,6 @@ Imports:
     yaml (>= 2.1.18),
     assertthat,
     purrr,
-    GCAMCPUB (>= 0.2.9)
+    GCAMCPUB (>= 0.2.8)
 Suggests: 
     testthat

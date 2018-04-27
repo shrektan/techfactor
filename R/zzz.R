@@ -7,5 +7,5 @@
 
 
 .onUnload <- function(libpath) {
-  library.dynam.unload("GCAMCTS", libpath)
+  library.dynam.unload("GCAMCTF", libpath)
 }
