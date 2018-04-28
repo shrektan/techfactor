@@ -39,19 +39,6 @@ private:
 };
 
 
-// implied that the date sequence here must be a continous trading date sequence
-class Quote_pool
-{
-public:
-  Quote_pool() = default;
-  Timeseries& raw(const Code code, const Quote_tag tag) const;
-private:
-  std::map<Code, std::pair<TD_index, Quote_elem>> pool_;
-  void check_index_() const;
-};
-
-
-double delta(const double x1, const double x0);
 Timeseries delta(const Timeseries& x);
 double corr(const Timeseries& x, const Timeseries& y);
 Timeseries rank(const Timeseries& x);
@@ -82,7 +69,7 @@ class Quotes
 {
 public:
   Quotes() = default;
-  explicit Quotes(const Quote_pool& pool, const Code code);
+  explicit Quotes(const Rcpp::DataFrame tbl);
   double prev_close(const int delay = 0) const;
   double open(const int delay = 0) const;
   double high(const int delay = 0) const;
@@ -97,7 +84,7 @@ public:
   double dbm() const;
   double hd() const;
   double ld() const;
-  void set(const int today) const;
+  void set(const TD_code today) const;
 
 private:
   TD_index& td_index_;
@@ -111,7 +98,7 @@ private:
   Timeseries& amount_;
   Timeseries& bmk_close_;
   Timeseries& bmk_open_;
-  mutable int today_;
+  mutable TD_code today_ {0};
 };
 
 
@@ -136,7 +123,7 @@ std::vector<bool> operator>(const Timeseries& x, const double y);
 std::vector<bool> operator<(const Timeseries& x, const double y);
 
 
-auto alpha1 = [](const Quotes& quotes, const int today) -> double {
+auto alpha1 = [](const Quotes& quotes, const TD_code today) -> double {
   quotes.set(today);
   const auto rk_delta_log_vol = rank(delta(log(close(quotes, 7))));
   const auto rk_close_open = rank((close(quotes, 6) - open(quotes, 6)) / open(quotes, 6));
@@ -144,7 +131,7 @@ auto alpha1 = [](const Quotes& quotes, const int today) -> double {
 };
 
 
-auto alpha3 = [](const Quotes& quotes, const int today) -> double {
+auto alpha3 = [](const Quotes& quotes, const TD_code today) -> double {
   quotes.set(today);
   const auto sum_close_8 = sum(close(quotes, 8));
   const auto std_close_8 = stdev(close(quotes, 8));
@@ -165,7 +152,7 @@ auto alpha3 = [](const Quotes& quotes, const int today) -> double {
 };
 
 
-auto alpha5 = [](const Quotes& quotes, const int today) -> double {
+auto alpha5 = [](const Quotes& quotes, const TD_code today) -> double {
   Timeseries ts;
   for (int i {2}; i >= 0; --i)
   {
@@ -182,13 +169,13 @@ auto alpha5 = [](const Quotes& quotes, const int today) -> double {
 };
 
 
-auto alpha14 = [](const Quotes& quotes, const int today) -> double {
+auto alpha14 = [](const Quotes& quotes, const TD_code today) -> double {
   quotes.set(today);
   return quotes.close() - quotes.close(5);
 };
 
 
-auto alpha53 = [](const Quotes& quotes, const int today) -> double {
+auto alpha53 = [](const Quotes& quotes, const TD_code today) -> double {
   std::vector<bool> cond;
   for (int i {11}; i >= 0; --i)
   {
@@ -199,7 +186,7 @@ auto alpha53 = [](const Quotes& quotes, const int today) -> double {
 };
 
 
-auto alpha149 = [](const Quotes& quotes, const int today) -> double {
+auto alpha149 = [](const Quotes& quotes, const TD_code today) -> double {
   quotes.set(today);
   const auto dr = close(quotes, 252) / close(quotes, 252, 1) - 1.0;
   const auto bmk_dr = bmk_close(quotes, 252) / bmk_close(quotes, 252, 1) - 1.0;
@@ -207,3 +194,78 @@ auto alpha149 = [](const Quotes& quotes, const int today) -> double {
   const auto y = filter(bmk_dr, bmk_dr < 0.0);
   return regbeta(x, y);
 };
+
+
+// implied that the date sequence here must be a continous trading date sequence
+class Quote_pool
+{
+public:
+  Quote_pool() = default;
+  explicit Quote_pool(Rcpp::List raw);
+  Quotes& raw(const Code code) const;
+private:
+  std::map<Code, Quotes> pool_;
+  void check_index_() const;
+};
+
+
+std::map<std::string, std::function<
+  double(const Quotes& quotes, const TD_code today)>> tf_funs = {
+  {"alpha1", alpha1},
+  {"alpha3", alpha3},
+  {"alpha5", alpha5},
+  {"alpha14", alpha14},
+  {"alpha53", alpha53},
+  {"alpha149", alpha149}
+};
+
+
+std::map<std::string, std::function<
+  Rcpp::DataFrame(const Quotes& quotes, const Rcpp::newDateVector from_to)>> tf_fast_funs = {
+
+};
+
+// [[Rcpp::export]]
+SEXP tf_pool_ptr(Rcpp::List raw)
+{
+  Quote_pool* pool = new Quote_pool {raw};
+  return  Rcpp::XPtr<Quote_pool>(pool, true);
+}
+
+
+void assert_valid(const Rcpp::newDateVector from_to);
+
+
+// [[Rcpp::export]]
+Rcpp::List tf_run_cpp(SEXP ptr,
+                      const Rcpp::StringVector factors_,
+                      const Rcpp::newDateVector from_to,
+                      const Rcpp::IntegerVector codes)
+{
+  assert_valid(from_to);
+  const std::vector<std::string> factors = Rcpp::as<std::vector<std::string>>(factors_);
+  Rcpp::XPtr<Quote_pool> xptr {ptr};
+  const auto& pool = *xptr;
+  Rcpp::List res(codes.length());
+  int i {0};
+  for (const int code : codes)
+  {
+    Rcpp::List res_code(factors.size());
+    const auto& quotes = pool.raw(code);
+    int j {0};
+    for (const auto& factor : factors)
+    {
+      if (tf_fast_funs.count(factor)) {
+        res_code[j] = tf_fast_funs.at(factor)(quotes, from_to);
+      } else if (tf_funs.count(factor)) {
+
+      } else {
+
+      }
+      ++j;
+    }
+    res[i] = res_code;
+    ++i;
+  }
+  return res;
+}
