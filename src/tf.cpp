@@ -1,55 +1,41 @@
-// Design:
-// * the date sequences here must be contious trading date sequence, we also have a converter
-//   so that locate a special date is fast and easy
-// * the option to use single pass algo to boost the performance
-// * any NA in the input will lead to NA in the output
-// *
+/*
+ * Design:
+ *
+ * - the date sequences here must be contious trading date sequence, we also have a converter
+ *   so that locate a special date is fast and easy
+ * - the option to use single pass algo to boost the performance
+ *   __UPDATE__: difficult to do it generally and may not neccessary since many calculations
+ *   are very small except for the regression stuff.
+ * - any NA in the input will lead to NA in the output
+ * - support concurrency for different codes. It means we can calculate different codes at the
+ *   same time. However, you can't calculate the same codes for different date parrellely.
+ */
 
 #include <map>
 #include <Rcpp.h>
 
 
 enum class Quote_tag {
-  prev_close, open, high, low, close, vwap, volume, amount
+  prev_close, open, high, low, close, vwap, volume, amount,
+  bmk_open, bmk_close
 };
+
 
 using Code = int;
 using Date = int;
-using Index = std::map<Date, int>;
-using Quote_elem = std::map<Quote_tag, std::vector<double>>;
-using Quote_ts = std::vector<double>;
+using TD_code = int;
+using TD_index = std::map<Date, TD_code>;
+using Timeseries = std::vector<double>;
+using Quote_elem = std::map<Quote_tag, Timeseries>;
+
 
 class TD_converter {
 public:
   TD_converter() = default;
   TD_converter(Rcpp::newDateVector x);
-  const int td_code(const Date date);
+  TD_code td_code(const Date date) const;
 private:
-  std::map<Date, int> dates_;
-};
-
-
-
-class Quote_query
-{
-public:
-  Quote_query() = default;
-  Quote_query(const int code, const int date) :
-    code_ {code}, date_ {date} { }
-private:
-  int code_ {-1};
-  int date_ {-1};
-};
-
-
-
-class Quote_raw
-{
-public:
-  Quote_raw() = default;
-  Quote_ts& ref;
-  int start_ {0};
-  int end_ {0};
+  TD_index td_indexes_;
 };
 
 
@@ -58,13 +44,166 @@ class Quote_pool
 {
 public:
   Quote_pool() = default;
-  const std::vector<double>& raw(const Code code, const Quote_tag tag);
-
+  Timeseries& raw(const Code code, const Quote_tag tag) const;
 private:
-  std::map<Code, std::pair<Index, Quote_elem>> pool_;
+  std::map<Code, std::pair<TD_index, Quote_elem>> pool_;
+  void check_index_() const;
 };
 
 
-double ret(const Quote_raw& raw);
-double ret(const Quote_raw& raw, const double pv);
+double delta(const double x1, const double x0);
+Timeseries delta(const Timeseries& x);
+double corr(const Timeseries& x, const Timeseries& y);
+Timeseries rank(const Timeseries& x);
+double sum(const Timeseries& x);
+double stdev(const Timeseries& x);
+double mean(const Timeseries& x);
+double tsmin(const Timeseries& x);
+double tsmax(const Timeseries& x);
+int tsrank(const Timeseries& x);
+int sign(const double x);
+double sma(const Timeseries& x, const int n, const int m);
+double wma(const Timeseries& x);
+Timeseries sequence(const int n);
+Timeseries sumac(const Timeseries& x);
+Timeseries log(const Timeseries& x);
+Timeseries abs(const Timeseries& x);
+double covariance(const Timeseries& x, const Timeseries& y);
+double prod(const Timeseries& x);
+int count(const std::vector<bool>& x);
+double regbeta(const Timeseries& x, const Timeseries& y);
+double regresi(const Timeseries& x, const Timeseries& y);
+Timeseries filter(const Timeseries& x, const std::vector<bool>& cond);
+int highday(const Timeseries& x);
+int lowday(const Timeseries& x);
 
+
+class Quotes
+{
+public:
+  Quotes() = default;
+  explicit Quotes(const Quote_pool& pool, const Code code);
+  double prev_close(const int delay = 0) const;
+  double open(const int delay = 0) const;
+  double high(const int delay = 0) const;
+  double low(const int delay = 0) const;
+  double close(const int delay = 0) const;
+  double volume(const int delay = 0) const;
+  double amount(const int delay = 0) const;
+  double bmk_close(const int delay = 0) const;
+  double bmk_open(const int delay = 0) const;
+  double tr(const int delay = 0) const;
+  double dtm() const;
+  double dbm() const;
+  double hd() const;
+  double ld() const;
+  void set(const int today) const;
+
+private:
+  TD_index& td_index_;
+  Timeseries& prev_close_;
+  Timeseries& open_;
+  Timeseries& high_;
+  Timeseries& low_;
+  Timeseries& close_;
+  Timeseries& vwap_;
+  Timeseries& volume_;
+  Timeseries& amount_;
+  Timeseries& bmk_close_;
+  Timeseries& bmk_open_;
+  mutable int today_;
+};
+
+
+Timeseries close(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries open(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries high(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries low(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries prev_close(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries volume(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries amount(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries bmk_close(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries bmk_open(const Quotes& quotes, const int n, const int delay = 0);
+Timeseries operator+(const Timeseries& x, const Timeseries& y);
+Timeseries operator-(const Timeseries& x, const Timeseries& y);
+Timeseries operator*(const Timeseries& x, const Timeseries& y);
+Timeseries operator/(const Timeseries& x, const Timeseries& y);
+Timeseries operator+(const Timeseries& x, const double y);
+Timeseries operator-(const Timeseries& x, const double y);
+Timeseries operator*(const Timeseries& x, const double y);
+Timeseries operator/(const Timeseries& x, const double y);
+std::vector<bool> operator>(const Timeseries& x, const double y);
+std::vector<bool> operator<(const Timeseries& x, const double y);
+
+
+auto alpha1 = [](const Quotes& quotes, const int today) -> double {
+  quotes.set(today);
+  const auto rk_delta_log_vol = rank(delta(log(close(quotes, 7))));
+  const auto rk_close_open = rank((close(quotes, 6) - open(quotes, 6)) / open(quotes, 6));
+  return corr(rk_delta_log_vol, rk_close_open) * -1;
+};
+
+
+auto alpha3 = [](const Quotes& quotes, const int today) -> double {
+  quotes.set(today);
+  const auto sum_close_8 = sum(close(quotes, 8));
+  const auto std_close_8 = stdev(close(quotes, 8));
+  const auto sum_close_2 = sum(close(quotes, 2));
+  if (sum_close_8 / 8 + std_close_8 < sum_close_2 / 2) {
+    return -1.0;
+  } else if (sum_close_2 / 2 < sum_close_8 / 8 - std_close_8) {
+    return 1.0;
+  } else {
+    const auto vol = quotes.volume();
+    const auto mean_vol_20 = mean(volume(quotes, 20));
+    if (vol / mean_vol_20 >= 1) {
+      return 1.0;
+    } else {
+      return -1.0;
+    }
+  }
+};
+
+
+auto alpha5 = [](const Quotes& quotes, const int today) -> double {
+  Timeseries ts;
+  for (int i {2}; i >= 0; --i)
+  {
+    Timeseries rk_vol_5, rk_high_5;
+    for (int k {5}; k >= 0; --k)
+    {
+      quotes.set(today - i - k);
+      rk_vol_5.push_back(tsrank(volume(quotes, 5)));
+      rk_high_5.push_back(tsrank(high(quotes, 5)));
+    }
+    ts.push_back(corr(rk_vol_5, rk_high_5));
+  }
+  return -tsmax(ts);
+};
+
+
+auto alpha14 = [](const Quotes& quotes, const int today) -> double {
+  quotes.set(today);
+  return quotes.close() - quotes.close(5);
+};
+
+
+auto alpha53 = [](const Quotes& quotes, const int today) -> double {
+  std::vector<bool> cond;
+  for (int i {11}; i >= 0; --i)
+  {
+    quotes.set(today - i);
+    cond.push_back(quotes.close() > quotes.close(1));
+  }
+  return count(cond);
+};
+
+
+auto alpha149 = [](const Quotes& quotes, const int today) -> double {
+  quotes.set(today);
+  const auto dr = close(quotes, 252) / close(quotes, 252, 1) - 1.0;
+  const auto bmk_dr = bmk_close(quotes, 252) / bmk_close(quotes, 252, 1) - 1.0;
+  const auto x = filter(dr, bmk_dr < 0.0);
+  const auto y = filter(bmk_dr, bmk_dr < 0.0);
+  return regbeta(x, y);
+};
