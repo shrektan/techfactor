@@ -196,18 +196,6 @@ auto alpha149 = [](const Quotes& quotes, const TD_code today) -> double {
 };
 
 
-// implied that the date sequence here must be a continous trading date sequence
-class Quote_pool
-{
-public:
-  Quote_pool() = default;
-  explicit Quote_pool(Rcpp::List raw);
-  Quotes& raw(const Code code) const;
-private:
-  std::map<Code, Quotes> pool_;
-  void check_index_() const;
-};
-
 
 std::map<std::string, std::function<
   double(const Quotes& quotes, const TD_code today)>> tf_funs = {
@@ -226,46 +214,50 @@ std::map<std::string, std::function<
 };
 
 // [[Rcpp::export]]
-SEXP tf_pool_ptr(Rcpp::List raw)
+SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
 {
-  Quote_pool* pool = new Quote_pool {raw};
-  return  Rcpp::XPtr<Quote_pool>(pool, true);
+  Quotes* ptr = new Quotes {raw};
+  return  Rcpp::XPtr<Quotes>(ptr, true);
 }
 
 
 void assert_valid(const Rcpp::newDateVector from_to);
 
+std::vector<int> td_seq(const Rcpp::newDateVector from_to);
+
 
 // [[Rcpp::export]]
-Rcpp::List tf_run_cpp(SEXP ptr,
-                      const Rcpp::StringVector factors_,
-                      const Rcpp::newDateVector from_to,
-                      const Rcpp::IntegerVector codes)
+Rcpp::List tf_run_cpp(SEXP quotes_ptr,
+                      const Rcpp::StringVector factors,
+                      const Rcpp::newDateVector from_to)
 {
+  using namespace Rcpp;
   assert_valid(from_to);
-  const std::vector<std::string> factors = Rcpp::as<std::vector<std::string>>(factors_);
-  Rcpp::XPtr<Quote_pool> xptr {ptr};
-  const auto& pool = *xptr;
-  Rcpp::List res(codes.length());
-  int i {0};
-  for (const int code : codes)
+  Rcpp::XPtr<Quotes> xptr {quotes_ptr};
+  const auto& quotes = *xptr;
+  const int n_factor = factors.length();
+  Rcpp::List res(n_factor);
+  const auto dates = td_seq(from_to);
+  const int n_dates = dates.size();
+  for (int i {0}; i < n_factor; ++i)
   {
-    Rcpp::List res_code(factors.size());
-    const auto& quotes = pool.raw(code);
-    int j {0};
-    for (const auto& factor : factors)
+    const auto factor = std::string {factors[i]};
+    if (tf_fast_funs.count(factor))
     {
-      if (tf_fast_funs.count(factor)) {
-        res_code[j] = tf_fast_funs.at(factor)(quotes, from_to);
-      } else if (tf_funs.count(factor)) {
-
-      } else {
-
-      }
-      ++j;
+      res[i] = tf_fast_funs.at(factor)(quotes, from_to);
     }
-    res[i] = res_code;
-    ++i;
+    else if (tf_funs.count(factor))
+    {
+      const auto fun = tf_funs.at(factor);
+      NumericVector res_i(n_dates);
+      for (int j {0}; i < n_dates; ++j) res_i[j] = fun(quotes, dates[j]);
+      res[i] = DataFrame::create(
+        _["DATE"] = wrap(dates),
+        _["VALUE"] = res_i
+      );
+    } else {
+      stop("factor %s must be defined before using.", factor);
+    }
   }
   return res;
 }
