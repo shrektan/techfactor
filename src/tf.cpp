@@ -16,7 +16,7 @@
 #include "algo.h"
 
 
-auto alpha1 = [](const Quotes& quotes, const TD_code today) -> double {
+auto alpha1 = [](const Quotes& quotes, const Date today) -> double {
   quotes.set(today);
   const auto rk_delta_log_vol = rank(delta(log(close(quotes, 7))));
   const auto rk_close_open = rank((close(quotes, 6) - open(quotes, 6)) / open(quotes, 6));
@@ -24,7 +24,7 @@ auto alpha1 = [](const Quotes& quotes, const TD_code today) -> double {
 };
 
 
-auto alpha3 = [](const Quotes& quotes, const TD_code today) -> double {
+auto alpha3 = [](const Quotes& quotes, const Date today) -> double {
   quotes.set(today);
   const auto sum_close_8 = sum(close(quotes, 8));
   const auto std_close_8 = stdev(close(quotes, 8));
@@ -45,7 +45,7 @@ auto alpha3 = [](const Quotes& quotes, const TD_code today) -> double {
 };
 
 
-auto alpha5 = [](const Quotes& quotes, const TD_code today) -> double {
+auto alpha5 = [](const Quotes& quotes, const Date today) -> double {
   Timeseries ts;
   for (int i {2}; i >= 0; --i)
   {
@@ -62,13 +62,13 @@ auto alpha5 = [](const Quotes& quotes, const TD_code today) -> double {
 };
 
 
-auto alpha14 = [](const Quotes& quotes, const TD_code today) -> double {
+auto alpha14 = [](const Quotes& quotes, const Date today) -> double {
   quotes.set(today);
   return quotes.close() - quotes.close(5);
 };
 
 
-auto alpha53 = [](const Quotes& quotes, const TD_code today) -> double {
+auto alpha53 = [](const Quotes& quotes, const Date today) -> double {
   std::vector<bool> cond;
   for (int i {11}; i >= 0; --i)
   {
@@ -79,7 +79,7 @@ auto alpha53 = [](const Quotes& quotes, const TD_code today) -> double {
 };
 
 
-auto alpha149 = [](const Quotes& quotes, const TD_code today) -> double {
+auto alpha149 = [](const Quotes& quotes, const Date today) -> double {
   quotes.set(today);
   const auto dr = close(quotes, 252) / close(quotes, 252, 1) - 1.0;
   const auto bmk_dr = bmk_close(quotes, 252) / bmk_close(quotes, 252, 1) - 1.0;
@@ -91,7 +91,7 @@ auto alpha149 = [](const Quotes& quotes, const TD_code today) -> double {
 
 
 std::map<std::string, std::function<
-  double(const Quotes& quotes, const TD_code today)>> tf_funs = {
+  double(const Quotes& quotes, const Date today)>> tf_funs = {
   {"alpha1", alpha1},
   {"alpha3", alpha3},
   {"alpha5", alpha5},
