@@ -131,7 +131,7 @@ Timeseries sequence(const int n)
 {
   if (n <= 0) Rcpp::stop("n must be a positive integer but now is %d.", n);
   Timeseries res(n);
-  for (int i = 0; i < n; ++i) res[i] = i + 1.0;
+  std::generate(res.begin(), res.end(), [n = 0]() mutable { return ++n; });
   return res;
 }
 
@@ -139,16 +139,8 @@ Timeseries sequence(const int n)
 // [[Rcpp::export("tf_sumac")]]
 Timeseries sumac(const Timeseries& x)
 {
-  const int n_x = x.size();
-  Timeseries res(n_x);
-  for (int i = 0; i < n_x; ++i)
-  {
-    if (i == 0) {
-      res[i] = x[i];
-    } else {
-      res[i] = res[i - 1] + x[i];
-    }
-  }
+  Timeseries res(x.size());
+  std::partial_sum(x.cbegin(), x.cend(), res.begin());
   return res;
 }
 
@@ -174,15 +166,13 @@ Timeseries abs(const Timeseries& x)
 // [[Rcpp::export("tf_prod")]]
 double prod(const Timeseries& x)
 {
-  return std::accumulate(x.cbegin(), x.cend(), 1.0, [](double v1, double v2) {
-    return v1 * v2;
-  });
+  return std::accumulate(x.cbegin(), x.cend(), 1.0, std::multiple<double>());
 }
 
 
 // [[Rcpp::export("tf_count")]]
 int count(const std::vector<bool>& x) {
-  return std::accumulate(x.cbegin(), x.cend(), 0);
+  return std::count(x.cbegin(), x.cend(), true);
 }
 
 
