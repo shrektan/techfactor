@@ -131,7 +131,8 @@ Timeseries sequence(const int n)
 {
   if (n <= 0) Rcpp::stop("n must be a positive integer but now is %d.", n);
   Timeseries res(n);
-  std::generate(res.begin(), res.end(), [n = 0]() mutable { return ++n; });
+  int v {0};
+  std::generate(res.begin(), res.end(), [&v]() mutable { return ++v; });
   return res;
 }
 
@@ -166,7 +167,7 @@ Timeseries abs(const Timeseries& x)
 // [[Rcpp::export("tf_prod")]]
 double prod(const Timeseries& x)
 {
-  return std::accumulate(x.cbegin(), x.cend(), 1.0, std::multiple<double>());
+  return std::accumulate(x.cbegin(), x.cend(), 1.0, std::multiplies<double>());
 }
 
 
