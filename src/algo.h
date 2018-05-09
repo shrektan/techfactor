@@ -75,59 +75,18 @@ public:
       bmk_close_ { col(tbl, "BMK_CLOSE") },
       bmk_open_ { col(tbl, "BMK_OPEN") } { }
 
-  double prev_close(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return prev_close_[today_ - delay];
-  }
-
-  double open(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return open_[today_ - delay];
-  }
-
-  double high(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return high_[today_ - delay];
-  }
-
-  double low(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return low_[today_ - delay];
-  }
-
-  double close(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return close_[today_ - delay];
-  }
-
-  double volume(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return volume_[today_ - delay];
-  }
-
-  double amount(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return amount_[today_ - delay];
-  }
-
-  double bmk_close(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return bmk_close_[today_ - delay];
-  }
-
-  double bmk_open(const int delay = 0) const
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return bmk_open_[today_ - delay];
-  }
+  void set(const Date today) {  today_ = today; }
+  double prev_close(const int delay = 0) const { return get_(prev_close_, delay); }
+  double open(const int delay = 0) const { return get_(open_, delay); }
+  double high(const int delay = 0) const { return get_(high_, delay); }
+  double low(const int delay = 0) const { return get_(low_, delay); }
+  double close(const int delay = 0) const { return get_(close_, delay); }
+  double volume(const int delay = 0) const { return get_(volume_, delay); }
+  double amount(const int delay = 0) const { return get_(amount_, delay); }
+  double bmk_close(const int delay = 0) const { return get_(bmk_close_, delay); }
+  double bmk_open(const int delay = 0) const { return get_(bmk_open_, delay); }
+  double hd() const { return high() - high(1); }
+  double ld() const { return low(1) - low(); }
 
   double tr(const int delay = 0) const
   {
@@ -147,21 +106,6 @@ public:
     return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
   }
 
-  double hd() const
-  {
-    return high() - high(1);
-  }
-
-  double ld() const
-  {
-    return low(1) - low();
-  }
-
-  void set(const Date today)
-  {
-    today_ = today;
-  }
-
 private:
   std::vector<Date> td_index_;
   Timeseries prev_close_;
@@ -175,6 +119,11 @@ private:
   Timeseries bmk_close_;
   Timeseries bmk_open_;
   Date today_ {0};
+  double get_(const Timeseries& ts, const int delay = 0) const
+  {
+    if (!valid_(delay)) return NA_REAL;
+    return ts[today_ - delay];
+  }
   bool valid_(const int delay) const { return today_ - delay >= 0; }
 };
 
