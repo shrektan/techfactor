@@ -115,15 +115,42 @@ int sign(const double x)
 
 
 // [[Rcpp::export("tf_sma")]]
-double sma(const Timeseries& x, const int n, const int m);
+double sma(const Timeseries& x, const int m)
+{
+  const int n = x.size();
+  if (n == 0) Rcpp::stop("x must contain elements.");
+  if (n < m) Rcpp::stop("m must be smaller than the length of x.");
+  if (n == 1) return x[0];
+  return std::accumulate(
+    x.cbegin() + 1, x.cend(),
+    x[0], [m, n](const double last_value, const double new_entry) {
+      return last_value * (n - m) / n + new_entry * m / n;
+    }
+  );
+}
 
 
 // [[Rcpp::export("tf_wma")]]
-double wma(const Timeseries& x);
+double wma(const Timeseries& x)
+{
+  const int n = x.size();
+  if (n == 0) Rcpp::stop("x must contain elements.");
+  Timeseries weights(n);
+  int i {0};
+  std::generate(weights.end(), weights.begin(), [&i]() mutable { std::pow(0.9, ++i); });
+  return std::inner_product(x.cbegin(), x.cend(), weights.cbegin(), 0.0);
+}
 
 
 // [[Rcpp::export("tf_decaylinear")]]
-Timeseries decaylinear(const Timeseries& x, const int days);
+Timeseries decaylinear(const Timeseries& x)
+{
+  const int n = x.size();
+  if (n == 0) Rcpp::stop("x must contain elements.");
+  Timeseries weights(sequence(n));
+  const double sum_weights = std::accumulate(weights.cbegin(), weights.cend(), 0.0);
+  return weights / sum_weights * x;
+}
 
 
 // [[Rcpp::export("tf_sequence")]]
@@ -131,8 +158,7 @@ Timeseries sequence(const int n)
 {
   if (n <= 0) Rcpp::stop("n must be a positive integer but now is %d.", n);
   Timeseries res(n);
-  int v {0};
-  std::generate(res.begin(), res.end(), [&v]() mutable { return ++v; });
+  std::iota(res.begin(), res.end(), 0);
   return res;
 }
 
@@ -178,11 +204,27 @@ int count(const std::vector<bool>& x) {
 
 
 // [[Rcpp::export("tf_regbeta")]]
-double regbeta(const Timeseries& x, const Timeseries& y);
+double regbeta(const Timeseries& y, const Timeseries& x)
+{
+  const double cov_xy = covariance(x, y);
+  const double std_x = stdev(x);
+  if (std_x == 0.0) return NA_REAL;
+  return cov_xy / std_x / std_x;
+}
 
 
 // [[Rcpp::export("tf_regresi")]]
-double regresi(const Timeseries& x, const Timeseries& y);
+Timeseries regresi(const Timeseries& y, const Timeseries& x)
+{
+  const double beta = regbeta(y, x);
+  Timeseries res(y.size());
+  std::transform(
+    y.cbegin(), y.cend(), x.cbegin(),
+    res.begin(),
+    [beta](const double v_y, const double v_x) { return v_y - v_x * beta; }
+  );
+  return res;
+}
 
 
 // [[Rcpp::export("tf_filter")]]

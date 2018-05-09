@@ -38,7 +38,7 @@ double covariance(const Timeseries& x, const Timeseries& y);
 double prod(const Timeseries& x);
 int count(const std::vector<bool>& x);
 double regbeta(const Timeseries& x, const Timeseries& y);
-double regresi(const Timeseries& x, const Timeseries& y);
+Timeseries regresi(const Timeseries& x, const Timeseries& y);
 Timeseries filter(const Timeseries& x, const std::vector<bool>& cond);
 int highday(const Timeseries& x);
 int lowday(const Timeseries& x);
@@ -258,10 +258,12 @@ inline Timeseries operator/(const Timeseries& x, const Timeseries& y)
 {
   assert_same_size(x, y);
   Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), y.cbegin(), res.begin(), [](const double v1, const double v2) {
-    if (v2 == 0) return NA_REAL;
-    return v1 / v2;
-  });
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (v2 == 0) return NA_REAL;
+      return v1 / v2;
+    });
   return res;
 }
 
