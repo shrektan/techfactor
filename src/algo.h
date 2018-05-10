@@ -144,7 +144,7 @@ private:
   Timeseries bmk_open_;
   int today_index_ {0};
   int delayed_index_(const int delay) const noexcept { return today_index_ - delay; }
-  double get_(const Timeseries& ts, const int delay = 0) const noexcept
+  double get_(const Timeseries& ts, const int delay) const noexcept
   {
     if (!valid_(delay)) return NA_REAL;
     return ts[delayed_index_(delay)];
