@@ -101,6 +101,7 @@ std::map<std::string, std::function<
 };
 
 
+//' @export
 // [[Rcpp::export]]
 SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
 {
@@ -109,6 +110,17 @@ SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
 }
 
 
+// [[Rcpp::export]]
+Rcpp::newDateVector tf_dates(SEXP quotes_ptr, const Rcpp::newDateVector from_to)
+{
+  Rcpp::XPtr<Quotes> xptr {quotes_ptr};
+  const auto dates = xptr->dates(from_to);
+  return Rcpp::wrap(dates);
+}
+
+
+
+//' @export
 // [[Rcpp::export]]
 Rcpp::List tf_run_cpp(SEXP quotes_ptr,
                       const Rcpp::StringVector factors,
@@ -145,5 +157,6 @@ Rcpp::List tf_run_cpp(SEXP quotes_ptr,
       stop("factor %s must be defined before using.", factor);
     }
   }
+  res.attr("names") = factors;
   return res;
 }

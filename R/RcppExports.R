@@ -121,10 +121,16 @@ tf_assert_no_na <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_no_na`, x))
 }
 
+#' @export
 tf_quotes_ptr <- function(raw) {
     .Call(`_GCAMCTF_tf_quotes_ptr`, raw)
 }
 
+tf_dates <- function(quotes_ptr, from_to) {
+    .Call(`_GCAMCTF_tf_dates`, quotes_ptr, from_to)
+}
+
+#' @export
 tf_run_cpp <- function(quotes_ptr, factors, from_to) {
     .Call(`_GCAMCTF_tf_run_cpp`, quotes_ptr, factors, from_to)
 }

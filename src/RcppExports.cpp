@@ -351,6 +351,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tf_dates
+Rcpp::newDateVector tf_dates(SEXP quotes_ptr, const Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_tf_dates(SEXP quotes_ptrSEXP, SEXP from_toSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::newDateVector >::type from_to(from_toSEXP);
+    rcpp_result_gen = Rcpp::wrap(tf_dates(quotes_ptr, from_to));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_run_cpp
 Rcpp::List tf_run_cpp(SEXP quotes_ptr, const Rcpp::StringVector factors, const Rcpp::newDateVector from_to);
 RcppExport SEXP _GCAMCTF_tf_run_cpp(SEXP quotes_ptrSEXP, SEXP factorsSEXP, SEXP from_toSEXP) {
@@ -397,6 +409,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_any_na", (DL_FUNC) &_GCAMCTF_any_na, 1},
     {"_GCAMCTF_assert_no_na", (DL_FUNC) &_GCAMCTF_assert_no_na, 1},
     {"_GCAMCTF_tf_quotes_ptr", (DL_FUNC) &_GCAMCTF_tf_quotes_ptr, 1},
+    {"_GCAMCTF_tf_dates", (DL_FUNC) &_GCAMCTF_tf_dates, 2},
     {"_GCAMCTF_tf_run_cpp", (DL_FUNC) &_GCAMCTF_tf_run_cpp, 3},
     {NULL, NULL, 0}
 };
