@@ -374,6 +374,35 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_qt_get
+double test_qt_get(SEXP quotes_ptr, const Rcpp::Date today, const std::string tag, const int delay);
+RcppExport SEXP _GCAMCTF_test_qt_get(SEXP quotes_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP delaySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
+    Rcpp::traits::input_parameter< const std::string >::type tag(tagSEXP);
+    Rcpp::traits::input_parameter< const int >::type delay(delaySEXP);
+    rcpp_result_gen = Rcpp::wrap(test_qt_get(quotes_ptr, today, tag, delay));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_qt_ts_get
+Timeseries test_qt_ts_get(SEXP quotes_ptr, const Rcpp::Date today, const std::string tag, const int n, const int delay);
+RcppExport SEXP _GCAMCTF_test_qt_ts_get(SEXP quotes_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP nSEXP, SEXP delaySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
+    Rcpp::traits::input_parameter< const std::string >::type tag(tagSEXP);
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const int >::type delay(delaySEXP);
+    rcpp_result_gen = Rcpp::wrap(test_qt_ts_get(quotes_ptr, today, tag, n, delay));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_quotes_ptr
 SEXP tf_quotes_ptr(Rcpp::DataFrame raw);
 RcppExport SEXP _GCAMCTF_tf_quotes_ptr(SEXP rawSEXP) {
@@ -433,6 +462,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_assert_sorted", (DL_FUNC) &_GCAMCTF_assert_sorted, 1},
     {"_GCAMCTF_test_qt_tdates", (DL_FUNC) &_GCAMCTF_test_qt_tdates, 2},
     {"_GCAMCTF_test_qt_today", (DL_FUNC) &_GCAMCTF_test_qt_today, 2},
+    {"_GCAMCTF_test_qt_get", (DL_FUNC) &_GCAMCTF_test_qt_get, 4},
+    {"_GCAMCTF_test_qt_ts_get", (DL_FUNC) &_GCAMCTF_test_qt_ts_get, 5},
     {"_GCAMCTF_tf_quotes_ptr", (DL_FUNC) &_GCAMCTF_tf_quotes_ptr, 1},
     {"_GCAMCTF_tf_run_cpp", (DL_FUNC) &_GCAMCTF_tf_run_cpp, 3},
     {NULL, NULL, 0}

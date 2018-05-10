@@ -133,6 +133,14 @@ test_qt_today <- function(quotes_ptr, today) {
     .Call(`_GCAMCTF_test_qt_today`, quotes_ptr, today)
 }
 
+test_qt_get <- function(quotes_ptr, today, tag, delay) {
+    .Call(`_GCAMCTF_test_qt_get`, quotes_ptr, today, tag, delay)
+}
+
+test_qt_ts_get <- function(quotes_ptr, today, tag, n, delay) {
+    .Call(`_GCAMCTF_test_qt_ts_get`, quotes_ptr, today, tag, n, delay)
+}
+
 #' @export
 tf_quotes_ptr <- function(raw) {
     .Call(`_GCAMCTF_tf_quotes_ptr`, raw)
