@@ -7,7 +7,7 @@ Authors@R: c(
     person("Nick", "Wang", email = "nkwangpeng@126.com", role = c("ctb"))
     )
 Maintainer: Xianying Tan <shrektan@126.com>
-Description: The package to maintain technical factors.
+Description: Provide tools that calculate technical factors efficiently.
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
