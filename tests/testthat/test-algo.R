@@ -115,7 +115,7 @@ test_that("sign", {
 test_that("sma", {
   x <- rnorm(10)
   expect_error(tf_sma(x, 0), "m must be positive")
-  expect_error(tf_sma(x, 11), "x must have 11 elements")
+  expect_error(tf_sma(x, 11), "x must have at least 11 elements")
   expect_equal(tf_sma(x, 5), {
     res <- 0
     for (i in seq_along(x)) {

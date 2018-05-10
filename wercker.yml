@@ -1,0 +1,6 @@
+box: shrektan/rdocker4ci
+build:
+  steps:
+    - jimhester/r-dependencies
+    - jimhester/r-check
+    - jimhester/r-coverage
