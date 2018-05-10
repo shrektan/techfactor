@@ -21,10 +21,8 @@ Imports:
     Rcpp (>= 0.12.10),
     data.table (>= 1.10.5),
     progress,
-    fst (>= 0.8.0),
     magrittr,
     yaml (>= 2.1.18),
-    assertthat,
     purrr
 Suggests: 
     testthat,

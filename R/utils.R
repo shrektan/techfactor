@@ -3,7 +3,6 @@
 NULL
 
 #' @import data.table
-#' @import assertthat
 #' @importFrom magrittr %>%
 
 
