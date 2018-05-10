@@ -116,8 +116,6 @@ public:
     auto begin = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[0]));
     auto end = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[1]));
     std::vector<RDate> res;
-    if (begin == dates_.cend()) return res;
-    if (*end > int(from_to[1]) && end != dates_.cbegin()) { --end; }
     std::copy(begin, end, std::back_inserter(res));
     return res;
   }
