@@ -20,7 +20,7 @@ Timeseries na_vector(const int length)
 // [[Rcpp::export("tf_delta")]]
 Timeseries delta(const Timeseries& x)
 {
-  assert_no_na(x); assert_length(x, 2);
+  assert_length(x, 2);
   const int n_x = x.size();
   Timeseries res(n_x - 1);
   for (int i {1}; i < n_x; ++i) {
@@ -51,7 +51,6 @@ Timeseries rank(const Timeseries& x)
 // [[Rcpp::export("tf_sum")]]
 double sum(const Timeseries& x)
 {
-  if (any_na(x)) return NA_REAL;
   return std::accumulate(x.cbegin(), x.cend(), 0.0);
 }
 
