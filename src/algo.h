@@ -100,6 +100,7 @@ public:
 
   double tr(const int delay = 0) const noexcept
   {
+    if (!valid_(1)) return NA_REAL;
     return std::max(
       std::max(high() - low(), std::abs(high() - close(1))),
       std::abs(low() - close(1))
@@ -108,11 +109,13 @@ public:
 
   double dtm() const noexcept
   {
+    if (!valid_(1)) return NA_REAL;
     return open() <= open(1) ? 0.0 : std::max(high() - open(), open() - open(1));
   }
 
   double dbm() const noexcept
   {
+    if (!valid_(1)) return NA_REAL;
     return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
   }
 
