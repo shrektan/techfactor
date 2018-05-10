@@ -169,8 +169,22 @@ test_that("abs", {
   expect_equal(tf_abs(-1.3), 1.3)
   x <- rnorm(10)
   expect_equal(tf_abs(x), abs(x))
-  expect_equal(tf_abs(c(x, NA)), tf_abs(c(x, NA)))
-  expect_equal(tf_abs(c(NA, x)), tf_abs(c(NA, x)))
+  expect_equal(tf_abs(c(x, NA)), abs(c(x, NA)))
+  expect_equal(tf_abs(c(NA, x)), abs(c(NA, x)))
+})
+
+test_that("log", {
+  expect_equal(tf_log(double()), double())
+  expect_equal(tf_log(1.3), log(1.3))
+  expect_equal(tf_log(-1.3), NA_real_)
+  expect_equal(tf_log(0), NA_real_)
+  x <- rnorm(10)
+  expect_equal(tf_log(x), {
+    res <- rep(NA_real_, 10)
+    res[x > 0] <- log(x[x > 0])
+    res
+  })
+  expect_equal(tf_log(c(1.0, NA)), c(0, NA))
 })
 
 test_that("prod", {
@@ -178,8 +192,8 @@ test_that("prod", {
   expect_equal(tf_prod(-1.3), -1.3)
   x <- rnorm(10)
   expect_equal(tf_prod(x), prod(x))
-  expect_equal(tf_prod(c(x, NA)), tf_prod(c(x, NA)))
-  expect_equal(tf_prod(c(NA, x)), tf_prod(c(NA, x)))
+  expect_equal(tf_prod(c(x, NA)), prod(c(x, NA)))
+  expect_equal(tf_prod(c(NA, x)), prod(c(NA, x)))
 })
 
 test_that("count", {

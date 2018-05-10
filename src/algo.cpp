@@ -203,7 +203,10 @@ Timeseries sumac(const Timeseries& x)
 Timeseries log(const Timeseries& x)
 {
   Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) { return std::log(v); });
+  std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) {
+    if (Rcpp::NumericVector::is_na(v) || v <= 0.0) return NA_REAL;
+    return std::log(v);
+  });
   return res;
 }
 
