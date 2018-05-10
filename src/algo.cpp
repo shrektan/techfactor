@@ -1,6 +1,9 @@
 #include <Rcpp.h>
 #include "algo.h"
 
+/* Note that it's the user's responsibility to ensure there's
+ * no NA in the timeseries, in the current implementations.
+ */
 
 // [[Rcpp::export("tf_delta")]]
 Timeseries delta(const Timeseries& x)
@@ -18,17 +21,12 @@ Timeseries delta(const Timeseries& x)
 // [[Rcpp::export("tf_rank")]]
 Timeseries rank(const Timeseries& x)
 {
-  Timeseries sorted;
-  std::copy_if(
-    x.cbegin(), x.cend(), std::back_inserter(sorted),
-    [](const double v) { return !Rcpp::NumericVector::is_na(v); }
-  );
+  Timeseries sorted = x;
   std::sort(sorted.begin(), sorted.end());
   Timeseries res;
   std::transform(
     x.cbegin(), x.cend(), std::back_inserter(res),
     [&sorted](const double v) {
-      if (Rcpp::NumericVector::is_na(v)) return NA_REAL;
       auto iter = std::lower_bound(sorted.cbegin(), sorted.cend(), v);
       return std::distance(sorted.cbegin(), iter) + 1.0;
     }
@@ -55,12 +53,7 @@ double mean(const Timeseries& x)
 // [[Rcpp::export("tf_stdev")]]
 double stdev(const Timeseries& x)
 {
-  if (x.size() <= 1) return NA_REAL;
-  const double avg = mean(x);
-  return std::accumulate(
-    x.cbegin(), x.cend(), 0.0, [avg](const double last, const double v) {
-      return last + std::pow(v - avg, 2.0);
-    }) / (x.size() - 1.0);
+  return std::sqrt(covariance(x, x));
 }
 
 
