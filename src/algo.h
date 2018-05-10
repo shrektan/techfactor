@@ -110,12 +110,14 @@ public:
     return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
   }
 
-  std::vector<RDate> dates(const Rcpp::newDateVector from_to) const
+  std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
   {
     assert_valid(from_to);
     auto begin = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[0]));
     auto end = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[1]));
     std::vector<RDate> res;
+    if (begin == dates_.cend()) return res;
+    if (*end > int(from_to[1]) && end != dates_.cbegin()) { --end; }
     std::copy(begin, end, std::back_inserter(res));
     return res;
   }
