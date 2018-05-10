@@ -217,3 +217,51 @@ test_that("regresi", {
   expect_equal(tf_regresi(c(NA, x), c(1, y)), rep(NA_real_, 11))
   expect_equal(tf_regresi(c(1, x), c(NA, y)), rep(NA_real_, 11))
 })
+
+test_that("filter", {
+  expect_equal(tf_filter(double(), logical()), double())
+  expect_error(tf_filter(c(1, 2), c(TRUE, FALSE, TRUE)),
+               "The length of x and cond must equal", fixed = TRUE)
+  x <- rnorm(10)
+  cond <- sample(c(TRUE, FALSE), 10, replace = TRUE)
+  expect_equal(tf_filter(x, cond), x[cond])
+  cond <- rep(FALSE, 10)
+  expect_equal(tf_filter(x, cond), double())
+  cond <- rep(TRUE, 10)
+  expect_equal(tf_filter(x, cond), x)
+  expect_equal(tf_filter(c(1.0, NA, 2.0), c(TRUE, TRUE, FALSE)), c(1.0, NA))
+})
+
+test_that("highday", {
+  expect_error(tf_highday(double()), "x must have at least 1 elements")
+  expect_equal(tf_highday(1.2), 0.0)
+  expect_equal(tf_highday(c(0.2, 8.8, 2.3, 1.2)), 2.0)
+  expect_equal(tf_highday(c(0.2, NA, 8.8, 2.3, 1.2)), NA_real_)
+})
+
+test_that("lowday", {
+  expect_error(tf_lowday(double()), "x must have at least 1 elements")
+  expect_equal(tf_lowday(1.2), 0.0)
+  expect_equal(tf_lowday(c(0.2, 8.8, 2.3, 1.2)), 3.0)
+  expect_equal(tf_lowday(c(0.2, NA, 8.8, 2.3, 1.2)), NA_real_)
+})
+
+test_that("assert_valid_from_to", {
+  expect_error(
+    tf_assert_valid_from_to(c(Sys.Date())),
+    "must be a length 2 date vector"
+  )
+  expect_error(
+    tf_assert_valid_from_to(as.Date(c("2018-01-01", "2017-12-20"))),
+    "larger than or equal to"
+  )
+  expect_silent(
+    tf_assert_valid_from_to(as.Date(c("2017-12-20", "2017-12-20")))
+  )
+})
+
+test_that("assert_no_na", {
+  expect_error(tf_assert_no_na(c(NA, 1.0)), "mustn't contain NA")
+  expect_silent(tf_assert_no_na(c(1.0)))
+  expect_silent(tf_assert_no_na(double()))
+})

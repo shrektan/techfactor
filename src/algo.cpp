@@ -278,7 +278,7 @@ double highday(const Timeseries& x)
   assert_length(x, 1);
   if (any_na(x)) return NA_REAL;
   auto it = std::max_element(x.cbegin(), x.cend());
-  return std::distance(it, x.cend());
+  return std::distance(it, x.cend()) - 1.0;
 }
 
 
@@ -288,7 +288,7 @@ double lowday(const Timeseries& x)
   assert_length(x, 1);
   if (any_na(x)) return NA_REAL;
   auto it = std::min_element(x.cbegin(), x.cend());
-  return std::distance(it, x.cend());
+  return std::distance(it, x.cend()) - 1.0;
 }
 
 
@@ -297,12 +297,12 @@ double lowday(const Timeseries& x)
 void assert_valid(const Rcpp::newDateVector from_to)
 {
   if (from_to.size() != 2) Rcpp::stop(
-    "from_to should be a length 2 date vector."
+    "from_to must be a length 2 date vector."
   );
   if (from_to[0] > from_to[1]) Rcpp::stop(
     "%s %s",
-    "The second element of from_to should be larger than",
-    "or equal to the first."
+    "The 2nd element of from_to must be larger than",
+    "or equal to the 1st."
   );
 }
 
