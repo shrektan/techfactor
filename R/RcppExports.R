@@ -121,10 +121,32 @@ tf_assert_no_na <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_no_na`, x))
 }
 
+tf_assert_is_sorted <- function(x) {
+    invisible(.Call(`_GCAMCTF_assert_sorted`, x))
+}
+
+test_qt_tdates <- function(quotes_ptr, from_to) {
+    .Call(`_GCAMCTF_test_qt_tdates`, quotes_ptr, from_to)
+}
+
+test_qt_today <- function(quotes_ptr, today) {
+    .Call(`_GCAMCTF_test_qt_today`, quotes_ptr, today)
+}
+
+test_qt_get <- function(quotes_ptr, today, tag, delay) {
+    .Call(`_GCAMCTF_test_qt_get`, quotes_ptr, today, tag, delay)
+}
+
+test_qt_ts_get <- function(quotes_ptr, today, tag, n, delay) {
+    .Call(`_GCAMCTF_test_qt_ts_get`, quotes_ptr, today, tag, n, delay)
+}
+
+#' @export
 tf_quotes_ptr <- function(raw) {
     .Call(`_GCAMCTF_tf_quotes_ptr`, raw)
 }
 
+#' @export
 tf_run_cpp <- function(quotes_ptr, factors, from_to) {
     .Call(`_GCAMCTF_tf_run_cpp`, quotes_ptr, factors, from_to)
 }

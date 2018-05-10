@@ -1,11 +1,15 @@
 #' @useDynLib GCAMCTF, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
+#' @import data.table
 NULL
 
-#' @import data.table
-#' @import assertthat
+
 #' @importFrom magrittr %>%
+#' @export
+magrittr::`%>%`
 
 
-#' @export %>%
-`%>%`
+#' @importFrom anytime anydate
+#' @export
+anytime::anydate
+

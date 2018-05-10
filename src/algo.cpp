@@ -203,7 +203,10 @@ Timeseries sumac(const Timeseries& x)
 Timeseries log(const Timeseries& x)
 {
   Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) { return std::log(v); });
+  std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) {
+    if (Rcpp::NumericVector::is_na(v) || v <= 0.0) return NA_REAL;
+    return std::log(v);
+  });
   return res;
 }
 
@@ -327,4 +330,13 @@ bool any_na(const Timeseries& x)
 void assert_no_na(const Timeseries& x)
 {
   if (any_na(x)) Rcpp::stop("x mustn't contain NA.");
+}
+
+
+// [[Rcpp::export("tf_assert_is_sorted")]]
+void assert_sorted(const std::vector<RDate>& x)
+{
+  if (!std::is_sorted(x.cbegin(), x.cend())) Rcpp::stop(
+    "x must be a sorted date vector."
+  );
 }

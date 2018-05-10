@@ -5,13 +5,6 @@
 #include <map>
 #include "GCAMCTF_types.h"
 
-enum class Quote_tag {
-  prev_close, open, high, low, close, vwap, volume, amount,
-  bmk_open, bmk_close
-};
-
-using Quote_elem = std::map<Quote_tag, Timeseries>;
-
 void assert_same_size(const Timeseries& x, const Timeseries& y);
 void assert_valid(const Rcpp::newDateVector from_to);
 bool any_na(const Timeseries& x);
@@ -52,20 +45,21 @@ inline Timeseries col(const Rcpp::DataFrame tbl, const std::string field)
 }
 
 
-inline std::vector<Date> col_date(const Rcpp::DataFrame tbl, const std::string field)
+inline std::vector<RDate> col_date(const Rcpp::DataFrame tbl, const std::string field)
 {
   Rcpp::newDateVector res = tbl[field];
-  return Rcpp::as<std::vector<Date>>(res);
+  return Rcpp::as<std::vector<RDate>>(res);
 }
 
+void assert_sorted(const std::vector<RDate>& x);
 
 class Quotes
 {
 public:
   Quotes() = default;
   explicit Quotes(const Rcpp::DataFrame tbl)
-    : td_index_ { col_date(tbl, "DATE") },
-      prev_close_ { col(tbl, "PREV_CLOSE") },
+    : dates_ { col_date(tbl, "DATE") },
+      pclose_ { col(tbl, "PCLOSE") },
       open_ { col(tbl, "OPEN") },
       high_ { col(tbl, "HIGH") },
       low_ { col(tbl, "LOW") },
@@ -74,52 +68,104 @@ public:
       volume_ { col(tbl, "VOLUME") },
       amount_ { col(tbl, "AMOUNT") },
       bmk_close_ { col(tbl, "BMK_CLOSE") },
-      bmk_open_ { col(tbl, "BMK_OPEN") } { }
+      bmk_open_ { col(tbl, "BMK_OPEN") }
+  { assert_sorted(dates_); }
 
-  void set(const Date today) noexcept {  today_ = today; }
-  double prev_close(const int delay = 0) const noexcept { return get_(prev_close_, delay); }
-  double open(const int delay = 0) const noexcept { return get_(open_, delay); }
-  double high(const int delay = 0) const noexcept { return get_(high_, delay); }
-  double low(const int delay = 0) const noexcept { return get_(low_, delay); }
-  double close(const int delay = 0) const noexcept { return get_(close_, delay); }
-  double volume(const int delay = 0) const noexcept { return get_(volume_, delay); }
-  double amount(const int delay = 0) const noexcept { return get_(amount_, delay); }
-  double bmk_close(const int delay = 0) const noexcept { return get_(bmk_close_, delay); }
-  double bmk_open(const int delay = 0) const noexcept { return get_(bmk_open_, delay); }
-  double hd() const noexcept { return high() - high(1); }
-  double ld() const noexcept { return low(1) - low(); }
+  // it's mainly for tests
+  RDate today() {
+    if (today_index_ < 0) Rcpp::stop("negative today_index_ %d.", today_index_);
+    return dates_[today_index_];
+  }
 
-  double tr(const int delay = 0) const noexcept
+  void set(const RDate today) noexcept {
+    auto iter = std::lower_bound(dates_.cbegin(), dates_.cend(), today);
+    if (iter == dates_.cend() || *iter > today) {
+      today_index_ = -1;
+    } else {
+      today_index_ = std::distance(dates_.cbegin(), iter);
+    }
+  }
+
+  double pclose(const int delay = 0) const { return get_(pclose_, delay); }
+  double open(const int delay = 0) const { return get_(open_, delay); }
+  double high(const int delay = 0) const { return get_(high_, delay); }
+  double low(const int delay = 0) const { return get_(low_, delay); }
+  double close(const int delay = 0) const { return get_(close_, delay); }
+  double vwap(const int delay = 0) const { return get_(vwap_, delay); }
+  double volume(const int delay = 0) const { return get_(volume_, delay); }
+  double amount(const int delay = 0) const { return get_(amount_, delay); }
+  double bmk_close(const int delay = 0) const { return get_(bmk_close_, delay); }
+  double bmk_open(const int delay = 0) const { return get_(bmk_open_, delay); }
+
+  Timeseries ts_pclose(const int n, const int delay = 0) const {
+    return ts_get_(pclose_, n, delay);
+  }
+  Timeseries ts_open(const int n, const int delay = 0) const {
+    return ts_get_(open_, n, delay);
+  }
+  Timeseries ts_high(const int n, const int delay = 0) const {
+    return ts_get_(high_, n, delay);
+  }
+  Timeseries ts_low(const int n, const int delay = 0) const {
+    return ts_get_(low_, n, delay);
+  }
+  Timeseries ts_close(const int n, const int delay = 0) const {
+    return ts_get_(close_, n, delay);
+  }
+  Timeseries ts_vwap(const int n, const int delay = 0) const {
+    return ts_get_(vwap_, n, delay);
+  }
+  Timeseries ts_volume(const int n, const int delay = 0) const {
+    return ts_get_(volume_, n, delay);
+  }
+  Timeseries ts_amount(const int n, const int delay = 0) const {
+    return ts_get_(amount_, n, delay);
+  }
+  Timeseries ts_bmk_close(const int n, const int delay = 0) const {
+    return ts_get_(bmk_close_, n, delay);
+  }
+  Timeseries ts_bmk_open(const int n, const int delay = 0) const {
+    return ts_get_(bmk_open_, n, delay);
+  }
+
+  double hd() const { return high() - high(1); }
+  double ld() const { return low(1) - low(); }
+
+  double tr(const int delay = 0) const
   {
+    if (!in_bound_(1)) return NA_REAL;
     return std::max(
       std::max(high() - low(), std::abs(high() - close(1))),
       std::abs(low() - close(1))
     );
   }
 
-  double dtm() const noexcept
+  double dtm() const
   {
+    if (!in_bound_(1)) return NA_REAL;
     return open() <= open(1) ? 0.0 : std::max(high() - open(), open() - open(1));
   }
 
-  double dbm() const noexcept
+  double dbm() const
   {
+    if (!in_bound_(1)) return NA_REAL;
     return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
   }
 
-  std::vector<Date> dates(const Rcpp::newDateVector from_to) const
+  std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
   {
     assert_valid(from_to);
-    auto begin = std::lower_bound(td_index_.cbegin(), td_index_.cend(), from_to[0]);
-    auto end = std::lower_bound(td_index_.cbegin(), td_index_.cend(), from_to[1]);
-    std::vector<Date> res;
+    auto begin = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[0]));
+    auto end = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[1]));
+    if (end != dates_.cend() && *end == int(from_to[1])) ++end;
+    std::vector<RDate> res;
     std::copy(begin, end, std::back_inserter(res));
     return res;
   }
 
 private:
-  std::vector<Date> td_index_;
-  Timeseries prev_close_;
+  std::vector<RDate> dates_;
+  Timeseries pclose_;
   Timeseries open_;
   Timeseries high_;
   Timeseries low_;
@@ -129,113 +175,44 @@ private:
   Timeseries amount_;
   Timeseries bmk_close_;
   Timeseries bmk_open_;
-  Date today_ {0};
-  double get_(const Timeseries& ts, const int delay = 0) const noexcept
-  {
-    if (!valid_(delay)) return NA_REAL;
-    return ts[today_ - delay];
+  int today_index_ {0};
+  int delayed_index_(const int delay) const {
+    assert_valid_(delay);
+    return today_index_ - delay;
   }
-  bool valid_(const int delay) const noexcept { return today_ - delay >= 0; }
+  double get_(const Timeseries& ts, const int delay) const
+  {
+    if (!in_bound_(delay)) return NA_REAL;
+    return ts[delayed_index_(delay)];
+  }
+  Timeseries ts_get_(const Timeseries& ts, const int n, const int delay) const
+  {
+    int begin = delayed_index_(delay + n - 1);
+    int end = delayed_index_(delay);
+    Timeseries res;
+    // how many NA: end < 0 => n; 0 <= end <= n - 1 => n - 1 - end; end >= n => 0;
+    std::fill_n(
+      std::back_inserter(res),
+      n - 1 - std::min(std::max(end, -1), n - 1),
+      NA_REAL
+    );
+    if (end >= 0) {
+      auto iter_b = ts.cbegin() + std::max(0, begin);
+      auto iter_e = ts.cbegin() + std::max(0, end) + 1;
+      std::copy(iter_b, iter_e, std::back_inserter(res));
+    }
+    return res;
+  }
+  bool in_bound_(const int delay) const {
+    assert_valid_(delay);
+    return delayed_index_(delay) >= 0;
+  }
+  void assert_valid_(const int delay) const {
+    if (delay < 0) Rcpp::stop(
+        "delay must be a non-negative integer instead of %d.", delay
+    );
+  }
 };
-
-
-inline Timeseries close(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.close(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries open(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.open(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries high(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.high(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries low(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.low(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries prev_close(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.prev_close(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries volume(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.volume(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries amount(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.amount(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries bmk_close(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.bmk_close(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries bmk_open(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.bmk_open(i + delay));
-  }
-  return res;
-}
 
 
 inline Timeseries operator+(const Timeseries& x, const Timeseries& y)
