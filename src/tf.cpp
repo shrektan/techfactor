@@ -95,8 +95,10 @@ std::map<std::string, std::function<
 };
 
 
-std::map<std::string, std::function<
-  Rcpp::DataFrame(Quotes& quotes, const Rcpp::newDateVector from_to)>> tf_fast_funs = {
+std::map<
+  std::string,
+  std::function<Rcpp::DataFrame(Quotes& quotes, const Rcpp::newDateVector from_to)>
+> tf_fast_funs = {
 
 };
 
@@ -106,7 +108,7 @@ std::map<std::string, std::function<
 SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
 {
   Quotes* ptr = new Quotes {raw};
-  return  Rcpp::XPtr<Quotes>(ptr, true);
+  return Rcpp::XPtr<Quotes>(ptr, true);
 }
 
 
