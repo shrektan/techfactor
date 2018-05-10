@@ -115,6 +115,7 @@ public:
     assert_valid(from_to);
     auto begin = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[0]));
     auto end = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[1]));
+    if (end != dates_.cend() && *end == int(from_to[1])) ++end;
     std::vector<RDate> res;
     std::copy(begin, end, std::back_inserter(res));
     return res;
