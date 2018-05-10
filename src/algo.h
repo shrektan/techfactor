@@ -14,7 +14,7 @@ using Quote_elem = std::map<Quote_tag, Timeseries>;
 
 void assert_same_size(const Timeseries& x, const Timeseries& y);
 void assert_valid(const Rcpp::newDateVector from_to);
-void assert_no_na(const Timeseries& x);
+void assert_no_na(const Timeseries& x, const bool must_check = false);
 
 Timeseries delta(const Timeseries& x);
 double corr(const Timeseries& x, const Timeseries& y);

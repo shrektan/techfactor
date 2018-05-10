@@ -6,6 +6,17 @@
 
 using namespace Rcpp;
 
+// check_no_na
+bool check_no_na(const bool flag);
+RcppExport SEXP _GCAMCTF_check_no_na(SEXP flagSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const bool >::type flag(flagSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_no_na(flag));
+    return rcpp_result_gen;
+END_RCPP
+}
 // delta
 Timeseries delta(const Timeseries& x);
 RcppExport SEXP _GCAMCTF_delta(SEXP xSEXP) {
@@ -308,6 +319,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// assert_no_na
+void assert_no_na(const Timeseries& x, const bool must_check);
+RcppExport SEXP _GCAMCTF_assert_no_na(SEXP xSEXP, SEXP must_checkSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const bool >::type must_check(must_checkSEXP);
+    assert_no_na(x, must_check);
+    return R_NilValue;
+END_RCPP
+}
 // tf_quotes_ptr
 SEXP tf_quotes_ptr(Rcpp::DataFrame raw);
 RcppExport SEXP _GCAMCTF_tf_quotes_ptr(SEXP rawSEXP) {
@@ -334,6 +356,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_GCAMCTF_check_no_na", (DL_FUNC) &_GCAMCTF_check_no_na, 1},
     {"_GCAMCTF_delta", (DL_FUNC) &_GCAMCTF_delta, 1},
     {"_GCAMCTF_rank", (DL_FUNC) &_GCAMCTF_rank, 1},
     {"_GCAMCTF_sum", (DL_FUNC) &_GCAMCTF_sum, 1},
@@ -361,6 +384,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_lowday", (DL_FUNC) &_GCAMCTF_lowday, 1},
     {"_GCAMCTF_assert_valid", (DL_FUNC) &_GCAMCTF_assert_valid, 1},
     {"_GCAMCTF_assert_same_size", (DL_FUNC) &_GCAMCTF_assert_same_size, 2},
+    {"_GCAMCTF_assert_no_na", (DL_FUNC) &_GCAMCTF_assert_no_na, 2},
     {"_GCAMCTF_tf_quotes_ptr", (DL_FUNC) &_GCAMCTF_tf_quotes_ptr, 1},
     {"_GCAMCTF_tf_run_cpp", (DL_FUNC) &_GCAMCTF_tf_run_cpp, 3},
     {NULL, NULL, 0}
