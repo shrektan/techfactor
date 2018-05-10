@@ -3,15 +3,13 @@
 
 #include <Rcpp.h>
 #include <map>
+#include "GCAMCTF_types.h"
 
 enum class Quote_tag {
   prev_close, open, high, low, close, vwap, volume, amount,
   bmk_open, bmk_close
 };
 
-using Code = int;
-using Date = int;
-using Timeseries = std::vector<double>;
 using Quote_elem = std::map<Quote_tag, Timeseries>;
 
 void assert_same_size(const Timeseries& x, const Timeseries& y);
@@ -104,6 +102,16 @@ public:
   double dbm() const
   {
     return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
+  }
+
+  std::vector<Date> dates(const Rcpp::newDateVector from_to) const
+  {
+    assert_valid(from_to);
+    auto begin = std::lower_bound(td_index_.cbegin(), td_index_.cend(), from_to[0]);
+    auto end = std::lower_bound(td_index_.cbegin(), td_index_.cend(), from_to[1]);
+    std::vector<Date> res;
+    std::copy(begin, end, std::back_inserter(res));
+    return res;
   }
 
 private:

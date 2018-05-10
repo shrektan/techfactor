@@ -7,5 +7,5 @@ NULL
 #' @importFrom magrittr %>%
 
 
-#' @export
+#' @export %>%
 `%>%`

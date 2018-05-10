@@ -16,16 +16,14 @@
 #include "algo.h"
 
 
-auto alpha1 = [](const Quotes& quotes, const Date today) -> double {
-  quotes.set(today);
+auto alpha1 = [](const Quotes& quotes) -> double {
   const auto rk_delta_log_vol = rank(delta(log(close(quotes, 7))));
   const auto rk_close_open = rank((close(quotes, 6) - open(quotes, 6)) / open(quotes, 6));
   return corr(rk_delta_log_vol, rk_close_open) * -1;
 };
 
 
-auto alpha3 = [](const Quotes& quotes, const Date today) -> double {
-  quotes.set(today);
+auto alpha3 = [](const Quotes& quotes) -> double {
   const auto sum_close_8 = sum(close(quotes, 8));
   const auto std_close_8 = stdev(close(quotes, 8));
   const auto sum_close_2 = sum(close(quotes, 2));
@@ -45,16 +43,15 @@ auto alpha3 = [](const Quotes& quotes, const Date today) -> double {
 };
 
 
-auto alpha5 = [](const Quotes& quotes, const Date today) -> double {
+auto alpha5 = [](const Quotes& quotes) -> double {
   Timeseries ts;
   for (int i {2}; i >= 0; --i)
   {
     Timeseries rk_vol_5, rk_high_5;
     for (int k {5}; k >= 0; --k)
     {
-      quotes.set(today - i - k);
-      rk_vol_5.push_back(tsrank(volume(quotes, 5)));
-      rk_high_5.push_back(tsrank(high(quotes, 5)));
+      rk_vol_5.push_back(tsrank(volume(quotes, 5, i + k)));
+      rk_high_5.push_back(tsrank(high(quotes, 5, i + k)));
     }
     ts.push_back(corr(rk_vol_5, rk_high_5));
   }
@@ -62,25 +59,22 @@ auto alpha5 = [](const Quotes& quotes, const Date today) -> double {
 };
 
 
-auto alpha14 = [](const Quotes& quotes, const Date today) -> double {
-  quotes.set(today);
+auto alpha14 = [](const Quotes& quotes) -> double {
   return quotes.close() - quotes.close(5);
 };
 
 
-auto alpha53 = [](const Quotes& quotes, const Date today) -> double {
+auto alpha53 = [](const Quotes& quotes) -> double {
   std::vector<bool> cond;
   for (int i {11}; i >= 0; --i)
   {
-    quotes.set(today - i);
     cond.push_back(quotes.close() > quotes.close(1));
   }
   return count(cond);
 };
 
 
-auto alpha149 = [](const Quotes& quotes, const Date today) -> double {
-  quotes.set(today);
+auto alpha149 = [](const Quotes& quotes) -> double {
   const auto dr = close(quotes, 252) / close(quotes, 252, 1) - 1.0;
   const auto bmk_dr = bmk_close(quotes, 252) / bmk_close(quotes, 252, 1) - 1.0;
   const auto x = filter(dr, bmk_dr < 0.0);
@@ -91,7 +85,7 @@ auto alpha149 = [](const Quotes& quotes, const Date today) -> double {
 
 
 std::map<std::string, std::function<
-  double(const Quotes& quotes, const Date today)>> tf_funs = {
+  double(const Quotes& quotes)>> tf_funs = {
   {"alpha1", alpha1},
   {"alpha3", alpha3},
   {"alpha5", alpha5},
@@ -102,9 +96,10 @@ std::map<std::string, std::function<
 
 
 std::map<std::string, std::function<
-  Rcpp::DataFrame(const Quotes& quotes, const Rcpp::newDateVector from_to)>> tf_fast_funs = {
+  Rcpp::DataFrame(Quotes& quotes, const Rcpp::newDateVector from_to)>> tf_fast_funs = {
 
 };
+
 
 // [[Rcpp::export]]
 SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
@@ -112,8 +107,6 @@ SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
   Quotes* ptr = new Quotes {raw};
   return  Rcpp::XPtr<Quotes>(ptr, true);
 }
-
-
 
 
 // [[Rcpp::export]]
@@ -124,10 +117,10 @@ Rcpp::List tf_run_cpp(SEXP quotes_ptr,
   using namespace Rcpp;
   assert_valid(from_to);
   Rcpp::XPtr<Quotes> xptr {quotes_ptr};
-  const auto& quotes = *xptr;
+  auto& quotes = *xptr;
   const int n_factor = factors.length();
   Rcpp::List res(n_factor);
-  const auto dates = td_seq(from_to);
+  const auto dates = quotes.dates(from_to);
   const int n_dates = dates.size();
   for (int i {0}; i < n_factor; ++i)
   {
@@ -138,9 +131,12 @@ Rcpp::List tf_run_cpp(SEXP quotes_ptr,
     }
     else if (tf_funs.count(factor))
     {
-      const auto fun = tf_funs.at(factor);
+      const auto cal = tf_funs.at(factor);
       NumericVector res_i(n_dates);
-      for (int j {0}; i < n_dates; ++j) res_i[j] = fun(quotes, dates[j]);
+      for (int j {0}; i < n_dates; ++j) {
+        quotes.set(dates[j]);
+        res_i[j] = cal(quotes);
+      }
       res[i] = DataFrame::create(
         _["DATE"] = wrap(dates),
         _["VALUE"] = res_i

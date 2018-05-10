@@ -50,9 +50,10 @@ double stdev(const Timeseries& x)
 {
   if (x.size() <= 1) return NA_REAL;
   const double avg = mean(x);
-  return std::accumulate(x.cbegin(), x.cend(), 0.0, [avg](const double v) {
-    return std::pow(v - avg, 2.0);
-  }) / (x.size() - 1.0);
+  return std::accumulate(
+    x.cbegin(), x.cend(), 0.0, [avg](const double last, const double v) {
+      return last + std::pow(v - avg, 2.0);
+    }) / (x.size() - 1.0);
 }
 
 
@@ -73,9 +74,9 @@ double tsmax(const Timeseries& x)
 // [[Rcpp::export("tf_tsrank")]]
 int tsrank(const Timeseries& x)
 {
+  if (x.size() == 0) Rcpp::stop("x must contain elements.");
   Timeseries sorted = x;
   std::sort(sorted.begin(), sorted.end());
-  const int n_x = x.size();
   auto iter = std::lower_bound(sorted.cbegin(), sorted.cend(), x[x.size() - 1]);
   return std::distance(x.cbegin(), iter);
 }
@@ -137,7 +138,10 @@ double wma(const Timeseries& x)
   if (n == 0) Rcpp::stop("x must contain elements.");
   Timeseries weights(n);
   int i {0};
-  std::generate(weights.end(), weights.begin(), [&i]() mutable { std::pow(0.9, ++i); });
+  std::generate(
+    weights.end(), weights.begin(),
+    [&i]() mutable { return std::pow(0.9, ++i); }
+  );
   return std::inner_product(x.cbegin(), x.cend(), weights.cbegin(), 0.0);
 }
 
