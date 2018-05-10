@@ -125,13 +125,17 @@ tf_assert_is_sorted <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_sorted`, x))
 }
 
+test_qt_tdates <- function(quotes_ptr, from_to) {
+    .Call(`_GCAMCTF_test_qt_tdates`, quotes_ptr, from_to)
+}
+
+test_qt_today <- function(quotes_ptr, today) {
+    .Call(`_GCAMCTF_test_qt_today`, quotes_ptr, today)
+}
+
 #' @export
 tf_quotes_ptr <- function(raw) {
     .Call(`_GCAMCTF_tf_quotes_ptr`, raw)
-}
-
-tf_tdates <- function(quotes_ptr, from_to) {
-    .Call(`_GCAMCTF_tf_tdates`, quotes_ptr, from_to)
 }
 
 #' @export

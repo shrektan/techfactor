@@ -71,6 +71,12 @@ public:
       bmk_open_ { col(tbl, "BMK_OPEN") }
   { assert_sorted(dates_); }
 
+  // it's mainly for tests
+  RDate today() {
+    if (today_index_ < 0) Rcpp::stop("negative today_index_ %d.", today_index_);
+    return dates_[today_index_];
+  }
+
   void set(const RDate today) noexcept {
     auto iter = std::lower_bound(dates_.cbegin(), dates_.cend(), today);
     if (iter == dates_.cend() || *iter > today) {

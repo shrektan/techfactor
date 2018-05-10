@@ -110,16 +110,6 @@ SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
 }
 
 
-// [[Rcpp::export]]
-Rcpp::newDateVector tf_tdates(SEXP quotes_ptr, const Rcpp::newDateVector from_to)
-{
-  Rcpp::XPtr<Quotes> xptr {quotes_ptr};
-  const auto dates = xptr->tdates(from_to);
-  return Rcpp::wrap(dates);
-}
-
-
-
 //' @export
 // [[Rcpp::export]]
 Rcpp::List tf_run_cpp(SEXP quotes_ptr,
