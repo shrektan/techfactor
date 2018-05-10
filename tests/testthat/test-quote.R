@@ -48,3 +48,37 @@ test_that("quotes.tdates()", {
     anydate(double())
   )
 })
+
+
+test_that("quotes.set()", {
+  # too small
+  expect_error(
+    test_qt_today(qt, anydate(20180101)),
+    "negative today_index_ -1"
+  )
+  # too large
+  expect_error(
+    test_qt_today(qt, anydate(20180801)),
+    "negative today_index_ -1"
+  )
+  # holiday
+  expect_error(
+    test_qt_today(qt, anydate(20180501)),
+    "negative today_index_ -1"
+  )
+  # first
+  expect_equivalent(
+    test_qt_today(qt, anydate(20180102)),
+    anydate(20180102)
+  )
+  # last
+  expect_equivalent(
+    test_qt_today(qt, anydate(20180507)),
+    anydate(20180507)
+  )
+  # middle
+  expect_equivalent(
+    test_qt_today(qt, anydate(20180502)),
+    anydate(20180502)
+  )
+})
