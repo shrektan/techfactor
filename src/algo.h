@@ -187,10 +187,15 @@ private:
   }
   Timeseries ts_get_(const Timeseries& ts, const int n, const int delay) const
   {
-    int begin = delayed_index_(delay + n);
+    int begin = delayed_index_(delay + n - 1);
     int end = delayed_index_(delay);
     Timeseries res;
-    if (n - 1 > end) std::fill_n(std::back_inserter(res), n - 1 - end, NA_REAL);
+    // how many NA: end < 0 => n; 0 <= end <= n - 1 => n - 1 - end; end >= n => 0;
+    std::fill_n(
+      std::back_inserter(res),
+      n - 1 - std::min(std::max(end, -1), n - 1),
+      NA_REAL
+    );
     if (end >= 0) {
       auto iter_b = ts.cbegin() + std::max(0, begin);
       auto iter_e = ts.cbegin() + std::max(0, end) + 1;

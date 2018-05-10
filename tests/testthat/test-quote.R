@@ -1,5 +1,7 @@
 context("test-quote.R")
 
+tags <- c("pclose", "open", "high", "low", "close", "vwap",
+          "volume", "amount", "bmk_close", "bmk_open")
 dt <- data.table::fread(
   "quote-sample.csv",
   colClasses = c("character", rep("double", 10))
@@ -75,5 +77,79 @@ test_that("quotes.set()", {
   expect_equivalent(
     test_qt_today(qt, anydate(20180502)),
     anydate(20180502)
+  )
+})
+
+test_that("qt.get()", {
+  date <- anydate(20180504)
+  expect_equal(
+    purrr::map_dbl(tags, ~test_qt_get(qt, date, ., 0)),
+    as.double(dt[DATE == date, seq_len(ncol(dt))[-1], with = FALSE])
+  )
+  date <- anydate(20180501)
+  expect_equal(
+    purrr::map_dbl(tags, ~test_qt_get(qt, date, ., 0)),
+    as.double(dt[DATE == date, seq_len(ncol(dt))[-1], with = FALSE])
+  )
+  expect_equal(
+    purrr::map_dbl(tags, ~test_qt_get(qt, anydate(20180507), ., 5)),
+    as.double(dt[DATE == anydate(20180426), seq_len(ncol(dt))[-1], with = FALSE])
+  )
+  expect_error(
+    test_qt_get(qt, anydate(20180503), "amount", -1),
+    "delay must be a non-negative integer"
+  )
+  expect_equal(
+    test_qt_get(qt, anydate(20180803), "volume", 5),
+    NA_real_
+  )
+  expect_equal(
+    test_qt_get(qt, anydate(20171231), "close", 0),
+    NA_real_
+  )
+})
+
+test_that("qt.ts_get()", {
+  expect_equal(
+    purrr::map(tags, ~test_qt_ts_get(qt, anydate(20180503), ., 3, 0)),
+    purrr::map(tags, ~as.double(
+      dt[DATE %in% anydate(c(20180427, 20180502, 20180503)),
+         toupper(.), with = FALSE][[1L]]
+    ))
+  )
+  expect_equal(
+    purrr::map(tags, ~test_qt_ts_get(qt, anydate(20180503), ., 3, 5)),
+    purrr::map(tags, ~as.double(
+      dt[DATE %in% anydate(c(20180420, 20180423, 20180424)),
+         toupper(.), with = FALSE][[1L]]
+    ))
+  )
+  expect_equal(
+    purrr::map(tags, ~test_qt_ts_get(qt, anydate(20180104), ., 5, 0)),
+    purrr::map(tags, ~{
+      res <- dt[DATE %in% anydate(c(20180102, 20180103, 20180104)),
+                toupper(.), with = FALSE][[1L]]
+      c(NA, NA, res)
+    })
+  )
+  expect_equal(
+    purrr::map(tags, ~test_qt_ts_get(qt, anydate(20180104), ., 5, 10)),
+    purrr::map(tags, ~rep(NA_real_, 5))
+  )
+  expect_equal(
+    test_qt_ts_get(qt, anydate(20180104), "close", 3, 3),
+    rep(NA_real_, 3)
+  )
+  expect_equal(
+    test_qt_ts_get(qt, anydate(20180104), "close", 3, 4),
+    rep(NA_real_, 3)
+  )
+  expect_equal(
+    test_qt_ts_get(qt, anydate(20180104), "close", 3, 2),
+    c(NA, NA, 32.56)
+  )
+  expect_equal(
+    test_qt_ts_get(qt, anydate(20180104), "close", 3, 1),
+    c(NA, 32.56, 32.33)
   )
 })
