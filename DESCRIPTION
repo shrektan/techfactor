@@ -23,7 +23,8 @@ Imports:
     progress,
     magrittr,
     yaml (>= 2.1.18),
-    purrr
+    purrr,
+    anytime
 Suggests: 
     testthat,
     covr
