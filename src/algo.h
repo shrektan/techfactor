@@ -72,8 +72,14 @@ public:
   { assert_sorted(dates_); }
 
   void set(const RDate today) noexcept {
-
+    auto iter = std::lower_bound(dates_.cbegin(), dates_.cend(), today);
+    if (iter == dates_.cend() || *iter > today) {
+      today_index_ = -1;
+    } else {
+      today_index_ = std::distance(dates_.cbegin(), iter);
+    }
   }
+
   double prev_close(const int delay = 0) const noexcept { return get_(prev_close_, delay); }
   double open(const int delay = 0) const noexcept { return get_(open_, delay); }
   double high(const int delay = 0) const noexcept { return get_(high_, delay); }
