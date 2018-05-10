@@ -139,6 +139,7 @@ double sign(const double x)
 double sma(const Timeseries& x, const int m)
 {
   assert_length(x, 1); assert_length(x, m);
+  if (m <= 0) Rcpp::stop("m must be positive.");
   if (any_na(x)) return NA_REAL;
   const int n = x.size();
   if (n == 1) return x[0];
@@ -158,10 +159,10 @@ double wma(const Timeseries& x)
   if (any_na(x)) return NA_REAL;
   const int n = x.size();
   Timeseries weights(n);
-  int i {0};
+  int i {n};
   std::generate(
-    weights.end(), weights.begin(),
-    [&i]() mutable { return std::pow(0.9, ++i); }
+    weights.begin(), weights.end(),
+    [&i]() mutable { return std::pow(0.9, --i); }
   );
   return std::inner_product(x.cbegin(), x.cend(), weights.cbegin(), 0.0);
 }
@@ -184,7 +185,7 @@ Timeseries sequence(const int n)
 {
   if (n <= 0) Rcpp::stop("n must be a positive integer but now is %d.", n);
   Timeseries res(n);
-  std::iota(res.begin(), res.end(), 0);
+  std::iota(res.begin(), res.end(), 1);
   return res;
 }
 
@@ -192,7 +193,6 @@ Timeseries sequence(const int n)
 // [[Rcpp::export("tf_sumac")]]
 Timeseries sumac(const Timeseries& x)
 {
-  if (any_na(x)) return na_vector(x.size());
   Timeseries res(x.size());
   std::partial_sum(x.cbegin(), x.cend(), res.begin());
   return res;
@@ -202,7 +202,6 @@ Timeseries sumac(const Timeseries& x)
 // [[Rcpp::export("tf_log")]]
 Timeseries log(const Timeseries& x)
 {
-  if (any_na(x)) return na_vector(x.size());
   Timeseries res(x.size());
   std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) { return std::log(v); });
   return res;
@@ -212,7 +211,6 @@ Timeseries log(const Timeseries& x)
 // [[Rcpp::export("tf_abs")]]
 Timeseries abs(const Timeseries& x)
 {
-  if (any_na(x)) return na_vector(x.size());
   Timeseries res(x.size());
   std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) { return std::abs(v); });
   return res;
@@ -222,7 +220,7 @@ Timeseries abs(const Timeseries& x)
 // [[Rcpp::export("tf_prod")]]
 double prod(const Timeseries& x)
 {
-  if (any_na(x)) return NA_REAL;
+  assert_length(x, 1);
   return std::accumulate(x.cbegin(), x.cend(), 1.0, std::multiplies<double>());
 }
 

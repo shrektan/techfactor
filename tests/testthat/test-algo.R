@@ -111,3 +111,81 @@ test_that("sign", {
   expect_equal(tf_sign(1.3), 1)
   expect_equal(tf_sign(-3.1), -1)
 })
+
+test_that("sma", {
+  x <- rnorm(10)
+  expect_error(tf_sma(x, 0), "m must be positive")
+  expect_error(tf_sma(x, 11), "x must have 11 elements")
+  expect_equal(tf_sma(x, 5), {
+    res <- 0
+    for (i in seq_along(x)) {
+      if (i == 1) res <- x[i]
+      res <- (res * (length(x) - 5) + x[i] * 5) / length(x)
+    }
+    res
+  })
+  expect_silent(tf_sma(x, 10))
+  expect_equal(tf_sma(c(x, NA), 3), NA_real_)
+})
+
+test_that("wma", {
+  x <- rnorm(10)
+  expect_equal(tf_wma(x), {
+    wts <- 0.9 ^ (length(x) - seq_along(x))
+    sum(x * wts)
+  })
+  expect_equal(tf_wma(c(x, NA)), NA_real_)
+  expect_equal(tf_wma(1.2), 1.2)
+  expect_error(tf_wma(double()), "x must have at least 1 elements")
+})
+
+test_that("decaylinear", {
+  expect_error(tf_decaylinear(double()), "x must have at least 1 elements")
+  expect_equal(tf_decaylinear(1.2), 1.2)
+  x <- rnorm(10)
+  expect_equal(tf_decaylinear(x), {
+    wts <- seq_along(x)
+    x * wts / sum(wts)
+  })
+})
+
+test_that("sequence", {
+  expect_error(tf_sequence(0), "n must be a positive integer")
+  expect_equal(tf_sequence(1), 1)
+  expect_equal(tf_sequence(20), 1:20)
+})
+
+test_that("sumac", {
+  expect_equal(tf_sumac(double()), double())
+  expect_equal(tf_sumac(1.3), 1.3)
+  x <- rnorm(10)
+  expect_equal(tf_sumac(x), cumsum(x))
+  expect_equal(tf_sumac(c(x, NA)), cumsum(c(x, NA)))
+  expect_equal(tf_sumac(c(NA, x)), cumsum(c(NA, x)))
+})
+
+test_that("abs", {
+  expect_equal(tf_abs(double()), double())
+  expect_equal(tf_abs(-1.3), 1.3)
+  x <- rnorm(10)
+  expect_equal(tf_abs(x), abs(x))
+  expect_equal(tf_abs(c(x, NA)), tf_abs(c(x, NA)))
+  expect_equal(tf_abs(c(NA, x)), tf_abs(c(NA, x)))
+})
+
+test_that("prod", {
+  expect_error(tf_prod(double()), "x must have at least 1 elements.")
+  expect_equal(tf_prod(-1.3), -1.3)
+  x <- rnorm(10)
+  expect_equal(tf_prod(x), prod(x))
+  expect_equal(tf_prod(c(x, NA)), tf_prod(c(x, NA)))
+  expect_equal(tf_prod(c(NA, x)), tf_prod(c(NA, x)))
+})
+
+test_that("count", {
+  expect_equal(tf_count(logical()), 0.0)
+  expect_equal(tf_count(TRUE), 1.0)
+  expect_equal(tf_count(FALSE), 0.0)
+  x <- rnorm(10) > 0
+  expect_equal(tf_count(x), sum(x))
+})
