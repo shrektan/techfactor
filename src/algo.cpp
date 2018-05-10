@@ -6,7 +6,7 @@
 Timeseries delta(const Timeseries& x)
 {
   const int n_x = x.size();
-  if (n_x == 2) Rcpp::stop("x must have at least two elements.");
+  if (n_x < 2) Rcpp::stop("x must have at least two elements.");
   Timeseries res(n_x - 1);
   for (int i {1}; i < n_x; ++i) {
     res[i - 1] = x[i] - x[i - 1];
@@ -18,14 +18,21 @@ Timeseries delta(const Timeseries& x)
 // [[Rcpp::export("tf_rank")]]
 Timeseries rank(const Timeseries& x)
 {
-  Timeseries sorted = x;
+  Timeseries sorted;
+  std::copy_if(
+    x.cbegin(), x.cend(), std::back_inserter(sorted),
+    [](const double v) { return !Rcpp::NumericVector::is_na(v); }
+  );
   std::sort(sorted.begin(), sorted.end());
-  const int n_x = x.size();
-  Timeseries res(n_x);
-  for (int i {0}; i < n_x; ++i) {
-    auto iter = std::lower_bound(sorted.cbegin(), sorted.cend(), x[i]);
-    res[i] = std::distance(x.cbegin(), iter);
-  }
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), std::back_inserter(res),
+    [&sorted](const double v) {
+      if (Rcpp::NumericVector::is_na(v)) return NA_REAL;
+      auto iter = std::lower_bound(sorted.cbegin(), sorted.cend(), v);
+      return std::distance(sorted.cbegin(), iter) + 1.0;
+    }
+  );
   return res;
 }
 
