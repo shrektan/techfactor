@@ -121,6 +121,10 @@ tf_assert_no_na <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_no_na`, x))
 }
 
+tf_assert_is_sorted <- function(x) {
+    invisible(.Call(`_GCAMCTF_assert_sorted`, x))
+}
+
 tf_quotes_ptr <- function(raw) {
     .Call(`_GCAMCTF_tf_quotes_ptr`, raw)
 }

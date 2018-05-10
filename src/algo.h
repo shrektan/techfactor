@@ -45,12 +45,13 @@ inline Timeseries col(const Rcpp::DataFrame tbl, const std::string field)
 }
 
 
-inline std::vector<Date> col_date(const Rcpp::DataFrame tbl, const std::string field)
+inline std::vector<RDate> col_date(const Rcpp::DataFrame tbl, const std::string field)
 {
   Rcpp::newDateVector res = tbl[field];
-  return Rcpp::as<std::vector<Date>>(res);
+  return Rcpp::as<std::vector<RDate>>(res);
 }
 
+void assert_sorted(const std::vector<RDate>& x);
 
 class Quotes
 {
@@ -67,9 +68,10 @@ public:
       volume_ { col(tbl, "VOLUME") },
       amount_ { col(tbl, "AMOUNT") },
       bmk_close_ { col(tbl, "BMK_CLOSE") },
-      bmk_open_ { col(tbl, "BMK_OPEN") } { }
+      bmk_open_ { col(tbl, "BMK_OPEN") }
+  { assert_sorted(td_index_); }
 
-  void set(const Date today) noexcept {  today_ = today; }
+  void set(const RDate today) noexcept {  today_ = today; }
   double prev_close(const int delay = 0) const noexcept { return get_(prev_close_, delay); }
   double open(const int delay = 0) const noexcept { return get_(open_, delay); }
   double high(const int delay = 0) const noexcept { return get_(high_, delay); }
@@ -100,18 +102,18 @@ public:
     return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
   }
 
-  std::vector<Date> dates(const Rcpp::newDateVector from_to) const
+  std::vector<RDate> dates(const Rcpp::newDateVector from_to) const
   {
     assert_valid(from_to);
     auto begin = std::lower_bound(td_index_.cbegin(), td_index_.cend(), from_to[0]);
     auto end = std::lower_bound(td_index_.cbegin(), td_index_.cend(), from_to[1]);
-    std::vector<Date> res;
+    std::vector<RDate> res;
     std::copy(begin, end, std::back_inserter(res));
     return res;
   }
 
 private:
-  std::vector<Date> td_index_;
+  std::vector<RDate> td_index_;
   Timeseries prev_close_;
   Timeseries open_;
   Timeseries high_;
@@ -122,7 +124,7 @@ private:
   Timeseries amount_;
   Timeseries bmk_close_;
   Timeseries bmk_open_;
-  Date today_ {0};
+  RDate today_ {0};
   double get_(const Timeseries& ts, const int delay = 0) const noexcept
   {
     if (!valid_(delay)) return NA_REAL;

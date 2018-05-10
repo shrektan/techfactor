@@ -4,7 +4,7 @@
 #include <vector>
 
 using Code = int;
-using Date = int;
+using RDate = int;
 using Timeseries = std::vector<double>;
 
 #endif // __GCAMCTF_TYPES__

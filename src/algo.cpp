@@ -328,3 +328,12 @@ void assert_no_na(const Timeseries& x)
 {
   if (any_na(x)) Rcpp::stop("x mustn't contain NA.");
 }
+
+
+// [[Rcpp::export("tf_assert_is_sorted")]]
+void assert_sorted(const std::vector<RDate>& x)
+{
+  if (!std::is_sorted(x.cbegin(), x.cend())) Rcpp::stop(
+    "x must be a sorted date vector."
+  );
+}

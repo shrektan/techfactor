@@ -265,3 +265,7 @@ test_that("assert_no_na", {
   expect_silent(tf_assert_no_na(c(1.0)))
   expect_silent(tf_assert_no_na(double()))
 })
+
+test_that("assert_is_sorted", {
+  dates <- anytime::anydate(c(180101, 180102, 180103))
+})

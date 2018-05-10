@@ -340,6 +340,16 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// assert_sorted
+void assert_sorted(const std::vector<RDate>& x);
+RcppExport SEXP _GCAMCTF_assert_sorted(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<RDate>& >::type x(xSEXP);
+    assert_sorted(x);
+    return R_NilValue;
+END_RCPP
+}
 // tf_quotes_ptr
 SEXP tf_quotes_ptr(Rcpp::DataFrame raw);
 RcppExport SEXP _GCAMCTF_tf_quotes_ptr(SEXP rawSEXP) {
@@ -396,6 +406,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_assert_same_size", (DL_FUNC) &_GCAMCTF_assert_same_size, 2},
     {"_GCAMCTF_any_na", (DL_FUNC) &_GCAMCTF_any_na, 1},
     {"_GCAMCTF_assert_no_na", (DL_FUNC) &_GCAMCTF_assert_no_na, 1},
+    {"_GCAMCTF_assert_sorted", (DL_FUNC) &_GCAMCTF_assert_sorted, 1},
     {"_GCAMCTF_tf_quotes_ptr", (DL_FUNC) &_GCAMCTF_tf_quotes_ptr, 1},
     {"_GCAMCTF_tf_run_cpp", (DL_FUNC) &_GCAMCTF_tf_run_cpp, 3},
     {NULL, NULL, 0}
