@@ -68,3 +68,46 @@ test_that("tsmax", {
   expect_error(tf_tsmax(double()), "at least 1 elements")
   expect_equal(tf_tsmax(1.2), 1.2)
 })
+
+test_that("tsrank", {
+  x <- c(5, 3, 2, 4, 8)
+  expect_equal(tf_tsrank(x), 5)
+  expect_equal(tf_tsrank(c(NA, x)), NA_real_)
+  expect_error(tf_tsrank(double()), "at least 1 elements")
+  expect_equal(tf_tsrank(1.2), 1)
+})
+
+test_that("covariance", {
+  expect_error(tf_covariance(double(), double()),
+               "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_covariance(1.2, 1.2),
+               "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_covariance(c(1, 2), c(1, 2, 3)),
+               "The size of x and y must be the same.", fixed = TRUE)
+  x <- rnorm(10)
+  y <- rnorm(10)
+  expect_equal(tf_covariance(x, y), cov(x, y))
+  expect_equal(tf_covariance(c(NA, x), c(1, y)), NA_real_)
+  expect_equal(tf_covariance(c(1, x), c(NA, y)), NA_real_)
+})
+
+test_that("corr", {
+  expect_error(tf_corr(double(), double()),
+               "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_corr(1.2, 1.2),
+               "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_corr(c(1, 2), c(1, 2, 3)),
+               "The size of x and y must be the same.", fixed = TRUE)
+  x <- rnorm(10)
+  y <- rnorm(10)
+  expect_equal(tf_corr(x, y), cor(x, y))
+  expect_equal(tf_corr(c(NA, x), c(1, y)), NA_real_)
+  expect_equal(tf_corr(c(1, x), c(NA, y)), NA_real_)
+})
+
+test_that("sign", {
+  expect_equal(tf_sign(NA_real_), NA_real_)
+  expect_equal(tf_sign(0), 0)
+  expect_equal(tf_sign(1.3), 1)
+  expect_equal(tf_sign(-3.1), -1)
+})
