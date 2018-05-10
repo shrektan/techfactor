@@ -249,7 +249,10 @@ inline Timeseries operator*(const Timeseries& x, const Timeseries& y)
 {
   assert_same_size(x, y);
   Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), y.cbegin(), res.begin(), std::multiplies<double>());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), std::multiplies<double>()
+  );
   return res;
 }
 
@@ -271,7 +274,10 @@ inline Timeseries operator/(const Timeseries& x, const Timeseries& y)
 inline Timeseries operator+(const Timeseries& x, const double y)
 {
   Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), res.begin(), [y](const double v) { return v + y; });
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v + y; }
+  );
   return res;
 }
 
@@ -279,7 +285,10 @@ inline Timeseries operator+(const Timeseries& x, const double y)
 inline Timeseries operator-(const Timeseries& x, const double y)
 {
   Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), res.begin(), [y](const double v) { return v - y; });
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v - y; }
+  );
   return res;
 }
 
@@ -287,7 +296,10 @@ inline Timeseries operator-(const Timeseries& x, const double y)
 inline Timeseries operator*(const Timeseries& x, const double y)
 {
   Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), res.begin(), [y](const double v) { return v * y; });
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v * y; }
+  );
   return res;
 }
 
@@ -295,11 +307,13 @@ inline Timeseries operator*(const Timeseries& x, const double y)
 inline Timeseries operator/(const Timeseries& x, const double y)
 {
   Timeseries res(x.size());
-  if (y == 0.0) {
-    std::transform(x.cbegin(), x.cend(), res.begin(), [](const double v) { return NA_REAL; });
-  } else {
-    std::transform(x.cbegin(), x.cend(), res.begin(), [y](const double v) { return v + y; });
-  }
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) {
+      if (v == 0.0) return NA_REAL;
+      return v / y;
+    }
+  );
   return res;
 }
 
@@ -307,7 +321,10 @@ inline Timeseries operator/(const Timeseries& x, const double y)
 inline std::vector<bool> operator>(const Timeseries& x, const double y)
 {
   std::vector<bool> res(x.size());
-  std::transform(x.cbegin(), x.cend(), res.begin(), [y](const double v) { return v > y; });
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v > y; }
+  );
   return res;
 }
 
@@ -315,7 +332,10 @@ inline std::vector<bool> operator>(const Timeseries& x, const double y)
 inline std::vector<bool> operator<(const Timeseries& x, const double y)
 {
   std::vector<bool> res(x.size());
-  std::transform(x.cbegin(), x.cend(), res.begin(), [y](const double v) { return v < y; });
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v < y; }
+  );
   return res;
 }
 
