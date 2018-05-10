@@ -95,6 +95,35 @@ public:
   double amount(const int delay = 0) const noexcept { return get_(amount_, delay); }
   double bmk_close(const int delay = 0) const noexcept { return get_(bmk_close_, delay); }
   double bmk_open(const int delay = 0) const noexcept { return get_(bmk_open_, delay); }
+
+  Timeseries ts_pclose(const int n, const int delay = 0) const noexcept {
+    return ts_get_(pclose_, n, delay);
+  }
+  Timeseries ts_open(const int n, const int delay = 0) const noexcept {
+    return ts_get_(open_, n, delay);
+  }
+  Timeseries ts_high(const int n, const int delay = 0) const noexcept {
+    return ts_get_(high_, n, delay);
+  }
+  Timeseries ts_low(const int n, const int delay = 0) const noexcept {
+    return ts_get_(low_, n, delay);
+  }
+  Timeseries ts_close(const int n, const int delay = 0) const noexcept {
+    return ts_get_(close_, n, delay);
+  }
+  Timeseries ts_volume(const int n, const int delay = 0) const noexcept {
+    return ts_get_(volume_, n, delay);
+  }
+  Timeseries ts_amount(const int n, const int delay = 0) const noexcept {
+    return ts_get_(amount_, n, delay);
+  }
+  Timeseries ts_bmk_close(const int n, const int delay = 0) const noexcept {
+    return ts_get_(bmk_close_, n, delay);
+  }
+  Timeseries ts_bmk_open(const int n, const int delay = 0) const noexcept {
+    return ts_get_(bmk_open_, n, delay);
+  }
+
   double hd() const noexcept { return high() - high(1); }
   double ld() const noexcept { return low(1) - low(); }
 
@@ -149,7 +178,7 @@ private:
     if (!valid_(delay)) return NA_REAL;
     return ts[delayed_index_(delay)];
   }
-  Timeseries ts_get_(const Timeseries& ts, const int n, const int delay)
+  Timeseries ts_get_(const Timeseries& ts, const int n, const int delay) const noexcept
   {
     int begin = delayed_index_(delay + n);
     int end = delayed_index_(delay);
@@ -164,105 +193,6 @@ private:
   }
   bool valid_(const int delay) const noexcept { return delayed_index_(delay) >= 0; }
 };
-
-
-inline Timeseries close(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.close(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries open(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.open(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries high(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.high(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries low(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.low(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries pclose(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.pclose(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries volume(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.volume(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries amount(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.amount(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries bmk_close(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.bmk_close(i + delay));
-  }
-  return res;
-}
-
-
-inline Timeseries bmk_open(const Quotes& quotes, const int n, const int delay = 0)
-{
-  Timeseries res;
-  for (int i {n}; i > n; --i)
-  {
-    res.push_back(quotes.bmk_open(i + delay));
-  }
-  return res;
-}
 
 
 inline Timeseries operator+(const Timeseries& x, const Timeseries& y)
