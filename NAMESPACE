@@ -3,7 +3,6 @@
 export("%>%")
 export(tf_quotes_ptr)
 export(tf_run_cpp)
-import(assertthat)
 import(data.table)
 importFrom(Rcpp,sourceCpp)
 importFrom(magrittr,"%>%")

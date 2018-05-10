@@ -111,10 +111,10 @@ SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
 
 
 // [[Rcpp::export]]
-Rcpp::newDateVector tf_dates(SEXP quotes_ptr, const Rcpp::newDateVector from_to)
+Rcpp::newDateVector tf_tdates(SEXP quotes_ptr, const Rcpp::newDateVector from_to)
 {
   Rcpp::XPtr<Quotes> xptr {quotes_ptr};
-  const auto dates = xptr->dates(from_to);
+  const auto dates = xptr->tdates(from_to);
   return Rcpp::wrap(dates);
 }
 
@@ -132,7 +132,7 @@ Rcpp::List tf_run_cpp(SEXP quotes_ptr,
   auto& quotes = *xptr;
   const int n_factor = factors.length();
   Rcpp::List res(n_factor);
-  const auto dates = quotes.dates(from_to);
+  const auto dates = quotes.tdates(from_to);
   const int n_dates = dates.size();
   for (int i {0}; i < n_factor; ++i)
   {
@@ -145,7 +145,7 @@ Rcpp::List tf_run_cpp(SEXP quotes_ptr,
     {
       const auto cal = tf_funs.at(factor);
       NumericVector res_i(n_dates);
-      for (int j {0}; i < n_dates; ++j) {
+      for (int j {0}; j < n_dates; ++j) {
         quotes.set(dates[j]);
         res_i[j] = cal(quotes);
       }
