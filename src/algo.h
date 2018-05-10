@@ -91,6 +91,7 @@ public:
   double high(const int delay = 0) const noexcept { return get_(high_, delay); }
   double low(const int delay = 0) const noexcept { return get_(low_, delay); }
   double close(const int delay = 0) const noexcept { return get_(close_, delay); }
+  double vwap(const int delay = 0) const noexcept { return get_(vwap_, delay); }
   double volume(const int delay = 0) const noexcept { return get_(volume_, delay); }
   double amount(const int delay = 0) const noexcept { return get_(amount_, delay); }
   double bmk_close(const int delay = 0) const noexcept { return get_(bmk_close_, delay); }
@@ -110,6 +111,9 @@ public:
   }
   Timeseries ts_close(const int n, const int delay = 0) const noexcept {
     return ts_get_(close_, n, delay);
+  }
+  Timeseries ts_vwap(const int n, const int delay = 0) const noexcept {
+    return ts_get_(vwap_, n, delay);
   }
   Timeseries ts_volume(const int n, const int delay = 0) const noexcept {
     return ts_get_(volume_, n, delay);
