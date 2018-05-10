@@ -5,13 +5,6 @@
 #include <map>
 #include "GCAMCTF_types.h"
 
-enum class Quote_tag {
-  prev_close, open, high, low, close, vwap, volume, amount,
-  bmk_open, bmk_close
-};
-
-using Quote_elem = std::map<Quote_tag, Timeseries>;
-
 void assert_same_size(const Timeseries& x, const Timeseries& y);
 void assert_valid(const Rcpp::newDateVector from_to);
 bool any_na(const Timeseries& x);
