@@ -86,69 +86,69 @@ public:
     }
   }
 
-  double pclose(const int delay = 0) const noexcept { return get_(pclose_, delay); }
-  double open(const int delay = 0) const noexcept { return get_(open_, delay); }
-  double high(const int delay = 0) const noexcept { return get_(high_, delay); }
-  double low(const int delay = 0) const noexcept { return get_(low_, delay); }
-  double close(const int delay = 0) const noexcept { return get_(close_, delay); }
-  double vwap(const int delay = 0) const noexcept { return get_(vwap_, delay); }
-  double volume(const int delay = 0) const noexcept { return get_(volume_, delay); }
-  double amount(const int delay = 0) const noexcept { return get_(amount_, delay); }
-  double bmk_close(const int delay = 0) const noexcept { return get_(bmk_close_, delay); }
-  double bmk_open(const int delay = 0) const noexcept { return get_(bmk_open_, delay); }
+  double pclose(const int delay = 0) const { return get_(pclose_, delay); }
+  double open(const int delay = 0) const { return get_(open_, delay); }
+  double high(const int delay = 0) const { return get_(high_, delay); }
+  double low(const int delay = 0) const { return get_(low_, delay); }
+  double close(const int delay = 0) const { return get_(close_, delay); }
+  double vwap(const int delay = 0) const { return get_(vwap_, delay); }
+  double volume(const int delay = 0) const { return get_(volume_, delay); }
+  double amount(const int delay = 0) const { return get_(amount_, delay); }
+  double bmk_close(const int delay = 0) const { return get_(bmk_close_, delay); }
+  double bmk_open(const int delay = 0) const { return get_(bmk_open_, delay); }
 
-  Timeseries ts_pclose(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_pclose(const int n, const int delay = 0) const {
     return ts_get_(pclose_, n, delay);
   }
-  Timeseries ts_open(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_open(const int n, const int delay = 0) const {
     return ts_get_(open_, n, delay);
   }
-  Timeseries ts_high(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_high(const int n, const int delay = 0) const {
     return ts_get_(high_, n, delay);
   }
-  Timeseries ts_low(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_low(const int n, const int delay = 0) const {
     return ts_get_(low_, n, delay);
   }
-  Timeseries ts_close(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_close(const int n, const int delay = 0) const {
     return ts_get_(close_, n, delay);
   }
-  Timeseries ts_vwap(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_vwap(const int n, const int delay = 0) const {
     return ts_get_(vwap_, n, delay);
   }
-  Timeseries ts_volume(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_volume(const int n, const int delay = 0) const {
     return ts_get_(volume_, n, delay);
   }
-  Timeseries ts_amount(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_amount(const int n, const int delay = 0) const {
     return ts_get_(amount_, n, delay);
   }
-  Timeseries ts_bmk_close(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_bmk_close(const int n, const int delay = 0) const {
     return ts_get_(bmk_close_, n, delay);
   }
-  Timeseries ts_bmk_open(const int n, const int delay = 0) const noexcept {
+  Timeseries ts_bmk_open(const int n, const int delay = 0) const {
     return ts_get_(bmk_open_, n, delay);
   }
 
-  double hd() const noexcept { return high() - high(1); }
-  double ld() const noexcept { return low(1) - low(); }
+  double hd() const { return high() - high(1); }
+  double ld() const { return low(1) - low(); }
 
-  double tr(const int delay = 0) const noexcept
+  double tr(const int delay = 0) const
   {
-    if (!valid_(1)) return NA_REAL;
+    if (!in_bound_(1)) return NA_REAL;
     return std::max(
       std::max(high() - low(), std::abs(high() - close(1))),
       std::abs(low() - close(1))
     );
   }
 
-  double dtm() const noexcept
+  double dtm() const
   {
-    if (!valid_(1)) return NA_REAL;
+    if (!in_bound_(1)) return NA_REAL;
     return open() <= open(1) ? 0.0 : std::max(high() - open(), open() - open(1));
   }
 
-  double dbm() const noexcept
+  double dbm() const
   {
-    if (!valid_(1)) return NA_REAL;
+    if (!in_bound_(1)) return NA_REAL;
     return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
   }
 
@@ -176,13 +176,16 @@ private:
   Timeseries bmk_close_;
   Timeseries bmk_open_;
   int today_index_ {0};
-  int delayed_index_(const int delay) const noexcept { return today_index_ - delay; }
-  double get_(const Timeseries& ts, const int delay) const noexcept
+  int delayed_index_(const int delay) const {
+    assert_valid_(delay);
+    return today_index_ - delay;
+  }
+  double get_(const Timeseries& ts, const int delay) const
   {
-    if (!valid_(delay)) return NA_REAL;
+    if (!in_bound_(delay)) return NA_REAL;
     return ts[delayed_index_(delay)];
   }
-  Timeseries ts_get_(const Timeseries& ts, const int n, const int delay) const noexcept
+  Timeseries ts_get_(const Timeseries& ts, const int n, const int delay) const
   {
     int begin = delayed_index_(delay + n);
     int end = delayed_index_(delay);
@@ -195,7 +198,15 @@ private:
     }
     return res;
   }
-  bool valid_(const int delay) const noexcept { return delayed_index_(delay) >= 0; }
+  bool in_bound_(const int delay) const {
+    assert_valid_(delay);
+    return delayed_index_(delay) >= 0;
+  }
+  void assert_valid_(const int delay) const {
+    if (delay < 0) Rcpp::stop(
+        "delay must be a non-negative integer instead of %d.", delay
+    );
+  }
 };
 
 
