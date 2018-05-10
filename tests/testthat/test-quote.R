@@ -7,7 +7,7 @@ dt <- data.table::fread(
 dt[, DATE := as.Date(DATE)]
 qt <- tf_quotes_ptr(dt)
 
-test_that("dates seq is correct", {
+test_that("quotes.tdates()", {
   # from is lower than min
   from_to <- as.Date(c("2017-12-01", "2018-01-06"))
   expect_equivalent(
@@ -23,28 +23,28 @@ test_that("dates seq is correct", {
   )
 
   # from_to are tdates
-  from_to <- anytime::anydate(c(20180427, 20180502))
+  from_to <- anydate(c(20180427, 20180502))
   expect_equivalent(
     test_qt_tdates(qt, from_to),
     from_to
   )
 
   # from_to are not tdates
-  from_to <- anytime::anydate(c(20180501, 20180505))
+  from_to <- anydate(c(20180501, 20180505))
   expect_equivalent(
     test_qt_tdates(qt, from_to),
-    anytime::anydate(c(20180502, 20180503, 20180504))
+    anydate(c(20180502, 20180503, 20180504))
   )
 
   # from_to are all smaller than min
   expect_equivalent(
-    test_qt_tdates(qt, anytime::anydate(c(20160101, 20160101))),
-    anytime::anydate(double())
+    test_qt_tdates(qt, anydate(c(20160101, 20160101))),
+    anydate(double())
   )
 
   # from_to are all larger than max
   expect_equivalent(
-    test_qt_tdates(qt, anytime::anydate(c(20190101, 20190101))),
-    anytime::anydate(double())
+    test_qt_tdates(qt, anydate(c(20190101, 20190101))),
+    anydate(double())
   )
 })
