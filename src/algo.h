@@ -59,7 +59,7 @@ public:
   Quotes() = default;
   explicit Quotes(const Rcpp::DataFrame tbl)
     : dates_ { col_date(tbl, "DATE") },
-      prev_close_ { col(tbl, "PREV_CLOSE") },
+      pclose_ { col(tbl, "PCLOSE") },
       open_ { col(tbl, "OPEN") },
       high_ { col(tbl, "HIGH") },
       low_ { col(tbl, "LOW") },
@@ -86,7 +86,7 @@ public:
     }
   }
 
-  double prev_close(const int delay = 0) const noexcept { return get_(prev_close_, delay); }
+  double pclose(const int delay = 0) const noexcept { return get_(pclose_, delay); }
   double open(const int delay = 0) const noexcept { return get_(open_, delay); }
   double high(const int delay = 0) const noexcept { return get_(high_, delay); }
   double low(const int delay = 0) const noexcept { return get_(low_, delay); }
@@ -132,7 +132,7 @@ public:
 
 private:
   std::vector<RDate> dates_;
-  Timeseries prev_close_;
+  Timeseries pclose_;
   Timeseries open_;
   Timeseries high_;
   Timeseries low_;
@@ -210,12 +210,12 @@ inline Timeseries low(const Quotes& quotes, const int n, const int delay = 0)
 }
 
 
-inline Timeseries prev_close(const Quotes& quotes, const int n, const int delay = 0)
+inline Timeseries pclose(const Quotes& quotes, const int n, const int delay = 0)
 {
   Timeseries res;
   for (int i {n}; i > n; --i)
   {
-    res.push_back(quotes.prev_close(i + delay));
+    res.push_back(quotes.pclose(i + delay));
   }
   return res;
 }
