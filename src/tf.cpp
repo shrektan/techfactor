@@ -17,23 +17,23 @@
 
 
 auto alpha1 = [](const Quotes& quotes) -> double {
-  const auto rk_delta_log_vol = rank(delta(log(close(quotes, 7))));
-  const auto rk_close_open = rank((close(quotes, 6) - open(quotes, 6)) / open(quotes, 6));
+  const auto rk_delta_log_vol = rank(delta(log(quotes.ts_close(7))));
+  const auto rk_close_open = rank((quotes.ts_close(6) - quotes.ts_open(6)) / quotes.ts_open(6));
   return corr(rk_delta_log_vol, rk_close_open) * -1;
 };
 
 
 auto alpha3 = [](const Quotes& quotes) -> double {
-  const auto sum_close_8 = sum(close(quotes, 8));
-  const auto std_close_8 = stdev(close(quotes, 8));
-  const auto sum_close_2 = sum(close(quotes, 2));
+  const auto sum_close_8 = sum(quotes.ts_close(8));
+  const auto std_close_8 = stdev(quotes.ts_close(8));
+  const auto sum_close_2 = sum(quotes.ts_close(2));
   if (sum_close_8 / 8 + std_close_8 < sum_close_2 / 2) {
     return -1.0;
   } else if (sum_close_2 / 2 < sum_close_8 / 8 - std_close_8) {
     return 1.0;
   } else {
     const auto vol = quotes.volume();
-    const auto mean_vol_20 = mean(volume(quotes, 20));
+    const auto mean_vol_20 = mean(quotes.ts_volume(20));
     if (vol / mean_vol_20 >= 1) {
       return 1.0;
     } else {
@@ -50,8 +50,8 @@ auto alpha5 = [](const Quotes& quotes) -> double {
     Timeseries rk_vol_5, rk_high_5;
     for (int k {5}; k >= 0; --k)
     {
-      rk_vol_5.push_back(tsrank(volume(quotes, 5, i + k)));
-      rk_high_5.push_back(tsrank(high(quotes, 5, i + k)));
+      rk_vol_5.push_back(tsrank(quotes.ts_volume(5, i + k)));
+      rk_high_5.push_back(tsrank(quotes.ts_high(5, i + k)));
     }
     ts.push_back(corr(rk_vol_5, rk_high_5));
   }
@@ -75,8 +75,8 @@ auto alpha53 = [](const Quotes& quotes) -> double {
 
 
 auto alpha149 = [](const Quotes& quotes) -> double {
-  const auto dr = close(quotes, 252) / close(quotes, 252, 1) - 1.0;
-  const auto bmk_dr = bmk_close(quotes, 252) / bmk_close(quotes, 252, 1) - 1.0;
+  const auto dr = quotes.ts_close(252) / quotes.ts_close(252, 1) - 1.0;
+  const auto bmk_dr = quotes.ts_bmk_close(252) / quotes.ts_bmk_close(252, 1) - 1.0;
   const auto x = filter(dr, bmk_dr < 0.0);
   const auto y = filter(bmk_dr, bmk_dr < 0.0);
   return regbeta(x, y);
