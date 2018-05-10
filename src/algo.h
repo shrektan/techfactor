@@ -14,7 +14,9 @@ using Quote_elem = std::map<Quote_tag, Timeseries>;
 
 void assert_same_size(const Timeseries& x, const Timeseries& y);
 void assert_valid(const Rcpp::newDateVector from_to);
-void assert_no_na(const Timeseries& x, const bool must_check = false);
+bool any_na(const Timeseries& x);
+void assert_no_na(const Timeseries& x);
+Timeseries na_vector(const int length);
 
 Timeseries delta(const Timeseries& x);
 double corr(const Timeseries& x, const Timeseries& y);
@@ -24,8 +26,8 @@ double stdev(const Timeseries& x);
 double mean(const Timeseries& x);
 double tsmin(const Timeseries& x);
 double tsmax(const Timeseries& x);
-int tsrank(const Timeseries& x);
-int sign(const double x);
+double tsrank(const Timeseries& x);
+double sign(const double x);
 double sma(const Timeseries& x, const int n, const int m);
 double wma(const Timeseries& x);
 Timeseries decaylinear(const Timeseries& x, const int days);
@@ -35,12 +37,12 @@ Timeseries log(const Timeseries& x);
 Timeseries abs(const Timeseries& x);
 double covariance(const Timeseries& x, const Timeseries& y);
 double prod(const Timeseries& x);
-int count(const std::vector<bool>& x);
+double count(const std::vector<bool>& x);
 double regbeta(const Timeseries& x, const Timeseries& y);
 Timeseries regresi(const Timeseries& x, const Timeseries& y);
 Timeseries filter(const Timeseries& x, const std::vector<bool>& cond);
-int highday(const Timeseries& x);
-int lowday(const Timeseries& x);
+double highday(const Timeseries& x);
+double lowday(const Timeseries& x);
 
 
 inline Timeseries col(const Rcpp::DataFrame tbl, const std::string field)
