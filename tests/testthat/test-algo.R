@@ -189,3 +189,31 @@ test_that("count", {
   x <- rnorm(10) > 0
   expect_equal(tf_count(x), sum(x))
 })
+
+test_that("regbeta", {
+  expect_error(tf_regbeta(double(), double()),
+               "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_regbeta(1.2, 1.2),
+               "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_regbeta(c(1, 2), c(1, 2, 3)),
+               "The size of x and y must be the same.", fixed = TRUE)
+  x <- rnorm(10)
+  y <- rnorm(10)
+  expect_equal(tf_regbeta(y, x), coef(lm(y ~ x))[["x"]])
+  expect_equal(tf_regbeta(c(NA, x), c(1, y)), NA_real_)
+  expect_equal(tf_regbeta(c(1, x), c(NA, y)), NA_real_)
+})
+
+test_that("regresi", {
+  expect_error(tf_regresi(double(), double()),
+               "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_regresi(1.2, 1.2),
+               "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_regresi(c(1, 2), c(1, 2, 3)),
+               "The size of x and y must be the same.", fixed = TRUE)
+  x <- rnorm(10)
+  y <- rnorm(10)
+  expect_equivalent(tf_regresi(y, x), resid(lm(y ~ x)))
+  expect_equal(tf_regresi(c(NA, x), c(1, y)), rep(NA_real_, 11))
+  expect_equal(tf_regresi(c(1, x), c(NA, y)), rep(NA_real_, 11))
+})

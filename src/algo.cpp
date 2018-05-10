@@ -247,11 +247,13 @@ Timeseries regresi(const Timeseries& y, const Timeseries& x)
 {
   assert_length(x, 2);
   const double beta = regbeta(y, x);
+  const double intercept = mean(y) - mean(x) * beta;
   Timeseries res(y.size());
   std::transform(
     y.cbegin(), y.cend(), x.cbegin(),
-    res.begin(),
-    [beta](const double v_y, const double v_x) { return v_y - v_x * beta; }
+    res.begin(), [beta, intercept](const double v_y, const double v_x) {
+      return v_y - v_x * beta - intercept;
+    }
   );
   return res;
 }
