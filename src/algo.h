@@ -149,6 +149,19 @@ private:
     if (!valid_(delay)) return NA_REAL;
     return ts[delayed_index_(delay)];
   }
+  Timeseries ts_get_(const Timeseries& ts, const int n, const int delay)
+  {
+    int begin = delayed_index_(delay + n);
+    int end = delayed_index_(delay);
+    Timeseries res;
+    if (n - 1 > end) std::fill_n(std::back_inserter(res), n - 1 - end, NA_REAL);
+    if (end >= 0) {
+      auto iter_b = ts.cbegin() + std::max(0, begin);
+      auto iter_e = ts.cbegin() + std::max(0, end) + 1;
+      std::copy(iter_b, iter_e, std::back_inserter(res));
+    }
+    return res;
+  }
   bool valid_(const int delay) const noexcept { return delayed_index_(delay) >= 0; }
 };
 
