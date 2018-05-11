@@ -7,6 +7,7 @@ dt <- data.table::fread(
   colClasses = c("character", rep("double", 10))
 )
 dt[, DATE := as.Date(DATE)]
+setkey(dt, DATE)
 qt <- tf_quotes_xptr(dt)
 
 test_that("quotes' input must be a sorted tbl", {
@@ -166,6 +167,74 @@ test_that("qt.ts_get()", {
   expect_equal(
     test_qt_ts_get(qt, anydate(20180104), "close", 3, 1),
     c(NA, 32.56, 32.33)
+  )
+})
+
+test_that("ts_qt_misc_getter", {
+  date <- anydate(20180504)
+  expect_equal(
+    test_qt_get(qt, date, "tr", 0),
+    {
+      crt <- dt[J(date)]
+      prev <- dt[J(date - 1), roll = TRUE]
+      max(
+        max(crt$HIGH - crt$LOW, abs(crt$HIGH - prev$CLOSE)),
+        abs(crt$LOW - prev$CLOSE)
+      )
+    }
+  )
+  expect_equal(
+    test_qt_get(qt, date, "ret", 0),
+    {
+      crt <- dt[J(date)]
+      crt$CLOSE / crt$PCLOSE - 1.0
+    }
+  )
+  expect_equal(
+    test_qt_get(qt, date, "dtm", 0),
+    {
+      crt <- dt[J(date)]
+      prev <- dt[J(date - 1), roll = TRUE]
+      if (crt$OPEN <= prev$OPEN) {
+        0
+      } else {
+        max(
+          crt$HIGH - crt$OPEN,
+          crt$OPEN - prev$OPEN
+        )
+      }
+    }
+  )
+  expect_equal(
+    test_qt_get(qt, date, "dbm", 0),
+    {
+      crt <- dt[J(date)]
+      prev <- dt[J(date - 1), roll = TRUE]
+      if (crt$OPEN >= prev$OPEN) {
+        0
+      } else {
+        max(
+          crt$OPEN - crt$LOW,
+          crt$OPEN - prev$OPEN
+        )
+      }
+    }
+  )
+  expect_equal(
+    test_qt_get(qt, date, "hd", 0),
+    {
+      crt <- dt[J(date)]
+      prev <- dt[J(date - 1), roll = TRUE]
+      crt$HIGH - prev$HIGH
+    }
+  )
+  expect_equal(
+    test_qt_get(qt, date, "ld", 0),
+    {
+      crt <- dt[J(date)]
+      prev <- dt[J(date - 1), roll = TRUE]
+      prev$LOW - crt$LOW
+    }
   )
 })
 
