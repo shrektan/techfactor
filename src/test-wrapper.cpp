@@ -20,7 +20,8 @@ Rcpp::Date test_qt_today(SEXP quotes_ptr, const Rcpp::Date today)
   return xptr->today();
 }
 
-const std::map<std::string, std::function<double(const Quotes& qt, const int delay)>> tag_map {
+const std::map<std::string, std::function<double(const Quotes, const int)>> tag_map
+{
   {"pclose", [](const Quotes& qt, const int delay) { return qt.pclose(delay); }},
   {"open", [](const Quotes& qt, const int delay) { return qt.open(delay); }},
   {"high", [](const Quotes& qt, const int delay) { return qt.high(delay); }},
@@ -47,8 +48,9 @@ double test_qt_get(SEXP quotes_ptr, const Rcpp::Date today,
 
 const std::map<
   std::string,
-  std::function<Timeseries(const Quotes& qt, const int n, const int delay)>
-> tag_ts_map {
+  std::function<Timeseries(const Quotes, const int, const int)>
+> tag_ts_map
+{
   {"pclose", [](const Quotes& qt, const int n, const int delay) { return qt.ts_pclose(n, delay); }},
   {"open", [](const Quotes& qt, const int n, const int delay) { return qt.ts_open(n, delay); }},
   {"high", [](const Quotes& qt, const int n, const int delay) { return qt.ts_high(n, delay); }},

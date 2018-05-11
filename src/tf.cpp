@@ -84,8 +84,8 @@ auto alpha149 = [](const Quotes& quotes) -> double {
 
 
 
-std::map<std::string, std::function<
-  double(const Quotes& quotes)>> tf_funs = {
+std::map<std::string, std::function<double(const Quotes&)>> tf_funs
+{
   {"alpha1", alpha1},
   {"alpha3", alpha3},
   {"alpha5", alpha5},
@@ -97,8 +97,9 @@ std::map<std::string, std::function<
 
 std::map<
   std::string,
-  std::function<Rcpp::DataFrame(Quotes& quotes, const Rcpp::newDateVector from_to)>
-> tf_fast_funs = {
+  std::function<Rcpp::DataFrame(Quotes&, const Rcpp::newDateVector)>
+> tf_fast_funs
+{
 
 };
 
