@@ -429,6 +429,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tf_reg_factors
+Rcpp::StringVector tf_reg_factors();
+RcppExport SEXP _GCAMCTF_tf_reg_factors() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(tf_reg_factors());
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_quotes_xptr
 SEXP tf_quotes_xptr(Rcpp::DataFrame qt_tbl);
 RcppExport SEXP _GCAMCTF_tf_quotes_xptr(SEXP qt_tblSEXP) {
@@ -492,6 +502,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_test_qt_ts_get", (DL_FUNC) &_GCAMCTF_test_qt_ts_get, 5},
     {"_GCAMCTF_test_ts_op", (DL_FUNC) &_GCAMCTF_test_ts_op, 3},
     {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
+    {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
     {"_GCAMCTF_tf_factor", (DL_FUNC) &_GCAMCTF_tf_factor, 3},
     {NULL, NULL, 0}
