@@ -16,14 +16,14 @@
 #include "algo.h"
 
 
-auto alpha1 = [](const Quotes& quotes) -> double {
+auto alpha001 = [](const Quotes& quotes) -> double {
   const auto rk_delta_log_vol = rank(delta(log(quotes.ts_close(7))));
   const auto rk_close_open = rank((quotes.ts_close(6) - quotes.ts_open(6)) / quotes.ts_open(6));
   return corr(rk_delta_log_vol, rk_close_open) * -1;
 };
 
 
-auto alpha3 = [](const Quotes& quotes) -> double {
+auto alpha003 = [](const Quotes& quotes) -> double {
   const auto sum_close_8 = sum(quotes.ts_close(8));
   const auto std_close_8 = stdev(quotes.ts_close(8));
   const auto sum_close_2 = sum(quotes.ts_close(2));
@@ -43,7 +43,7 @@ auto alpha3 = [](const Quotes& quotes) -> double {
 };
 
 
-auto alpha5 = [](const Quotes& quotes) -> double {
+auto alpha005 = [](const Quotes& quotes) -> double {
   Timeseries ts;
   for (int i {2}; i >= 0; --i)
   {
@@ -59,12 +59,12 @@ auto alpha5 = [](const Quotes& quotes) -> double {
 };
 
 
-auto alpha14 = [](const Quotes& quotes) -> double {
+auto alpha014 = [](const Quotes& quotes) -> double {
   return quotes.close() - quotes.close(5);
 };
 
 
-auto alpha53 = [](const Quotes& quotes) -> double {
+auto alpha053 = [](const Quotes& quotes) -> double {
   std::vector<bool> cond;
   for (int i {11}; i >= 0; --i)
   {
@@ -86,11 +86,11 @@ auto alpha149 = [](const Quotes& quotes) -> double {
 
 std::map<std::string, std::function<double(const Quotes&)>> tf_funs
 {
-  {"alpha1", alpha1},
-  {"alpha3", alpha3},
-  {"alpha5", alpha5},
-  {"alpha14", alpha14},
-  {"alpha53", alpha53},
+  {"alpha001", alpha001},
+  {"alpha003", alpha003},
+  {"alpha005", alpha005},
+  {"alpha014", alpha014},
+  {"alpha053", alpha053},
   {"alpha149", alpha149}
 };
 
