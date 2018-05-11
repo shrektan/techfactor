@@ -31,7 +31,13 @@ const std::map<std::string, std::function<double(const Quotes, const int)>> tag_
   {"volume", [](const Quotes& qt, const int delay) { return qt.volume(delay); }},
   {"amount", [](const Quotes& qt, const int delay) { return qt.amount(delay); }},
   {"bmk_close", [](const Quotes& qt, const int delay) { return qt.bmk_close(delay); }},
-  {"bmk_open", [](const Quotes& qt, const int delay) { return qt.bmk_open(delay); }}
+  {"bmk_open", [](const Quotes& qt, const int delay) { return qt.bmk_open(delay); }},
+  {"tr", [](const Quotes& qt, const int delay) { return qt.tr(delay); }},
+  {"ret", [](const Quotes& qt, const int delay) { return qt.ret(); }},
+  {"hd", [](const Quotes& qt, const int delay) { return qt.hd(); }},
+  {"ld", [](const Quotes& qt, const int delay) { return qt.ld(); }},
+  {"dtm", [](const Quotes& qt, const int delay) { return qt.dtm(); }},
+  {"dbm", [](const Quotes& qt, const int delay) { return qt.dbm(); }}
 };
 
 
