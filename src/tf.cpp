@@ -84,7 +84,7 @@ auto alpha149 = [](const Quotes& quotes) -> double {
 
 
 
-std::map<std::string, std::function<double(const Quotes&)>> tf_funs
+std::map<std::string, std::function<double(const Quotes&)>> tf_caculators
 {
   {"alpha001", alpha001},
   {"alpha003", alpha003},
@@ -98,7 +98,7 @@ std::map<std::string, std::function<double(const Quotes&)>> tf_funs
 std::map<
   std::string,
   std::function<Rcpp::DataFrame(Quotes&, const Rcpp::newDateVector)>
-> tf_fast_funs
+> tf_fast_caculators
 {
 
 };
@@ -113,8 +113,8 @@ std::map<
 Rcpp::StringVector tf_reg_factors()
 {
   std::set<std::string> names;
-  for (auto& elem : tf_funs) names.insert(elem.first);
-  for (auto& elem : tf_fast_funs) names.insert(elem.first);
+  for (auto& elem : tf_caculators) names.insert(elem.first);
+  for (auto& elem : tf_fast_caculators) names.insert(elem.first);
   Rcpp::StringVector res(names.size());
   std::copy(names.begin(), names.end(), res.begin());
   return res;
@@ -156,13 +156,13 @@ Rcpp::List tf_factor(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to)
   assert_valid(from_to);
   XPtr<Quotes> qt_xptr {qt_ptr};
   auto& qt = *qt_xptr;
-  if (tf_fast_funs.count(name))
+  if (tf_fast_caculators.count(name))
   {
-    return tf_fast_funs.at(name)(qt, from_to);
+    return tf_fast_caculators.at(name)(qt, from_to);
   }
-  else if (tf_funs.count(name))
+  else if (tf_caculators.count(name))
   {
-    const auto& calculator = tf_funs.at(name);
+    const auto& calculator = tf_caculators.at(name);
     const auto dates = qt.tdates(from_to);
     NumericVector vec(dates.size());
     std::transform(
