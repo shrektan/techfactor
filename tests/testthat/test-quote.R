@@ -2,12 +2,9 @@ context("test-quote.R")
 
 tags <- c("pclose", "open", "high", "low", "close", "vwap",
           "volume", "amount", "bmk_close", "bmk_open")
-dt <- data.table::fread(
-  "quote-sample.csv",
-  colClasses = c("character", rep("double", 10))
-)
-dt[, DATE := as.Date(DATE)]
-setkey(dt, DATE)
+
+data("tf_quote")
+dt <- copy(tf_quote)
 qt <- tf_quotes_xptr(dt)
 
 test_that("quotes' input must be a sorted tbl", {
