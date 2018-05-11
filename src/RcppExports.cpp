@@ -403,6 +403,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_ts_op
+Timeseries test_ts_op(const Timeseries& x, const Timeseries& y, const std::string op);
+RcppExport SEXP _GCAMCTF_test_ts_op(SEXP xSEXP, SEXP ySEXP, SEXP opSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Timeseries& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const std::string >::type op(opSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_ts_op(x, y, op));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_ts_scalar_op
+Timeseries test_ts_scalar_op(const Timeseries& x, const double y, const std::string op);
+RcppExport SEXP _GCAMCTF_test_ts_scalar_op(SEXP xSEXP, SEXP ySEXP, SEXP opSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const double >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const std::string >::type op(opSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_ts_scalar_op(x, y, op));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_quotes_ptr
 SEXP tf_quotes_ptr(Rcpp::DataFrame raw);
 RcppExport SEXP _GCAMCTF_tf_quotes_ptr(SEXP rawSEXP) {
@@ -464,6 +490,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_test_qt_today", (DL_FUNC) &_GCAMCTF_test_qt_today, 2},
     {"_GCAMCTF_test_qt_get", (DL_FUNC) &_GCAMCTF_test_qt_get, 4},
     {"_GCAMCTF_test_qt_ts_get", (DL_FUNC) &_GCAMCTF_test_qt_ts_get, 5},
+    {"_GCAMCTF_test_ts_op", (DL_FUNC) &_GCAMCTF_test_ts_op, 3},
+    {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
     {"_GCAMCTF_tf_quotes_ptr", (DL_FUNC) &_GCAMCTF_tf_quotes_ptr, 1},
     {"_GCAMCTF_tf_run_cpp", (DL_FUNC) &_GCAMCTF_tf_run_cpp, 3},
     {NULL, NULL, 0}

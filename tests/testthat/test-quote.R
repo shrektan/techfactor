@@ -153,3 +153,73 @@ test_that("qt.ts_get()", {
     c(NA, 32.56, 32.33)
   )
 })
+
+
+test_that("ts_op_ts", {
+  x <- c(-1.0, 0.0, 1.0, 2.0, NA, 3.0, NA, 0.0)
+  y <- c(-0.1, 0.1, 0.0, 1.0, 1.2, NA, NA, 0.0)
+  expect_equal(
+    test_ts_op(x, y, "+"),
+    x + y
+  )
+  expect_equal(
+    test_ts_op(x, y, "-"),
+    x - y
+  )
+  expect_equal(
+    test_ts_op(x, y, "*"),
+    x * y
+  )
+  expect_equal(
+    test_ts_op(x, y, "/"),
+    {
+      res <- rep(NA_real_, length(x))
+      flag <- !is.na(y) & y != 0.0
+      res[flag] <- x[flag] / y[flag]
+      res
+    }
+  )
+})
+
+
+test_that("ts_op_scalar", {
+  x <- c(-1.0, 0.0, 1.0, 2.0, NA_real_, NA_real_, 0.0)
+  y <- c(-1.3, 1.3, NA_real_, 0.0, -0.3, NA_real_, 0.0)
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "+")),
+    purrr::map(y, ~`+`(x, .))
+  )
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "-")),
+    purrr::map(y, ~`-`(x, .))
+  )
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "*")),
+    purrr::map(y, ~`*`(x, .))
+  )
+  # return NA if any NA or find zero in the denominator
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "/")),
+    purrr::map(y, ~{
+      if (is.na(.) || . == 0.0) return(rep(NA_real_, length(x)))
+      x / .
+    })
+  )
+  # return FALSE if any NA
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., ">")),
+    purrr::map(y, ~{
+      res <- as.double(`>`(x, .))
+      res[is.na(res)] <- 0.0
+      res
+    })
+  )
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "<")),
+    purrr::map(y, ~{
+      res <- as.double(`<`(x, .))
+      res[is.na(res)] <- 0.0
+      res
+    })
+  )
+})

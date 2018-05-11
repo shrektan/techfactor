@@ -141,6 +141,14 @@ test_qt_ts_get <- function(quotes_ptr, today, tag, n, delay) {
     .Call(`_GCAMCTF_test_qt_ts_get`, quotes_ptr, today, tag, n, delay)
 }
 
+test_ts_op <- function(x, y, op) {
+    .Call(`_GCAMCTF_test_ts_op`, x, y, op)
+}
+
+test_ts_scalar_op <- function(x, y, op) {
+    .Call(`_GCAMCTF_test_ts_scalar_op`, x, y, op)
+}
+
 #' @export
 tf_quotes_ptr <- function(raw) {
     .Call(`_GCAMCTF_tf_quotes_ptr`, raw)

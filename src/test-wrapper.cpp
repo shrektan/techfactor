@@ -74,3 +74,61 @@ Timeseries test_qt_ts_get(
   xptr->set(today);
   return tag_ts_map.at(tag)(*xptr, n, delay);
 }
+
+
+const std::map<
+  std::string,
+  std::function<Timeseries(const Timeseries&, const Timeseries&)>
+> op_map
+{
+  {"+", [](const Timeseries& x, const Timeseries& y) { return x + y; }},
+  {"-", [](const Timeseries& x, const Timeseries& y) { return x - y; }},
+  {"*", [](const Timeseries& x, const Timeseries& y) { return x * y; }},
+  {"/", [](const Timeseries& x, const Timeseries& y) { return x / y; }}
+};
+
+
+// [[Rcpp::export]]
+Timeseries test_ts_op(const Timeseries& x, const Timeseries& y, const std::string op)
+{
+  if (op_map.count(op) == 0) Rcpp::stop("op %s is not valid.", op);
+  return op_map.at(op)(x, y);
+}
+
+
+const std::map<
+  std::string,
+  std::function<Timeseries(const Timeseries&, const double)>
+> op_scalar_map
+{
+  {"+", [](const Timeseries& x, const double y) { return x + y; }},
+  {"-", [](const Timeseries& x, const double y) { return x - y; }},
+  {"*", [](const Timeseries& x, const double y) { return x * y; }},
+  {"/", [](const Timeseries& x, const double y) { return x / y; }},
+  {">",
+   [](const Timeseries& x, const double y) {
+     const auto bool_res = x > y;
+     Timeseries res(bool_res.size());
+     std::transform(bool_res.cbegin(), bool_res.cend(), res.begin(),
+                    [](const bool v) { return double(v); });
+     return res;
+   }
+  },
+  {"<",
+   [](const Timeseries& x, const double y) {
+     const auto bool_res = x < y;
+     Timeseries res(bool_res.size());
+     std::transform(bool_res.cbegin(), bool_res.cend(), res.begin(),
+                    [](const bool v) { return double(v); });
+     return res;
+   }
+  }
+};
+
+
+// [[Rcpp::export]]
+Timeseries test_ts_scalar_op(const Timeseries& x, const double y, const std::string op)
+{
+  if (op_scalar_map.count(op) == 0) Rcpp::stop("op %s is not valid.", op);
+  return op_scalar_map.at(op)(x, y);
+}

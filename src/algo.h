@@ -298,7 +298,7 @@ inline Timeseries operator/(const Timeseries& x, const double y)
   std::transform(
     x.cbegin(), x.cend(),
     res.begin(), [y](const double v) {
-      if (v == 0.0) return NA_REAL;
+      if (y == 0.0) return NA_REAL;
       return v / y;
     }
   );
