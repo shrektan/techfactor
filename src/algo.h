@@ -140,6 +140,12 @@ public:
     );
   }
 
+  double ret() const
+  {
+    if (pclose() == 0.0) return NA_REAL;
+    return close() / pclose() - 1.0;
+  }
+
   double dtm() const
   {
     if (!in_bound_(1)) return NA_REAL;
