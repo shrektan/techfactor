@@ -7,7 +7,22 @@ dt <- data.table::fread(
   colClasses = c("character", rep("double", 10))
 )
 dt[, DATE := as.Date(DATE)]
-qt <- tf_quotes_ptr(dt)
+qt <- tf_quotes_xptr(dt)
+
+test_that("quotes' input must be a sorted tbl", {
+  dt_copy <- copy(dt)
+  setorder(dt_copy, -DATE)
+  expect_error(
+    tf_quotes_xptr(dt_copy),
+    "x must be a sorted date vector"
+  )
+  setorder(dt_copy, DATE)
+  dt_copy[, CLOSE := NULL]
+  expect_error(
+    tf_quotes_xptr(dt_copy),
+    "CLOSE"
+  )
+})
 
 test_that("quotes.tdates()", {
   # from is lower than min
