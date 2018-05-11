@@ -2,8 +2,8 @@
 
 export("%>%")
 export(anydate)
-export(tf_quotes_ptr)
-export(tf_run_cpp)
+export(tf_factor)
+export(tf_quotes_xptr)
 import(data.table)
 importFrom(Rcpp,sourceCpp)
 importFrom(anytime,anydate)

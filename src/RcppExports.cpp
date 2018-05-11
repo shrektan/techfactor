@@ -429,27 +429,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// tf_quotes_ptr
-SEXP tf_quotes_ptr(Rcpp::DataFrame raw);
-RcppExport SEXP _GCAMCTF_tf_quotes_ptr(SEXP rawSEXP) {
+// tf_quotes_xptr
+SEXP tf_quotes_xptr(Rcpp::DataFrame qt_tbl);
+RcppExport SEXP _GCAMCTF_tf_quotes_xptr(SEXP qt_tblSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type raw(rawSEXP);
-    rcpp_result_gen = Rcpp::wrap(tf_quotes_ptr(raw));
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type qt_tbl(qt_tblSEXP);
+    rcpp_result_gen = Rcpp::wrap(tf_quotes_xptr(qt_tbl));
     return rcpp_result_gen;
 END_RCPP
 }
-// tf_run_cpp
-Rcpp::List tf_run_cpp(SEXP quotes_ptr, const Rcpp::StringVector factors, const Rcpp::newDateVector from_to);
-RcppExport SEXP _GCAMCTF_tf_run_cpp(SEXP quotes_ptrSEXP, SEXP factorsSEXP, SEXP from_toSEXP) {
+// tf_factor
+Rcpp::List tf_factor(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_tf_factor(SEXP qt_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::StringVector >::type factors(factorsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::newDateVector >::type from_to(from_toSEXP);
-    rcpp_result_gen = Rcpp::wrap(tf_run_cpp(quotes_ptr, factors, from_to));
+    Rcpp::traits::input_parameter< SEXP >::type qt_ptr(qt_ptrSEXP);
+    Rcpp::traits::input_parameter< std::string >::type name(nameSEXP);
+    Rcpp::traits::input_parameter< Rcpp::newDateVector >::type from_to(from_toSEXP);
+    rcpp_result_gen = Rcpp::wrap(tf_factor(qt_ptr, name, from_to));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -492,8 +492,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_test_qt_ts_get", (DL_FUNC) &_GCAMCTF_test_qt_ts_get, 5},
     {"_GCAMCTF_test_ts_op", (DL_FUNC) &_GCAMCTF_test_ts_op, 3},
     {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
-    {"_GCAMCTF_tf_quotes_ptr", (DL_FUNC) &_GCAMCTF_tf_quotes_ptr, 1},
-    {"_GCAMCTF_tf_run_cpp", (DL_FUNC) &_GCAMCTF_tf_run_cpp, 3},
+    {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
+    {"_GCAMCTF_tf_factor", (DL_FUNC) &_GCAMCTF_tf_factor, 3},
     {NULL, NULL, 0}
 };
 

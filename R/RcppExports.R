@@ -150,12 +150,12 @@ test_ts_scalar_op <- function(x, y, op) {
 }
 
 #' @export
-tf_quotes_ptr <- function(raw) {
-    .Call(`_GCAMCTF_tf_quotes_ptr`, raw)
+tf_quotes_xptr <- function(qt_tbl) {
+    .Call(`_GCAMCTF_tf_quotes_xptr`, qt_tbl)
 }
 
 #' @export
-tf_run_cpp <- function(quotes_ptr, factors, from_to) {
-    .Call(`_GCAMCTF_tf_run_cpp`, quotes_ptr, factors, from_to)
+tf_factor <- function(qt_ptr, name, from_to) {
+    .Call(`_GCAMCTF_tf_factor`, qt_ptr, name, from_to)
 }
 

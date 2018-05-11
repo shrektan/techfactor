@@ -106,50 +106,43 @@ std::map<
 
 //' @export
 // [[Rcpp::export]]
-SEXP tf_quotes_ptr(Rcpp::DataFrame raw)
+SEXP tf_quotes_xptr(Rcpp::DataFrame qt_tbl)
 {
-  Quotes* ptr = new Quotes {raw};
+  Quotes* ptr = new Quotes {qt_tbl};
   return Rcpp::XPtr<Quotes>(ptr, true);
 }
 
 
 //' @export
 // [[Rcpp::export]]
-Rcpp::List tf_run_cpp(SEXP quotes_ptr,
-                      const Rcpp::StringVector factors,
-                      const Rcpp::newDateVector from_to)
+Rcpp::List tf_factor(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to)
 {
   using namespace Rcpp;
   assert_valid(from_to);
-  Rcpp::XPtr<Quotes> xptr {quotes_ptr};
-  auto& quotes = *xptr;
-  const int n_factor = factors.length();
-  Rcpp::List res(n_factor);
-  const auto dates = quotes.tdates(from_to);
-  const int n_dates = dates.size();
-  for (int i {0}; i < n_factor; ++i)
+  XPtr<Quotes> qt_xptr {qt_ptr};
+  auto& qt = *qt_xptr;
+  if (tf_fast_funs.count(name))
   {
-    const auto factor = std::string {factors[i]};
-    if (tf_fast_funs.count(factor))
-    {
-      res[i] = tf_fast_funs.at(factor)(quotes, from_to);
-    }
-    else if (tf_funs.count(factor))
-    {
-      const auto cal = tf_funs.at(factor);
-      NumericVector res_i(n_dates);
-      for (int j {0}; j < n_dates; ++j) {
-        quotes.set(dates[j]);
-        res_i[j] = cal(quotes);
-      }
-      res[i] = DataFrame::create(
-        _["DATE"] = wrap(dates),
-        _["VALUE"] = res_i
-      );
-    } else {
-      stop("factor %s must be defined before using.", factor);
-    }
+    return tf_fast_funs.at(name)(qt, from_to);
   }
-  res.attr("names") = factors;
-  return res;
+  else if (tf_funs.count(name))
+  {
+    const auto& calculator = tf_funs.at(name);
+    const auto dates = qt.tdates(from_to);
+    NumericVector vec(dates.size());
+    std::transform(
+      dates.cbegin(), dates.cend(), vec.begin(),
+      [&qt, &calculator] (const RDate date) {
+        qt.set(date);
+        return calculator(qt);
+      }
+    );
+    newDateVector r_dates(dates.size());
+    std::copy(dates.cbegin(), dates.cend(), r_dates.begin());
+    return DataFrame::create(_["DATE"] = r_dates, _["VALUE"] = vec);
+  }
+  else
+  {
+    stop("factor %s must be defined before using.", name);
+  }
 }
