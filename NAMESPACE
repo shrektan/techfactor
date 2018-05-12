@@ -2,7 +2,7 @@
 
 export("%>%")
 export(anydate)
-export(tf_factor)
+export(tf_cal)
 export(tf_quotes_xptr)
 export(tf_reg_factors)
 import(data.table)

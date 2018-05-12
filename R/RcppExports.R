@@ -182,7 +182,7 @@ tf_quotes_xptr <- function(qt_tbl) {
 #' @return a `data.frame` with two columns _DATE_ and _VALUE_ . The order
 #'   of _DATE_ column is in ascending order.
 #' @export
-tf_factor <- function(qt_ptr, name, from_to) {
-    .Call(`_GCAMCTF_tf_factor`, qt_ptr, name, from_to)
+tf_cal <- function(qt_ptr, name, from_to) {
+    .Call(`_GCAMCTF_tf_cal`, qt_ptr, name, from_to)
 }
 

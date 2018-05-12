@@ -30,5 +30,5 @@ factors <- tf_reg_factors()
 str(factors)
 (factor <- factors[2])
 (from_to <- range(tail(tf_quote$DATE)))
-tf_factor(qt, factor, from_to)
+tf_cal(qt, factor, from_to)
 ```

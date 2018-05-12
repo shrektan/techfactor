@@ -11,7 +11,7 @@ test_that("tf_reg_factors", {
 
 test_that("fails for undefined factor names", {
   expect_error(
-    tf_factor(qt, "#garbname#", anydate(c(20180101, 20180109))),
+    tf_cal(qt, "#garbname#", anydate(c(20180101, 20180109))),
     "factor #garbname# must be defined before using"
   )
 })
@@ -20,7 +20,7 @@ test_that("all the factors can be run", {
   factors <- tf_reg_factors()
   from_to <- range(tail(dt$DATE, 10))
   for (factor in factors) {
-    res <- tf_factor(qt, factor, from_to)
+    res <- tf_cal(qt, factor, from_to)
     expect_is(res, "data.frame")
     expect_equal(nrow(res), 10)
     expect_equal(res$DATE, tail(dt$DATE, 10))

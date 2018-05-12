@@ -450,16 +450,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// tf_factor
-Rcpp::List tf_factor(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to);
-RcppExport SEXP _GCAMCTF_tf_factor(SEXP qt_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP) {
+// tf_cal
+Rcpp::List tf_cal(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_tf_cal(SEXP qt_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type qt_ptr(qt_ptrSEXP);
     Rcpp::traits::input_parameter< std::string >::type name(nameSEXP);
     Rcpp::traits::input_parameter< Rcpp::newDateVector >::type from_to(from_toSEXP);
-    rcpp_result_gen = Rcpp::wrap(tf_factor(qt_ptr, name, from_to));
+    rcpp_result_gen = Rcpp::wrap(tf_cal(qt_ptr, name, from_to));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -504,7 +504,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
-    {"_GCAMCTF_tf_factor", (DL_FUNC) &_GCAMCTF_tf_factor, 3},
+    {"_GCAMCTF_tf_cal", (DL_FUNC) &_GCAMCTF_tf_cal, 3},
     {NULL, NULL, 0}
 };
 

@@ -150,7 +150,7 @@ SEXP tf_quotes_xptr(Rcpp::DataFrame qt_tbl)
 //'   of _DATE_ column is in ascending order.
 //' @export
 // [[Rcpp::export]]
-Rcpp::List tf_factor(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to)
+Rcpp::List tf_cal(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to)
 {
   using namespace Rcpp;
   assert_valid(from_to);
