@@ -53,8 +53,7 @@ inline std::vector<RDate> col_date(const Rcpp::DataFrame tbl, const std::string 
 
 void assert_sorted(const std::vector<RDate>& x);
 
-class Quotes
-{
+class Quotes {
 public:
   Quotes() = default;
   explicit Quotes(const Rcpp::DataFrame tbl)
@@ -72,12 +71,14 @@ public:
   { assert_sorted(dates_); }
 
   // it's mainly for tests
-  RDate today() {
+  RDate today()
+  {
     if (today_index_ < 0) Rcpp::stop("negative today_index_ %d.", today_index_);
     return dates_[today_index_];
   }
 
-  void set(const RDate today) noexcept {
+  void set(const RDate today) noexcept
+  {
     auto iter = std::lower_bound(dates_.cbegin(), dates_.cend(), today);
     if (iter == dates_.cend() || *iter > today) {
       today_index_ = -1;
@@ -97,34 +98,44 @@ public:
   double bmk_close(const int delay = 0) const { return get_(bmk_close_, delay); }
   double bmk_open(const int delay = 0) const { return get_(bmk_open_, delay); }
 
-  Timeseries ts_pclose(const int n, const int delay = 0) const {
+  Timeseries ts_pclose(const int n, const int delay = 0) const
+  {
     return ts_get_(pclose_, n, delay);
   }
-  Timeseries ts_open(const int n, const int delay = 0) const {
+  Timeseries ts_open(const int n, const int delay = 0) const
+  {
     return ts_get_(open_, n, delay);
   }
-  Timeseries ts_high(const int n, const int delay = 0) const {
+  Timeseries ts_high(const int n, const int delay = 0) const
+  {
     return ts_get_(high_, n, delay);
   }
-  Timeseries ts_low(const int n, const int delay = 0) const {
+  Timeseries ts_low(const int n, const int delay = 0) const
+  {
     return ts_get_(low_, n, delay);
   }
-  Timeseries ts_close(const int n, const int delay = 0) const {
+  Timeseries ts_close(const int n, const int delay = 0) const
+  {
     return ts_get_(close_, n, delay);
   }
-  Timeseries ts_vwap(const int n, const int delay = 0) const {
+  Timeseries ts_vwap(const int n, const int delay = 0) const
+  {
     return ts_get_(vwap_, n, delay);
   }
-  Timeseries ts_volume(const int n, const int delay = 0) const {
+  Timeseries ts_volume(const int n, const int delay = 0) const
+  {
     return ts_get_(volume_, n, delay);
   }
-  Timeseries ts_amount(const int n, const int delay = 0) const {
+  Timeseries ts_amount(const int n, const int delay = 0) const
+  {
     return ts_get_(amount_, n, delay);
   }
-  Timeseries ts_bmk_close(const int n, const int delay = 0) const {
+  Timeseries ts_bmk_close(const int n, const int delay = 0) const
+  {
     return ts_get_(bmk_close_, n, delay);
   }
-  Timeseries ts_bmk_open(const int n, const int delay = 0) const {
+  Timeseries ts_bmk_open(const int n, const int delay = 0) const
+  {
     return ts_get_(bmk_open_, n, delay);
   }
 
@@ -182,7 +193,8 @@ private:
   Timeseries bmk_close_;
   Timeseries bmk_open_;
   int today_index_ {0};
-  int delayed_index_(const int delay) const {
+  int delayed_index_(const int delay) const
+  {
     assert_valid_(delay);
     return today_index_ - delay;
   }
@@ -209,11 +221,13 @@ private:
     }
     return res;
   }
-  bool in_bound_(const int delay) const {
+  bool in_bound_(const int delay) const
+  {
     assert_valid_(delay);
     return delayed_index_(delay) >= 0;
   }
-  void assert_valid_(const int delay) const {
+  void assert_valid_(const int delay) const
+  {
     if (delay < 0) Rcpp::stop(
         "delay must be a non-negative integer instead of %d.", delay
     );

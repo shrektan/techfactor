@@ -156,12 +156,10 @@ Rcpp::List tf_cal(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to)
   assert_valid(from_to);
   XPtr<Quotes> qt_xptr {qt_ptr};
   auto& qt = *qt_xptr;
-  if (tf_fast_caculators.count(name))
-  {
+  if (tf_fast_caculators.count(name)) {
     return tf_fast_caculators.at(name)(qt, from_to);
   }
-  else if (tf_caculators.count(name))
-  {
+  else if (tf_caculators.count(name)) {
     const auto& calculator = tf_caculators.at(name);
     const auto dates = qt.tdates(from_to);
     NumericVector vec(dates.size());
@@ -176,8 +174,7 @@ Rcpp::List tf_cal(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to)
     std::copy(dates.cbegin(), dates.cend(), r_dates.begin());
     return DataFrame::create(_["DATE"] = r_dates, _["VALUE"] = vec);
   }
-  else
-  {
+  else {
     stop("factor %s must be defined before using.", name);
   }
 }
