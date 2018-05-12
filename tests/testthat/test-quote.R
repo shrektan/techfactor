@@ -4,11 +4,11 @@ tags <- c("pclose", "open", "high", "low", "close", "vwap",
           "volume", "amount", "bmk_close", "bmk_open")
 
 data("tf_quote")
-dt <- copy(tf_quote)
+dt <- data.table::copy(tf_quote)
 qt <- tf_quotes_xptr(dt)
 
 test_that("quotes' input must be a sorted tbl", {
-  dt_copy <- copy(dt)
+  dt_copy <- data.table::copy(dt)
   setorder(dt_copy, -DATE)
   expect_error(
     tf_quotes_xptr(dt_copy),

@@ -1,7 +1,7 @@
 context("test-factor-calculator.R")
 
 data("tf_quote")
-dt <- copy(tf_quote)
+dt <- data.table::copy(tf_quote)
 qt <- tf_quotes_xptr(dt)
 
 test_that("tf_reg_factors", {

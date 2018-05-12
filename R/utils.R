@@ -1,6 +1,6 @@
 #' @useDynLib GCAMCTF, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-#' @import data.table
+#' @importFrom data.table data.table setkey setorder frank
 NULL
 
 
