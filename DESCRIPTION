@@ -1,7 +1,7 @@
 Package: GCAMCTF
 Type: Package
 Title: GCAMC's Technical Factors
-Version: 0.0.5
+Version: 0.0.6
 Authors@R: c(
     person("Xianying", "Tan", email = "shrektan@126.com", role = c("aut", "cre")),
     person("Nick", "Wang", email = "nkwangpeng@126.com", role = c("ctb"))
@@ -11,6 +11,8 @@ Description: Provide tools that calculate technical factors efficiently.
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/GCAMC/GCAMCTF
+BugReports: https://github.com/GCAMC/GCAMCTF/issues
 Roxygen: list(markdown = TRUE)   
 RoxygenNote: 6.0.1
 SystemRequirements: C++11

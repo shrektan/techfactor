@@ -1,4 +1,4 @@
-# GCAMCTF 0.0.5
+# GCAMCTF 0.0.6
 
 * Added a `NEWS.md` file to track changes to the package.
 * Set up CI and code coverage.
