@@ -23,12 +23,20 @@ The goal of GCAMCTF is to provide tools that calculate technical factors efficie
 ## Example
 
 ```{r example}
+(Sys.time())
 library(GCAMCTF)
 data(tf_quote)
 qt <- tf_quotes_xptr(tf_quote)
 factors <- tf_reg_factors()
 str(factors)
-(factor <- factors[2])
+(factor <- factors[1])
 (from_to <- range(tail(tf_quote$DATE)))
 tf_cal(qt, factor, from_to)
 ```
+
+## session info
+
+```{r session_info}
+sessioninfo::session_info()
+```
+
