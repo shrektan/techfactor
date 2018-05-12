@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{tf_reg_factors}
 \alias{tf_reg_factors}
-\title{The Registered Factor Names}
+\title{The registered factor names}
 \usage{
 tf_reg_factors()
 }

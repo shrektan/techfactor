@@ -2,20 +2,20 @@
 % Please edit documentation in R/RcppExports.R
 \name{tf_quotes_xptr}
 \alias{tf_quotes_xptr}
-\title{The Quotes External Pointer}
+\title{The quotes external pointer}
 \usage{
 tf_quotes_xptr(qt_tbl)
 }
 \arguments{
-\item{qt_tbl}{a \code{data.frame} contains the daily price info
-of a security. It must contain a \emph{DATE} column and 10 numeric
-columns \emph{PCLOSE, OPEN, HIGH, LOW, CLOSE, VWAP, VOLUME, AMOUNT}
-\emph{BMK_CLOSE, BMK_OPEN} . Moreover, the \emph{DATE} column must be
-in ascending order.}
+\item{qt_tbl}{A \code{data.frame} contains the daily price info
+of a security. It must contain a column \code{DATE} and 10 numeric
+columns \code{PCLOSE}, \code{OPEN}, \code{HIGH}, \code{LOW}, \code{CLOSE}, \code{VWAP},
+\code{VOLUME}, \code{AMOUNT}, \code{BMK_CLOSE}, \code{BMK_OPEN}. Moreover, the
+column \code{DATE} must be in ascending order.}
 }
 \value{
-an R external pointer than can hold a \code{Quotes} object.
+An R external pointer than can hold a \code{Quotes} object.
 }
 \description{
-The Quotes External Pointer
+The quotes external pointer
 }
