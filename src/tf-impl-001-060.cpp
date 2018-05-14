@@ -31,18 +31,16 @@ Alpha_fun alpha003 = [](const Quotes& quotes) -> double {
 
 
 Alpha_fun alpha005 = [](const Quotes& quotes) -> double {
-  Timeseries ts;
-  for (int i {2}; i >= 0; --i)
-  {
-    Timeseries rk_vol_5, rk_high_5;
-    for (int k {5}; k >= 0; --k)
-    {
-      rk_vol_5.push_back(tsrank(quotes.ts_volume(5, i + k)));
-      rk_high_5.push_back(tsrank(quotes.ts_high(5, i + k)));
-    }
-    ts.push_back(corr(rk_vol_5, rk_high_5));
-  }
-  return -tsmax(ts);
+  auto fun = [&quotes](const int delay1) {
+    auto volumn = [&quotes, delay1] (const int delay2) {
+      return tsrank(quotes.ts_volume(5, delay2 + delay1));
+    };
+    auto high = [&quotes, delay1] (const int delay2) {
+      return tsrank(quotes.ts_high(5, delay2 + delay1));
+    };
+    return corr(ts(5, volumn), ts(5, high));
+  };
+  return -tsmax(ts(3, fun));
 };
 
 
