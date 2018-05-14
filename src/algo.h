@@ -348,10 +348,11 @@ inline std::vector<bool> operator<(const Timeseries& x, const double y)
 }
 
 
-inline Timeseries ts(const int n, std::function<double(const int)> fun)
+template<typename T>
+std::vector<T> ts(const int n, std::function<T(const int delay)> fun)
 {
   if (n < 1) Rcpp::stop("n (%d) must be positive.", n);
-  Timeseries res;
+  std::vector<T> res;
   for (int i {n - 1}; i >= 0; --i) {
     res.push_back(fun(i));
   }
