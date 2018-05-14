@@ -6,7 +6,9 @@
 namespace alpha_impl
 {
 extern Alpha_fun alpha001;
+extern Alpha_fun alpha002;
 extern Alpha_fun alpha003;
+extern Alpha_fun alpha004;
 extern Alpha_fun alpha005;
 extern Alpha_fun alpha014;
 extern Alpha_fun alpha053;
@@ -23,7 +25,9 @@ extern Alpha_fun alpha149;
 std::map<std::string, Alpha_fun&> tf_caculators
 {
   {"alpha001", alpha_impl::alpha001},
+  {"alpha002", alpha_impl::alpha002},
   {"alpha003", alpha_impl::alpha003},
+  {"alpha004", alpha_impl::alpha004},
   {"alpha005", alpha_impl::alpha005},
   {"alpha014", alpha_impl::alpha014},
   {"alpha053", alpha_impl::alpha053},

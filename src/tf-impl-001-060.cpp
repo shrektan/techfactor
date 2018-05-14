@@ -10,7 +10,34 @@ Alpha_fun alpha001 = [](const Quotes& quotes) -> double {
 };
 
 
+Alpha_fun alpha002 = [](const Quotes& quotes) -> double {
+  const auto close = quotes.ts_close(2);
+  const auto open = quotes.ts_open(2);
+  const auto low = quotes.ts_low(2);
+  const auto high = quotes.ts_high(2);
+  const auto rk_price = ((close - low) - (high - close)) / (high - low);
+  return sum(delta(rk_price)) * -1;
+};
+
+
 Alpha_fun alpha003 = [](const Quotes& quotes) -> double {
+  Timeseries ts;
+  for (int i {5}; i >= 0; --i)
+  {
+    double delay_price;
+    if (quotes.close(i) == quotes.pclose(i)) {
+      ts.push_back(0.0);
+    } else if (quotes.close(i) > quotes.pclose(i)) {
+      ts.push_back(quotes.close(i) - std::min(quotes.low(i), quotes.pclose(i)));
+    } else {
+      ts.push_back(quotes.close(i) - std::min(quotes.high(i), quotes.pclose(i)));
+    }
+  }
+  return sum(ts);
+};
+
+
+Alpha_fun alpha004 = [](const Quotes& quotes) -> double {
   const auto sum_close_8 = sum(quotes.ts_close(8));
   const auto std_close_8 = stdev(quotes.ts_close(8));
   const auto sum_close_2 = sum(quotes.ts_close(2));
