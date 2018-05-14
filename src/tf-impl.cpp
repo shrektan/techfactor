@@ -13,6 +13,13 @@ extern Alpha_fun alpha053;
 extern Alpha_fun alpha149;
 }
 
+
+/* The reason that it has to be the reference of Alpha_fun rather
+ * than the copy is the function is defined externally. If we copy
+ * insert into the tf_calculator, it will fail to link the external
+ * definitions and result a failure `std_bad_call()` when called.
+ */
+
 std::map<std::string, Alpha_fun&> tf_caculators
 {
   {"alpha001", alpha_impl::alpha001},
