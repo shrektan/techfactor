@@ -430,6 +430,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_ts
+Timeseries test_ts(SEXP quotes_ptr, const Rcpp::Date today, const int n);
+RcppExport SEXP _GCAMCTF_test_ts(SEXP quotes_ptrSEXP, SEXP todaySEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_ts(quotes_ptr, today, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_reg_factors
 Rcpp::StringVector tf_reg_factors();
 RcppExport SEXP _GCAMCTF_tf_reg_factors() {
@@ -503,6 +516,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_test_qt_ts_get", (DL_FUNC) &_GCAMCTF_test_qt_ts_get, 5},
     {"_GCAMCTF_test_ts_op", (DL_FUNC) &_GCAMCTF_test_ts_op, 3},
     {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
+    {"_GCAMCTF_test_ts", (DL_FUNC) &_GCAMCTF_test_ts, 3},
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
     {"_GCAMCTF_tf_cal", (DL_FUNC) &_GCAMCTF_tf_cal, 3},
