@@ -138,3 +138,15 @@ Timeseries test_ts_scalar_op(const Timeseries& x, const double y, const std::str
   if (op_scalar_map.count(op) == 0) Rcpp::stop("op %s is not valid.", op);
   return op_scalar_map.at(op)(x, y);
 }
+
+
+// [[Rcpp::export]]
+Timeseries test_ts(SEXP quotes_ptr, const Rcpp::Date today, const int n)
+{
+  Rcpp::XPtr<Quotes> xptr {quotes_ptr};
+  xptr->set(today);
+  auto volumn = [xptr] (const int delay) {
+    return tsrank(xptr->ts_volume(5, delay));
+  };
+  return ts<double>(n, volumn);
+}

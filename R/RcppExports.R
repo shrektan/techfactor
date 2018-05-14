@@ -149,6 +149,10 @@ test_ts_scalar_op <- function(x, y, op) {
     .Call(`_GCAMCTF_test_ts_scalar_op`, x, y, op)
 }
 
+test_ts <- function(quotes_ptr, today, n) {
+    .Call(`_GCAMCTF_test_ts`, quotes_ptr, today, n)
+}
+
 #' The registered factor names
 #'
 #' Return all the factor names that are registered in the C++ routine.
