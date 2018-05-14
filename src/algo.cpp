@@ -18,13 +18,14 @@ Timeseries na_vector(const int length)
 
 
 // [[Rcpp::export("tf_delta")]]
-Timeseries delta(const Timeseries& x)
+Timeseries delta(const Timeseries& x, const int n)
 {
-  assert_length(x, 2);
+  if (n < 1) Rcpp::stop("n (%d) must be a positive integer", n);
+  assert_length(x, n + 1);
   const int n_x = x.size();
-  Timeseries res(n_x - 1);
-  for (int i {1}; i < n_x; ++i) {
-    res[i - 1] = x[i] - x[i - 1];
+  Timeseries res(n_x - n);
+  for (int i {n}; i < n_x; ++i) {
+    res[i - n] = x[i] - x[i - n];
   }
   return res;
 }

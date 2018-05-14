@@ -1,4 +1,4 @@
-# GCAMCTF 0.0.7
+# GCAMCTF 0.0.8
 
 * Added a `NEWS.md` file to track changes to the package.
 * Set up CI and code coverage.
@@ -7,3 +7,4 @@
 * Added the documentation for exported functions.
 * Rename `tf_factor()` to `tf_cal()` to be not confusing with `tf_registered_factors()`.
 * Refactor the cpp file structure.
+* `delta()` gains an additional param n.

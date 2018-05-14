@@ -18,13 +18,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // delta
-Timeseries delta(const Timeseries& x);
-RcppExport SEXP _GCAMCTF_delta(SEXP xSEXP) {
+Timeseries delta(const Timeseries& x, const int n);
+RcppExport SEXP _GCAMCTF_delta(SEXP xSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(delta(x));
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(delta(x, n));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -466,7 +467,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_na_vector", (DL_FUNC) &_GCAMCTF_na_vector, 1},
-    {"_GCAMCTF_delta", (DL_FUNC) &_GCAMCTF_delta, 1},
+    {"_GCAMCTF_delta", (DL_FUNC) &_GCAMCTF_delta, 2},
     {"_GCAMCTF_rank", (DL_FUNC) &_GCAMCTF_rank, 1},
     {"_GCAMCTF_sum", (DL_FUNC) &_GCAMCTF_sum, 1},
     {"_GCAMCTF_mean", (DL_FUNC) &_GCAMCTF_mean, 1},
