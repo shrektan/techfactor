@@ -3,3 +3,4 @@
 ^wercker\.yml$
 ^data-raw$
 ^README\.Rmd$
+^codecov\.yml$
