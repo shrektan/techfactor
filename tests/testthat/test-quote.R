@@ -304,3 +304,30 @@ test_that("ts_op_scalar", {
     })
   )
 })
+
+test_that("ts() algo works expectly", {
+  date <- anydate(20180502)
+  expect_error(test_ts(qt, date, 0), "must be positive")
+  res <- test_ts(qt, date, 1)
+  expect_length(res, 1)
+  expect_equal(
+    res,
+    {
+      rowindex <- dt[, which(DATE == date)]
+      tail(frank(dt[(-4:0 + rowindex), VOLUME]), 1)
+    }
+  )
+  res <- test_ts(qt, date, 3)
+  expect_length(res, 3)
+  expect_equal(
+    res,
+    {
+      rowindex <- dt[, which(DATE == date)]
+      c(
+        tail(frank(dt[(-6:-2 + rowindex), VOLUME]), 1),
+        tail(frank(dt[(-5:-1 + rowindex), VOLUME]), 1),
+        tail(frank(dt[(-4:0 + rowindex), VOLUME]), 1)
+      )
+    }
+  )
+})
