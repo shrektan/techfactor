@@ -15,85 +15,24 @@
 #include <Rcpp.h>
 #include "algo.h"
 
-
-auto alpha001 = [](const Quotes& quotes) -> double {
-  const auto rk_delta_log_vol = rank(delta(log(quotes.ts_close(7))));
-  const auto rk_close_open = rank((quotes.ts_close(6) - quotes.ts_open(6)) / quotes.ts_open(6));
-  return corr(rk_delta_log_vol, rk_close_open) * -1;
-};
-
-
-auto alpha003 = [](const Quotes& quotes) -> double {
-  const auto sum_close_8 = sum(quotes.ts_close(8));
-  const auto std_close_8 = stdev(quotes.ts_close(8));
-  const auto sum_close_2 = sum(quotes.ts_close(2));
-  if (sum_close_8 / 8 + std_close_8 < sum_close_2 / 2) {
-    return -1.0;
-  } else if (sum_close_2 / 2 < sum_close_8 / 8 - std_close_8) {
-    return 1.0;
-  } else {
-    const auto vol = quotes.volume();
-    const auto mean_vol_20 = mean(quotes.ts_volume(20));
-    if (vol / mean_vol_20 >= 1) {
-      return 1.0;
-    } else {
-      return -1.0;
-    }
-  }
-};
-
-
-auto alpha005 = [](const Quotes& quotes) -> double {
-  Timeseries ts;
-  for (int i {2}; i >= 0; --i)
-  {
-    Timeseries rk_vol_5, rk_high_5;
-    for (int k {5}; k >= 0; --k)
-    {
-      rk_vol_5.push_back(tsrank(quotes.ts_volume(5, i + k)));
-      rk_high_5.push_back(tsrank(quotes.ts_high(5, i + k)));
-    }
-    ts.push_back(corr(rk_vol_5, rk_high_5));
-  }
-  return -tsmax(ts);
-};
-
-
-auto alpha014 = [](const Quotes& quotes) -> double {
-  return quotes.close() - quotes.close(5);
-};
-
-
-auto alpha053 = [](const Quotes& quotes) -> double {
-  std::vector<bool> cond;
-  for (int i {11}; i >= 0; --i)
-  {
-    cond.push_back(quotes.close() > quotes.close(1));
-  }
-  return count(cond);
-};
-
-
-auto alpha149 = [](const Quotes& quotes) -> double {
-  const auto dr = quotes.ts_close(252) / quotes.ts_close(252, 1) - 1.0;
-  const auto bmk_dr = quotes.ts_bmk_close(252) / quotes.ts_bmk_close(252, 1) - 1.0;
-  const auto x = filter(dr, bmk_dr < 0.0);
-  const auto y = filter(bmk_dr, bmk_dr < 0.0);
-  return regbeta(x, y);
-};
-
-
-
-std::map<std::string, std::function<double(const Quotes&)>> tf_caculators
+namespace alpha_impl
 {
-  {"alpha001", alpha001},
-  {"alpha003", alpha003},
-  {"alpha005", alpha005},
-  {"alpha014", alpha014},
-  {"alpha053", alpha053},
-  {"alpha149", alpha149}
-};
+extern Alpha_fun alpha001;
+extern Alpha_fun alpha003;
+extern Alpha_fun alpha005;
+extern Alpha_fun alpha014;
+extern Alpha_fun alpha053;
+extern Alpha_fun alpha149;
+}
 
+std::map<std::string, Alpha_fun&> tf_caculators {
+  {"alpha001", alpha_impl::alpha001},
+  {"alpha003", alpha_impl::alpha003},
+  {"alpha005", alpha_impl::alpha005},
+  {"alpha014", alpha_impl::alpha014},
+  {"alpha053", alpha_impl::alpha053},
+  {"alpha149", alpha_impl::alpha149}
+};
 
 std::map<
   std::string,
@@ -160,7 +99,7 @@ Rcpp::List tf_cal(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to)
     return tf_fast_caculators.at(name)(qt, from_to);
   }
   else if (tf_caculators.count(name)) {
-    const auto& calculator = tf_caculators.at(name);
+    auto calculator = tf_caculators.at(name);
     const auto dates = qt.tdates(from_to);
     NumericVector vec(dates.size());
     std::transform(
