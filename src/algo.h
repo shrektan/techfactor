@@ -32,7 +32,7 @@ double covariance(const Timeseries& x, const Timeseries& y);
 double prod(const Timeseries& x);
 double count(const std::vector<bool>& x);
 double regbeta(const Timeseries& x, const Timeseries& y);
-Timeseries regresi(const Timeseries& x, const Timeseries& y);
+double regresi(const Timeseries& x, const Timeseries& y);
 Timeseries filter(const Timeseries& x, const std::vector<bool>& cond);
 double highday(const Timeseries& x);
 double lowday(const Timeseries& x);
