@@ -428,10 +428,15 @@ Alpha_fun alpha044 = [](const Quote& quote) -> double {
     };
     return decaylinear(ts<double>(6, fun2));
   };
+  auto fun3 = [&quote](const int delay1) {
+    auto fun4 = [&quote, delay1](const int delay2) {
+      return quote.vwap(delay1 + delay2) - quote.vwap(delay1 + delay2 + 3);
+    };
+    return decaylinear(ts<double>(10, fun4));
+  };
 
-  return tsrank(ts<double>(4, fun1));
+  return tsrank(ts<double>(4, fun1)) + tsrank(ts<double>(15, fun3));
 };
-
 
 
 // COUNT(CLOSE>DELAY(CLOSE,1),12)/12*100
