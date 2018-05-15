@@ -110,14 +110,26 @@ Alpha_fun alpha009 = [](const Quote& quote) -> double {
 // RANK(MAX(((RET < 0) ? STD(RET, 20) : CLOSE)^2, 5))
 Alpha_fun alpha010 = [](const Quote& quote) -> double {
   auto fun = [&quote](const int i) {
-    if (quote.ret() < 0) {
-      return quote.ret();
+    if (quote.ret(i) < 0) {
+      return std::pow(stdev(quote.ts_ret(20, i)), 2.0);
     } else {
       return std::pow(quote.close(i), 2.0);
     }
   };
   return tsmax(ts<double>(5, fun));
 };
+
+
+// SUM(((CLOSE-LOW)-(HIGH-CLOSE))./(HIGH-LOW).*VOLUME,6)
+Alpha_fun alpha011 = [](const Quote& quote) -> double {
+  auto rk_compose_pv = ((quote.ts_close(6) - quote.ts_low(6)) - (quote.ts_high(6) - quote.ts_close(6))) /
+                       (quote.ts_high(6) - quote.ts_low(6)) * quote.ts_volume(6);
+  return sum(rk_compose_pv);
+};
+
+
+// (RANK((OPEN -(SUM(VWAP, 10) / 10)))) * (-1 * (RANK(ABS((CLOSE -VWAP)))))
+
 
 
 // CLOSE-DELAY(CLOSE,5)

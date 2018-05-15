@@ -15,6 +15,7 @@ extern Alpha_fun alpha007;
 extern Alpha_fun alpha008;
 extern Alpha_fun alpha009;
 extern Alpha_fun alpha010;
+extern Alpha_fun alpha011;
 extern Alpha_fun alpha014;
 extern Alpha_fun alpha053;
 extern Alpha_fun alpha149;
@@ -39,6 +40,7 @@ std::map<std::string, Alpha_fun&> tf_caculators
   {"alpha008", alpha_impl::alpha008},
   {"alpha009", alpha_impl::alpha009},
   {"alpha010", alpha_impl::alpha010},
+  {"alpha011", alpha_impl::alpha011},
   {"alpha014", alpha_impl::alpha014},
   {"alpha053", alpha_impl::alpha053},
   {"alpha149", alpha_impl::alpha149}
