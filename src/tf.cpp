@@ -84,7 +84,9 @@ Rcpp::CharacterVector tf_reg_factors()
 SEXP tf_quote_xptr(Rcpp::DataFrame qt_tbl)
 {
   Quote* ptr = new Quote {qt_tbl};
-  return Rcpp::XPtr<Quote>(ptr, true);
+  auto res = Rcpp::XPtr<Quote>(ptr, true);
+  res.attr("class") = Rcpp::StringVector::create("tf_quote_xptr");
+  return res;
 }
 
 
@@ -94,8 +96,29 @@ SEXP tf_quote_xptr(Rcpp::DataFrame qt_tbl)
 SEXP tf_quotes_xptr(Rcpp::List qt_tbls)
 {
   Quotes* ptr = new Quotes {qt_tbls};
-  return Rcpp::XPtr<Quotes>(ptr, true);
+  auto res = Rcpp::XPtr<Quotes>(ptr, true);
+  res.attr("class") = Rcpp::StringVector::create("tf_quotes_xptr");
+  return res;
 }
+
+
+template<typename T>
+void asset_valid(Rcpp::XPtr<T> x, const std::string& classname)
+{
+  const std::string msg = "The class of xptr must be " + classname;
+  if (Rf_isNull(x.attr("class"))) {
+    Rcpp::stop(msg);
+  } else {
+    Rcpp::StringVector classes = x.attr("class");
+    const bool existed =
+      std::find(classes.cbegin(), classes.cend(), Rcpp::String(classname)) ==
+      classes.cend();
+    if (!existed) {
+      Rcpp::stop(msg);
+    }
+  }
+}
+
 
 
 //' Calculate the TF for single security
@@ -113,6 +136,7 @@ Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDa
   using namespace Rcpp;
   assert_valid(from_to);
   XPtr<Quote> qt_xptr {qt_ptr};
+  asset_valid(qt_xptr, "tf_quote_xptr");
   auto& qt = *qt_xptr;
 
   const auto dates = qt.tdates(from_to);
@@ -162,8 +186,8 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
   using namespace Rcpp;
   assert_valid(from_to);
   XPtr<Quotes> qts_xptr {qts_ptr};
+  asset_valid(qts_xptr, "tf_quotes_xptr");
   auto& qts = *qts_xptr;
-
   const auto dates = qts.tdates(from_to);
   NumericMatrix res(qts.size(), dates.size());
   auto res_iter = res.begin();
@@ -192,6 +216,7 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
     stop("factor %s must be defined before using.", name);
   }
 
+  return res;
   res = Rcpp::transpose(res);
   newDateVector r_dates(dates.size());
   std::copy(dates.cbegin(), dates.cend(), r_dates.begin());
