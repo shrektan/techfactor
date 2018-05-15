@@ -332,6 +332,33 @@ inline Timeseries operator/(const Timeseries& x, const Timeseries& y)
 }
 
 
+inline double tf_pow(const double base, const double exp)
+{
+  if (Rcpp::NumericVector::is_na(base) ||
+      Rcpp::NumericVector::is_na(exp) ||
+      base < 0.0 ||
+      (base == 0.0 && exp < 0.0)
+  ) return NA_REAL;
+  return std::pow(base, exp);
+}
+
+
+inline Timeseries pow(const Timeseries& base, const Timeseries& exp)
+{
+  Timeseries res(base.size());
+  std::transform(
+    base.cbegin(), base.cend(),
+    exp.cbegin(), res.begin(),
+    [](const double base_, const double exp_) {
+      double res = std::pow(base_, exp_);
+      if (R_finite(res)) return res;
+      return NA_REAL;
+    }
+  );
+  return res;
+}
+
+
 inline Timeseries operator+(const Timeseries& x, const double y)
 {
   Timeseries res(x.size());
@@ -400,5 +427,77 @@ inline std::vector<bool> operator<(const Timeseries& x, const double y)
   return res;
 }
 
+
+inline Timeseries pow(const Timeseries& base, const double exp)
+{
+  Timeseries res(base.size());
+  std::transform(
+    base.cbegin(), base.cend(),
+    res.begin(), [exp](const double v) {
+      double res = std::pow(v, exp);
+      if (R_finite(res)) return res;
+      return NA_REAL;
+    }
+  );
+  return res;
+}
+
+
+inline std::vector<Quote> v_quote(Rcpp::List qt_tbls)
+{
+  std::vector<Quote> res;
+  const int n = qt_tbls.size();
+  for (int i {0}; i < n; ++i) {
+    Rcpp::DataFrame qt_tbl = Rcpp::wrap(qt_tbls[i]);
+    res.emplace_back(qt_tbl);
+  }
+  return res;
+}
+
+
+inline std::vector<std::string> v_names(Rcpp::List qt_tbls)
+{
+  if (Rf_isNull(qt_tbls.attr("names"))) Rcpp::stop(
+      "qt_tbls must have names attributes."
+  );
+  Rcpp::StringVector names = qt_tbls.attr("names");
+  return Rcpp::as<std::vector<std::string>>(names);
+}
+
+
+class Quotes {
+public:
+  Quotes() = default;
+  explicit Quotes(Rcpp::List qt_tbls)
+    : names_ (v_names(qt_tbls)),
+      qts_ (v_quote(qt_tbls))
+    { }
+  void set(const RDate today) noexcept
+  {
+    for (auto& qt : qts_) qt.set(today);
+  }
+  Timeseries apply(std::function<double(const Quote&)> fun) const
+  {
+    Timeseries res;
+    std::transform(qts_.cbegin(), qts_.cend(), std::back_inserter(res), fun);
+    return res;
+  }
+  std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
+  {
+    std::set<RDate> set;
+    for (const auto& qt : qts_) {
+      auto dates = qt.tdates(from_to);
+      for (auto date : dates) set.insert(date);
+    }
+    std::vector<RDate> res;
+    std::copy(set.cbegin(), set.cend(), std::back_inserter(res));
+    return res;
+  }
+  int size() const { return qts_.size(); }
+  const std::vector<std::string>& names() const { return names_; }
+private:
+  std::vector<std::string> names_;
+  std::vector<Quote> qts_;
+};
 
 #endif //__GCAMCTF_ALGO__

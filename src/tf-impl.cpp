@@ -79,10 +79,13 @@ std::map<std::string, Alpha_fun&> tf_caculators
 };
 
 
-std::map<
-  std::string,
-  std::function<Rcpp::DataFrame(Quote&, const Rcpp::newDateVector)>
-> tf_fast_caculators
-{
 
+namespace alpha_impl
+{
+extern Alpha_mfun alpha121;
+}
+
+std::map<std::string, Alpha_mfun&> tf_mcaculators
+{
+  {"alpha121", alpha_impl::alpha121}
 };
