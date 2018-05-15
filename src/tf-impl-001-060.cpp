@@ -3,16 +3,17 @@
 
 namespace alpha_impl
 {
+
+// (-1 * CORR(RANK(DELTA(LOG(VOLUME), 1)), RANK(((CLOSE -OPEN) / OPEN)), 6))
 Alpha_fun alpha001 = [](const Quotes& quotes) -> double {
-  // (-1 * CORR(RANK(DELTA(LOG(VOLUME), 1)), RANK(((CLOSE -OPEN) / OPEN)), 6))
   const auto rk_delta_log_vol = rank(delta(log(quotes.ts_close(7)), 1));
   const auto rk_close_open = rank((quotes.ts_close(6) - quotes.ts_open(6)) / quotes.ts_open(6));
   return corr(rk_delta_log_vol, rk_close_open) * -1;
 };
 
 
+// (-1* DELTA((((CLOSE -LOW) -(HIGH -CLOSE)) / (HIGH -LOW)), 1))
 Alpha_fun alpha002 = [](const Quotes& quotes) -> double {
-  // (-1* DELTA((((CLOSE -LOW) -(HIGH -CLOSE)) / (HIGH -LOW)), 1))
   const auto close = quotes.ts_close(2);
   const auto open = quotes.ts_open(2);
   const auto low = quotes.ts_low(2);
@@ -40,10 +41,10 @@ Alpha_fun alpha003 = [](const Quotes& quotes) -> double {
 };
 
 
+// ((((SUM(CLOSE, 8) / 8) + STD(CLOSE, 8)) < (SUM(CLOSE, 2) / 2)) ?
+// (-1 * 1) : (((SUM(CLOSE, 2) / 2) < ((SUM(CLOSE, 8) / 8) -STD(CLOSE, 8))) ?
+// 1 : (((1 < (VOLUME / MEAN(VOLUME,20))) || ((VOLUME / MEAN(VOLUME,20)) == 1)) ? 1 : (-1 * 1))))
 Alpha_fun alpha004 = [](const Quotes& quotes) -> double {
-  // ((((SUM(CLOSE, 8) / 8) + STD(CLOSE, 8)) < (SUM(CLOSE, 2) / 2)) ? (-1 * 1) :
-  // (((SUM(CLOSE, 2) / 2) < ((SUM(CLOSE, 8) / 8) -STD(CLOSE, 8))) ? 1 :
-  // (((1 < (VOLUME / MEAN(VOLUME,20))) || ((VOLUME / MEAN(VOLUME,20)) == 1)) ? 1 : (-1 * 1))))
   const auto sum_close_8 = sum(quotes.ts_close(8));
   const auto std_close_8 = stdev(quotes.ts_close(8));
   const auto sum_close_2 = sum(quotes.ts_close(2));
@@ -63,8 +64,8 @@ Alpha_fun alpha004 = [](const Quotes& quotes) -> double {
 };
 
 
+// (-1 * TSMAX(CORR(TSRANK(VOLUME, 5), TSRANK(HIGH, 5), 5), 3))
 Alpha_fun alpha005 = [](const Quotes& quotes) -> double {
-  // (-1 * TSMAX(CORR(TSRANK(VOLUME, 5), TSRANK(HIGH, 5), 5), 3))
   auto fun = [&quotes](const int delay1) {
     auto volumn = [&quotes, delay1] (const int delay2) {
       return tsrank(quotes.ts_volume(5, delay2 + delay1));
@@ -78,24 +79,16 @@ Alpha_fun alpha005 = [](const Quotes& quotes) -> double {
 };
 
 
+// (RANK(SIGN(DELTA((((OPEN * 0.85) + (HIGH * 0.15))), 4)))* -1)
 Alpha_fun alpha006 = [](const Quotes& quotes) -> double {
-  // (RANK(SIGN(DELTA((((OPEN * 0.85) + (HIGH * 0.15))), 4)))* -1)
-  const auto rk_delta_price = delta(quotes.ts_open(5) * 0.85 + quotes.ts_high(5) * 0.15, 4);
-  return sign(sum(rk_delta_price));
+  const auto rk_delta_compose_price = delta(quotes.ts_open(5) * 0.85 + quotes.ts_high(5) * 0.15, 4);
+  return sign(sum(rk_delta_compose_price));
 };
 
 
+// (RANK(MAX((VWAP -CLOSE), 3)) + RANK(MIN((VWAP -CLOSE), 3))) * RANK(DELTA(VOLUME, 3))
 Alpha_fun alpha007 = [](const Quotes& quotes) -> double {
-  // (RANK(MAX((VWAP -CLOSE), 3)) + RANK(MIN((VWAP -CLOSE), 3))) * RANK(DELTA(VOLUME, 3))
   return 1;
-};
-
-
-Alpha_fun alpha008 = [](const Quotes& quotes) -> double {
-  // RANK(DELTA(((((HIGH + LOW) / 2) * 0.2) + (VWAP * 0.8)), 4) * -1)
-  const auto rk_compose_price = ((quotes.high(5) + quotes.low(5)) / 2) * 0.2 + quotes.vwap(5) * 0.8;
-  const auto rk_delta_compose_price = sum(delta(rk_compose_price, 4));
-  return -rk_delta_compose_price;
 };
 
 
