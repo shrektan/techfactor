@@ -22,7 +22,8 @@ Imports:
     Rcpp (>= 0.12.10),
     data.table (>= 1.10.5),
     magrittr,
-    anytime
+    anytime,
+    xts
 Suggests: 
     testthat,
     covr,

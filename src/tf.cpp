@@ -108,6 +108,26 @@ Rcpp::List tf_cal(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to)
 }
 
 
+// [[Rcpp::export]]
+Rcpp::NumericMatrix create_xts(Rcpp::NumericMatrix x_mat, Rcpp::newDateVector x_dates)
+{
+  Rcpp::NumericVector dates = Rcpp::clone(x_dates) * 86400;
+  dates.attr("tzone") = "UTC";
+  dates.attr("tclass") = "Date";
+
+  Rcpp::NumericMatrix mat = Rcpp::clone(x_mat);
+  mat.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::colnames(mat));
+  mat.attr("index") = dates;
+  mat.attr("class") = Rcpp::CharacterVector::create("xts", "zoo");
+  mat.attr(".indexCLASS") = "Date";
+  mat.attr("tclass") = "Date";
+  mat.attr(".indexTZ") = "UTC";
+  mat.attr("tzone") = "UTC";
+  return mat;
+}
+
+
+//' @rdname
 //' @export
 // [[Rcpp::export]]
 Rcpp::List tf_mcal(SEXP qts_ptr, std::string name, Rcpp::newDateVector from_to)

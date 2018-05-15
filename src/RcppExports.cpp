@@ -477,6 +477,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// create_xts
+Rcpp::NumericMatrix create_xts(Rcpp::NumericMatrix x_mat, Rcpp::newDateVector x_dates);
+RcppExport SEXP _GCAMCTF_create_xts(SEXP x_matSEXP, SEXP x_datesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type x_mat(x_matSEXP);
+    Rcpp::traits::input_parameter< Rcpp::newDateVector >::type x_dates(x_datesSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_xts(x_mat, x_dates));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_na_vector", (DL_FUNC) &_GCAMCTF_na_vector, 1},

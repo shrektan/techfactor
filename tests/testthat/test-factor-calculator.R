@@ -4,10 +4,20 @@ data("tf_quote")
 dt <- data.table::copy(tf_quote)
 qt <- tf_quote_xptr(dt)
 
+
+test_that("create_xts() return the same xts object as xts::xts()", {
+  dat <- as.matrix(head(cars))
+  dates <- as.Date("2018-01-01") + seq_len(nrow(dat)) - 1
+  expect_equal(
+    create_xts(dat, dates),
+    xts::xts(dat, dates)
+  )
+})
+
+
 test_that("tf_reg_factors", {
   expect_is(tf_reg_factors(), "character")
 })
-
 
 test_that("fails for undefined factor names", {
   expect_error(
