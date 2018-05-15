@@ -10,6 +10,6 @@ using Timeseries = std::vector<double>;
 class Quote;
 using Alpha_fun = std::function<double(const Quote&)>;
 class Quotes;
-using Alpha_mfun = std::function<Timeseries(const Quote&)>;
+using Alpha_mfun = std::function<Timeseries(const Quotes&)>;
 
 #endif // __GCAMCTF_TYPES__

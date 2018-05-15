@@ -381,7 +381,7 @@ public:
   {
     for (auto& qt : qts_) qt.set(today);
   }
-  Timeseries apply(std::function<Timeseries(const Quote&)> fun) const
+  Timeseries apply(std::function<double(const Quote&)> fun) const
   {
     Timeseries res;
     std::transform(qts_.cbegin(), qts_.cend(), std::back_inserter(res), fun);
@@ -389,7 +389,18 @@ public:
   }
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
   {
-
+    std::vector<RDate> res;
+    for (const auto& qt : qts_) {
+      auto dates = qt.tdates(from_to);
+      std::vector<RDate> merged;
+      std::set_union(
+        res.cbegin(), res.cend(),
+        dates.cbegin(), dates.cend(),
+        std::back_inserter(merged)
+      );
+      res = std::move(merged);
+    }
+    return res;
   }
 private:
   std::vector<Quote> qts_;
