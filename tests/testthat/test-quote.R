@@ -169,70 +169,84 @@ test_that("qt.ts_get()", {
 
 test_that("ts_qt_misc_getter", {
   date <- anydate(20180504)
+  date2 <- anydate(20180502)
   expect_equal(
-    test_qt_get(qt, date, "tr", 0),
+    c(test_qt_get(qt, date, "tr", 0), test_qt_get(qt, date, "tr", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
-      max(
-        max(crt$HIGH - crt$LOW, abs(crt$HIGH - prev$CLOSE)),
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
+      pmax(
+        pmax(crt$HIGH - crt$LOW, abs(crt$HIGH - prev$CLOSE)),
         abs(crt$LOW - prev$CLOSE)
       )
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "ret", 0),
+    c(test_qt_get(qt, date, "ret", 0), test_qt_get(qt, date, "ret", 2)),
     {
-      crt <- dt[J(date)]
+      crt <- dt[J(c(date, date2))]
       crt$CLOSE / crt$PCLOSE - 1.0
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "dtm", 0),
+    c(test_qt_get(qt, date, "dtm", 0), test_qt_get(qt, date, "dtm", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
-      if (crt$OPEN <= prev$OPEN) {
-        0
-      } else {
-        max(
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
+      ifelse(
+        crt$OPEN <= prev$OPEN,
+        0,
+        pmax(
           crt$HIGH - crt$OPEN,
           crt$OPEN - prev$OPEN
         )
-      }
+      )
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "dbm", 0),
+    c(test_qt_get(qt, date, "dbm", 0), test_qt_get(qt, date, "dbm", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
-      if (crt$OPEN >= prev$OPEN) {
-        0
-      } else {
-        max(
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
+      ifelse(
+        crt$OPEN >= prev$OPEN,
+        0,
+        pmax(
           crt$OPEN - crt$LOW,
           crt$OPEN - prev$OPEN
         )
-      }
+      )
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "hd", 0),
+    c(test_qt_get(qt, date, "hd", 0), test_qt_get(qt, date, "hd", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
       crt$HIGH - prev$HIGH
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "ld", 0),
+    c(test_qt_get(qt, date, "ld", 0), test_qt_get(qt, date, "ld", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
       prev$LOW - crt$LOW
     }
   )
+})
+
+
+test_that("ts_qt_misc_ts_getter", {
+  date <- anydate(20180504)
+  vars <- c("tr", "ret", "dtm", "dbm", "hd", "ld")
+  purrr::walk(vars, ~{
+    var <- .x
+    expect_equal(
+      test_qt_ts_get(qt, date, var, 5, 2),
+      purrr::map_dbl(4:0, ~test_qt_get(qt, date, var, 2 + .x))
+    )
+  })
 })
 
 
