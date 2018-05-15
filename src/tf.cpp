@@ -131,9 +131,9 @@ void asset_valid(SEXP x, const std::string& classname)
 Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDateVector from_to)
 {
   using namespace Rcpp;
+  asset_valid(qt_ptr, "tf_quote_xptr");
   assert_valid(from_to);
   XPtr<Quote> qt_xptr {qt_ptr};
-  asset_valid(qt_xptr, "tf_quote_xptr");
   auto& qt = *qt_xptr;
 
   const auto dates = qt.tdates(from_to);
@@ -181,9 +181,9 @@ Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDa
 Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVector from_to)
 {
   using namespace Rcpp;
+  asset_valid(qts_ptr, "tf_quotes_xptr");
   assert_valid(from_to);
   XPtr<Quotes> qts_xptr {qts_ptr};
-  asset_valid(qts_xptr, "tf_quotes_xptr");
   auto& qts = *qts_xptr;
   const auto dates = qts.tdates(from_to);
   NumericMatrix res(qts.size(), dates.size());
@@ -213,7 +213,6 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
     stop("factor %s must be defined before using.", name);
   }
 
-  return res;
   res = Rcpp::transpose(res);
   newDateVector r_dates(dates.size());
   std::copy(dates.cbegin(), dates.cend(), r_dates.begin());

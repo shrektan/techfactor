@@ -3,6 +3,7 @@ context("test-factor-calculator.R")
 data("tf_quote")
 dt <- data.table::copy(tf_quote)
 qt <- tf_quote_xptr(dt)
+qts <- tf_quotes_xptr(list(aa = dt, bb = dt))
 
 test_that("assert_class works", {
   x <- structure(list(a = 1), class = c("abc", "bcd"))
@@ -12,12 +13,20 @@ test_that("assert_class works", {
 })
 
 
-test_that("qt has class", {
+test_that("qt/qts has class", {
   expect_is(qt, "tf_quote_xptr")
+  expect_is(qts, "tf_quotes_xptr")
 })
 
-test_that("tf_quote_cal() and tf_quotes_cal() will check the xptr's class", {
-  tf_qts_cal(qt, "abc", range(tail(dt$DATE)))
+test_that("tf_qt_cal() and tf_qts_cal() will check the xptr's class", {
+  expect_error(
+    tf_qts_cal(qt, "abc", range(tail(dt$DATE))),
+    "must be tf_quotes_xptr"
+  )
+  expect_error(
+    tf_qt_cal(qts, "abc", range(tail(dt$DATE))),
+    "must be tf_quote_xptr"
+  )
 })
 
 test_that("create_xts() return the same xts object as xts::xts()", {
