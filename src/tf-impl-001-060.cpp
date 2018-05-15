@@ -298,16 +298,139 @@ Alpha_fun alpha029 = [](const Quote& quote) -> double {
 
 // WMA((REGRESI(CLOSE/DELAY(CLOSE)-1,MKT，60))^2,20)
 Alpha_fun alpha030 = [](const Quote& quote) -> double {
-
   auto fun = [&quote](const int delay) {
     Timeseries close_ret = quote.ts_close(60, delay) / quote.ts_close(60, 1 + delay) - 1;
     Timeseries bmk_close_ret = quote.ts_bmk_close(60, delay) / quote.ts_bmk_close(60, 1 + delay) - 1;
-    double residual = std::pow(regresi(close_ret, bmk_close_ret), 2.0);
+    return std::pow(regresi(close_ret, bmk_close_ret), 2.0);
   };
   return wma(ts<double>(20, fun));
 };
 
 
+// (CLOSE-MEAN(CLOSE,12))/MEAN(CLOSE,12)*100
+Alpha_fun alpha031 = [](const Quote& quote) -> double {
+  return (quote.close() - mean(quote.ts_close(12))) / mean(quote.ts_close(12)) * 100;
+};
+
+
+// (-1 * SUM(RANK(CORR(RANK(HIGH), RANK(VOLUME), 3)), 3))
+Alpha_fun alpha032 = [](const Quote& quote) -> double {
+  return 1;
+};
+
+
+// ((((-1 * TSMIN(LOW, 5)) + DELAY(TSMIN(LOW, 5), 5)) * RANK(((SUM(RET, 240) -SUM(RET, 20)) / 220))) * TSRANK(VOLUME, 5))
+Alpha_fun alpha033 = [](const Quote& quote) -> double {
+  return 1;
+};
+
+
+// MEAN(CLOSE,12)/CLOSE
+Alpha_fun alpha034 = [](const Quote& quote) -> double {
+  return mean(quote.ts_close(12)) / quote.close();
+};
+
+
+// (MIN(RANK(DECAYLINEAR(DELTA(OPEN, 1), 15)),
+// RANK(DECAYLINEAR(CORR((VOLUME), ((OPEN * 0.65) + (OPEN *0.35)), 17),7))) * -1)
+Alpha_fun alpha035 = [](const Quote& quote) -> double {
+  return 1;
+};
+
+
+// RANK(SUM(CORR(RANK(VOLUME), RANK(VWAP)),6), 2)
+Alpha_fun alpha036 = [](const Quote& quote) -> double {
+  return 1;
+};
+
+
+// (-1 * RANK(((SUM(OPEN, 5) * SUM(RET, 5)) -DELAY((SUM(OPEN, 5) * SUM(RET, 5)), 10))))
+Alpha_fun alpha037 = [](const Quote& quote) -> double {
+  return 1;
+};
+
+
+// (((SUM(HIGH, 20) / 20) < HIGH) ? (-1 * DELTA(HIGH, 2)) : 0)
+Alpha_fun alpha038 = [](const Quote& quote) -> double {
+  if (mean(quote.ts_high(20)) < quote.high()) {
+    return -sum(delta(quote.ts_high(3), 2));
+  } else {
+    return 0.0;
+  }
+};
+
+
+// ((RANK(DECAYLINEAR(DELTA((CLOSE), 2),8)) -RANK(DECAYLINEAR(CORR(((VWAP * 0.3) + (OPEN * 0.7)),
+// SUM(MEAN(VOLUME,180), 37), 14), 12))) * -1)
+Alpha_fun alpha039 = [](const Quote& quote) -> double {
+  return 1;
+};
+
+
+// SUM((CLOSE>DELAY(CLOSE,1)?VOLUME:0),26)/SUM((CLOSE<=DELAY(CLOSE,1)?VOLUME:0),26)*100
+Alpha_fun alpha040 = [](const Quote& quote) -> double {
+  auto fun1 = [&quote](const int delay) {
+    if (quote.close(delay) > quote.close(1 + delay)) {
+      return quote.volume(delay);
+    } else {
+      return 0.0;
+    }
+  };
+  auto fun2 = [&quote](const int delay) {
+    if (quote.close(delay) <= quote.close(1 + delay)) {
+      return quote.volume(delay);
+    } else {
+      return 0.0;
+    }
+  };
+  return sum(ts<double>(26, fun1)) / sum(ts<double>(26, fun2)) * 100;
+};
+
+
+// RANK(MAX(DELTA((VWAP), 3), 5))* -1
+Alpha_fun alpha041 = [](const Quote& quote) -> double {
+  return std::max(sum(delta(quote.ts_vwap(4), 3)), 5.0);
+};
+
+
+// (-1 * RANK(STD(HIGH, 10))) * CORR(HIGH, VOLUME, 10)
+Alpha_fun alpha042 = [](const Quote& quote) -> double {
+  return 1;
+};
+
+
+// SUM((CLOSE>DELAY(CLOSE,1)?VOLUME:(CLOSE<DELAY(CLOSE,1)?-VOLUME:0)),6)
+Alpha_fun alpha043 = [](const Quote& quote) -> double {
+  auto fun = [&quote](const int delay) {
+    if (quote.close(delay) > quote.close(delay + 1)) {
+      return quote.volume(delay);
+    } else if (quote.close(delay) < quote.close(delay + 1)) {
+      return -quote.volume(delay);
+    } else {
+      return 0.0;
+    }
+  };
+  return sum(ts<double>(6, fun));
+};
+
+
+// TSRANK(DECAYLINEAR(CORR((LOW), MEAN(VOLUME,10), 7), 6),4) +
+// TSRANK(DECAYLINEAR(DELTA(VWAP, 3), 10), 15)
+Alpha_fun alpha044 = [](const Quote& quote) -> double {
+  auto fun1 = [&quote](const int delay1) {
+    auto fun2 = [&quote, delay1](const int delay2) {
+      Timeseries ts_low = quote.ts_low(7, delay1 + delay2);
+      auto volume = [&quote, delay1, delay2](const int delay3) {
+        return mean(quote.ts_volume(10, delay1 + delay2 + delay3));
+      };
+      Timeseries ts_volume = ts<double>(7, volume);
+      return corr(ts_low, ts_volume);
+    };
+    return decaylinear(ts<double>(6, fun2));
+  };
+
+  return tsrank(ts<double>(4, fun1));
+};
 
 
 
