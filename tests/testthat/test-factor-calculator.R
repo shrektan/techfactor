@@ -24,7 +24,7 @@ test_that("all the factors can be run", {
     expect_is(res, "data.frame")
     expect_equal(nrow(res), 10)
     expect_equal(res$DATE, tail(dt$DATE, 10))
-    expect_true(all(is.finite(res$VALUE)))
+    expect_true(all(is.finite(res$VALUE[!is.na(res$VALUE)])))
     expect_true(!any(is.nan(res$VALUE)))
   }
 })

@@ -22,12 +22,12 @@ Alpha_fun alpha002 = [](const Quotes& quotes) -> double {
 };
 
 
+// SUM((CLOSE=DELAY(CLOSE,1)?0:CLOSE-(CLOSE>DELAY(CLOSE,1)?
+// MIN(LOW,DELAY(CLOSE,1)):MAX(HIGH,DELAY(CLOSE,1)))),6)
 Alpha_fun alpha003 = [](const Quotes& quotes) -> double {
-  // SUM((CLOSE=DELAY(CLOSE,1)?0:CLOSE-(CLOSE>DELAY(CLOSE,1)?MIN(LOW,DELAY(CLOSE,1)):MAX(HIGH,DELAY(CLOSE,1)))),6)
   Timeseries ts;
   for (int i {5}; i >= 0; --i)
   {
-    double delay_price;
     if (quotes.close(i) == quotes.pclose(i)) {
       ts.push_back(0.0);
     } else if (quotes.close(i) > quotes.pclose(i)) {
@@ -65,18 +65,16 @@ Alpha_fun alpha004 = [](const Quotes& quotes) -> double {
 
 Alpha_fun alpha005 = [](const Quotes& quotes) -> double {
   // (-1 * TSMAX(CORR(TSRANK(VOLUME, 5), TSRANK(HIGH, 5), 5), 3))
-  Timeseries ts;
-  for (int i {2}; i >= 0; --i)
-  {
-    Timeseries rk_vol_5, rk_high_5;
-    for (int k {5}; k >= 0; --k)
-    {
-      rk_vol_5.push_back(tsrank(quotes.ts_volume(5, i + k)));
-      rk_high_5.push_back(tsrank(quotes.ts_high(5, i + k)));
-    }
-    ts.push_back(corr(rk_vol_5, rk_high_5));
-  }
-  return -tsmax(ts);
+  auto fun = [&quotes](const int delay1) {
+    auto volumn = [&quotes, delay1] (const int delay2) {
+      return tsrank(quotes.ts_volume(5, delay2 + delay1));
+    };
+    auto high = [&quotes, delay1] (const int delay2) {
+      return tsrank(quotes.ts_high(5, delay2 + delay1));
+    };
+    return corr(ts<double>(5, volumn), ts<double>(5, high));
+  };
+  return -tsmax(ts<double>(3, fun));
 };
 
 
@@ -101,18 +99,18 @@ Alpha_fun alpha008 = [](const Quotes& quotes) -> double {
 };
 
 
+// CLOSE-DELAY(CLOSE,5)
 Alpha_fun alpha014 = [](const Quotes& quotes) -> double {
   return quotes.close() - quotes.close(5);
 };
 
 
+// COUNT(CLOSE>DELAY(CLOSE,1),12)/12*100
 Alpha_fun alpha053 = [](const Quotes& quotes) -> double {
-  std::vector<bool> cond;
-  for (int i {11}; i >= 0; --i)
-  {
-    cond.push_back(quotes.close() > quotes.close(1));
-  }
-  return count(cond);
+  auto fun = [&quotes] (const int delay) {
+    return quotes.close(delay + 0) > quotes.close(delay + 1);
+  };
+  return count(ts<bool>(12, fun)) / 12.0 * 100.0;
 };
 
 }
