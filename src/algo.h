@@ -401,4 +401,61 @@ inline std::vector<bool> operator<(const Timeseries& x, const double y)
 }
 
 
+inline std::vector<Quote> v_quote(Rcpp::List qt_tbls)
+{
+  std::vector<Quote> res;
+  const int n = qt_tbls.size();
+  for (int i {0}; i < n; ++i) {
+    Rcpp::DataFrame qt_tbl = Rcpp::wrap(qt_tbls[i]);
+    res.emplace_back(qt_tbl);
+  }
+  return res;
+}
+
+
+inline std::vector<std::string> v_names(Rcpp::List qt_tbls)
+{
+  if (Rf_isNull(qt_tbls.attr("names"))) Rcpp::stop(
+      "qt_tbls must have names attributes."
+  );
+  Rcpp::StringVector names = qt_tbls.attr("names");
+  return Rcpp::as<std::vector<std::string>>(names);
+}
+
+
+class Quotes {
+public:
+  Quotes() = default;
+  explicit Quotes(Rcpp::List qt_tbls)
+    : names_ (v_names(qt_tbls)),
+      qts_ (v_quote(qt_tbls))
+    { }
+  void set(const RDate today) noexcept
+  {
+    for (auto& qt : qts_) qt.set(today);
+  }
+  Timeseries apply(std::function<double(const Quote&)> fun) const
+  {
+    Timeseries res;
+    std::transform(qts_.cbegin(), qts_.cend(), std::back_inserter(res), fun);
+    return res;
+  }
+  std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
+  {
+    std::set<RDate> set;
+    for (const auto& qt : qts_) {
+      auto dates = qt.tdates(from_to);
+      for (auto date : dates) set.insert(date);
+    }
+    std::vector<RDate> res;
+    std::copy(set.cbegin(), set.cend(), std::back_inserter(res));
+    return res;
+  }
+  int size() const { return qts_.size(); }
+  const std::vector<std::string>& names() const { return names_; }
+private:
+  std::vector<std::string> names_;
+  std::vector<Quote> qts_;
+};
+
 #endif //__GCAMCTF_ALGO__
