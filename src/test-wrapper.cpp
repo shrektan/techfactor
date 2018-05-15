@@ -96,7 +96,8 @@ const std::map<
   {"+", [](const Timeseries& x, const Timeseries& y) { return x + y; }},
   {"-", [](const Timeseries& x, const Timeseries& y) { return x - y; }},
   {"*", [](const Timeseries& x, const Timeseries& y) { return x * y; }},
-  {"/", [](const Timeseries& x, const Timeseries& y) { return x / y; }}
+  {"/", [](const Timeseries& x, const Timeseries& y) { return x / y; }},
+  {"^", [](const Timeseries& x, const Timeseries& y) { return pow(x, y); }}
 };
 
 
@@ -117,6 +118,7 @@ const std::map<
   {"-", [](const Timeseries& x, const double y) { return x - y; }},
   {"*", [](const Timeseries& x, const double y) { return x * y; }},
   {"/", [](const Timeseries& x, const double y) { return x / y; }},
+  {"^", [](const Timeseries& x, const double y) { return pow(x, y); }},
   {">",
    [](const Timeseries& x, const double y) {
      const auto bool_res = x > y;

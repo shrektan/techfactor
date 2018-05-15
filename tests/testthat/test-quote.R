@@ -251,8 +251,8 @@ test_that("ts_qt_misc_ts_getter", {
 
 
 test_that("ts_op_ts", {
-  x <- c(-1.0, 0.0, 1.0, 2.0, NA, 3.0, NA, 0.0)
-  y <- c(-0.1, 0.1, 0.0, 1.0, 1.2, NA, NA, 0.0)
+  x <- c(-1.0, 0.0, 1.0, 2.0, NA, 3.0, NA, 0.0, -3.0, 2.3, 0.0)
+  y <- c(-0.1, 0.1, 0.0, 1.0, 1.2, NA, NA, 0.0, 2.3, -3.0, -2.0)
   expect_equal(
     test_ts_op(x, y, "+"),
     x + y
@@ -274,6 +274,15 @@ test_that("ts_op_ts", {
       res
     }
   )
+  expect_equal(
+    test_ts_op(x, y, "^"),
+    {
+      res <- x ^ y
+      res[!is.finite(res)] <- NA_real_
+      res
+    }
+  )
+  expect_false(is.nan(test_ts_op(-4, -0.5, "^")))
 })
 
 
@@ -291,6 +300,14 @@ test_that("ts_op_scalar", {
   expect_equal(
     purrr::map(y, ~test_ts_scalar_op(x, ., "*")),
     purrr::map(y, ~`*`(x, .))
+  )
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "^")),
+    purrr::map(y, ~{
+      res <- `^`(x, .)
+      res[is.infinite(res)] <- NA_real_
+      res
+    })
   )
   # return NA if any NA or find zero in the denominator
   expect_equal(

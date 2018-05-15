@@ -332,6 +332,33 @@ inline Timeseries operator/(const Timeseries& x, const Timeseries& y)
 }
 
 
+inline double tf_pow(const double base, const double exp)
+{
+  if (Rcpp::NumericVector::is_na(base) ||
+      Rcpp::NumericVector::is_na(exp) ||
+      base < 0.0 ||
+      (base == 0.0 && exp < 0.0)
+  ) return NA_REAL;
+  return std::pow(base, exp);
+}
+
+
+inline Timeseries pow(const Timeseries& base, const Timeseries& exp)
+{
+  Timeseries res(base.size());
+  std::transform(
+    base.cbegin(), base.cend(),
+    exp.cbegin(), res.begin(),
+    [](const double base_, const double exp_) {
+      double res = std::pow(base_, exp_);
+      if (R_finite(res)) return res;
+      return NA_REAL;
+    }
+  );
+  return res;
+}
+
+
 inline Timeseries operator+(const Timeseries& x, const double y)
 {
   Timeseries res(x.size());
@@ -396,6 +423,21 @@ inline std::vector<bool> operator<(const Timeseries& x, const double y)
   std::transform(
     x.cbegin(), x.cend(),
     res.begin(), [y](const double v) { return v < y; }
+  );
+  return res;
+}
+
+
+inline Timeseries pow(const Timeseries& base, const double exp)
+{
+  Timeseries res(base.size());
+  std::transform(
+    base.cbegin(), base.cend(),
+    res.begin(), [exp](const double v) {
+      double res = std::pow(v, exp);
+      if (R_finite(res)) return res;
+      return NA_REAL;
+    }
   );
   return res;
 }
