@@ -254,7 +254,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // regresi
-Timeseries regresi(const Timeseries& y, const Timeseries& x);
+double regresi(const Timeseries& y, const Timeseries& x);
 RcppExport SEXP _GCAMCTF_regresi(SEXP ySEXP, SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
