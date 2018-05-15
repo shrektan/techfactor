@@ -98,13 +98,22 @@ Alpha_fun alpha008 = [](const Quote& quote) -> double {
 };
 
 
+// SMA(((HIGH+LOW)/2-(DELAY(HIGH,1)+DELAY(LOW,1))/2)*(HIGH-LOW)/VOLUME,7,2)
+Alpha_fun alpha009 = [](const Quote& quote) -> double {
+  const auto rk_compose_price1 = (quote.ts_high(7) + quote.ts_low(7)) / 2 -
+                                 (quote.ts_high(7, 1) + quote.ts_low(7, 1)) / 2;
+  const auto rk_compose_price2 = (quote.ts_high(7) - quote.ts_low(7)) / quote.ts_volume(7);
+  return sma((rk_compose_price1 * rk_compose_price2), 2);
+};
+
+
 // RANK(MAX(((RET < 0) ? STD(RET, 20) : CLOSE)^2, 5))
 Alpha_fun alpha010 = [](const Quote& quote) -> double {
   auto fun = [&quote](const int i) {
     if (quote.ret() < 0) {
       return quote.ret();
     } else {
-      return quote.close(i);
+      return std::pow(quote.close(i), 2.0);
     }
   };
   return tsmax(ts<double>(5, fun));
