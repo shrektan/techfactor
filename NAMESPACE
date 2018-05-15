@@ -3,7 +3,7 @@
 export("%>%")
 export(anydate)
 export(tf_cal)
-export(tf_quotes_xptr)
+export(tf_quote_xptr)
 export(tf_reg_factors)
 importFrom(Rcpp,sourceCpp)
 importFrom(anytime,anydate)

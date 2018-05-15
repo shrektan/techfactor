@@ -12,10 +12,10 @@ Example
 
 ``` r
 (Sys.time())
-#> [1] "2018-05-12 12:09:13 CST"
+#> [1] "2018-05-15 09:08:28 CST"
 library(GCAMCTF)
 data(tf_quote)
-qt <- tf_quotes_xptr(tf_quote)
+qt <- tf_quote_xptr(tf_quote)
 factors <- tf_reg_factors()
 str(factors)
 #>  chr [1:6] "alpha001" "alpha003" "alpha005" "alpha014" "alpha053" ...
@@ -39,35 +39,35 @@ session info
 ``` r
 sessioninfo::session_info()
 #> ─ Session info ──────────────────────────────────────────────────────────
-#>  setting  value                       
-#>  version  R version 3.4.3 (2017-11-30)
-#>  os       macOS High Sierra 10.13.5   
-#>  system   x86_64, darwin15.6.0        
-#>  ui       X11                         
-#>  language (EN)                        
-#>  collate  en_US.UTF-8                 
-#>  tz       Asia/Shanghai               
-#>  date     2018-05-12                  
+#>  setting  value                                              
+#>  version  R version 3.4.4 (2018-03-15)                       
+#>  os       Windows 7 x64 SP 1                                 
+#>  system   x86_64, mingw32                                    
+#>  ui       RTerm                                              
+#>  language (EN)                                               
+#>  collate  Chinese (Simplified)_People's Republic of China.936
+#>  tz       Asia/Taipei                                        
+#>  date     2018-05-15                                         
 #> 
 #> ─ Packages ──────────────────────────────────────────────────────────────
-#>  package      * version date       source        
-#>  anytime        0.3.0   2017-06-05 CRAN (R 3.4.0)
-#>  backports      1.1.2   2017-12-13 CRAN (R 3.4.3)
-#>  clisymbols     1.2.0   2017-05-21 CRAN (R 3.4.0)
-#>  data.table     1.11.2  2018-05-08 CRAN (R 3.4.3)
-#>  digest         0.6.15  2018-01-28 CRAN (R 3.4.3)
-#>  evaluate       0.10.1  2017-06-24 CRAN (R 3.4.1)
-#>  GCAMCTF      * 0.0.4   2018-05-12 local         
-#>  htmltools      0.3.6   2017-04-28 CRAN (R 3.4.0)
-#>  knitr          1.20    2018-02-20 CRAN (R 3.4.3)
-#>  magrittr       1.5     2014-11-22 CRAN (R 3.4.0)
-#>  RApiDatetime   0.0.3   2017-04-02 CRAN (R 3.4.0)
-#>  Rcpp           0.12.16 2018-03-13 CRAN (R 3.4.4)
-#>  rmarkdown      1.9     2018-03-01 CRAN (R 3.4.3)
-#>  rprojroot      1.3-2   2018-01-03 CRAN (R 3.4.2)
-#>  sessioninfo    1.0.0   2017-06-21 cran (@1.0.0) 
-#>  stringi        1.2.2   2018-05-02 CRAN (R 3.4.3)
-#>  stringr        1.3.0   2018-02-19 CRAN (R 3.4.3)
-#>  withr          2.1.2   2018-03-15 CRAN (R 3.4.3)
-#>  yaml           2.1.18  2018-03-08 CRAN (R 3.4.4)
+#>  package      * version    date       source                            
+#>  anytime        0.3.0      2017-06-05 CRAN (R 3.4.4)                    
+#>  backports      1.1.2      2017-12-13 CRAN (R 3.4.3)                    
+#>  clisymbols     1.2.0      2017-05-21 CRAN (R 3.4.4)                    
+#>  data.table     1.11.0     2018-05-01 CRAN (R 3.4.4)                    
+#>  digest         0.6.15     2018-01-28 CRAN (R 3.4.3)                    
+#>  evaluate       0.10.1     2017-06-24 CRAN (R 3.4.1)                    
+#>  GCAMCTF      * 0.0.8      2018-05-15 local                             
+#>  htmltools      0.3.6.9000 2018-05-07 local                             
+#>  knitr          1.20       2018-02-20 CRAN (R 3.4.4)                    
+#>  magrittr       1.5        2014-11-22 CRAN (R 3.4.4)                    
+#>  RApiDatetime   0.0.3      2017-04-02 CRAN (R 3.4.1)                    
+#>  Rcpp           0.12.16    2018-03-13 CRAN (R 3.4.4)                    
+#>  rmarkdown      1.9        2018-03-01 CRAN (R 3.4.4)                    
+#>  rprojroot      1.3-2      2018-01-03 CRAN (R 3.4.3)                    
+#>  sessioninfo    1.0.1.9000 2017-12-06 Github (r-lib/sessioninfo@c871d01)
+#>  stringi        1.1.7      2018-03-12 CRAN (R 3.4.4)                    
+#>  stringr        1.3.0      2018-02-19 CRAN (R 3.4.3)                    
+#>  withr          2.1.2      2018-03-15 CRAN (R 3.4.4)                    
+#>  yaml           2.1.19     2018-05-01 CRAN (R 3.4.4)
 ```

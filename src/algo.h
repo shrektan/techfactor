@@ -53,10 +53,10 @@ inline std::vector<RDate> col_date(const Rcpp::DataFrame tbl, const std::string 
 
 void assert_sorted(const std::vector<RDate>& x);
 
-class Quotes {
+class Quote {
 public:
-  Quotes() = default;
-  explicit Quotes(const Rcpp::DataFrame tbl)
+  Quote() = default;
+  explicit Quote(const Rcpp::DataFrame tbl)
     : dates_ { col_date(tbl, "DATE") },
       pclose_ { col(tbl, "PCLOSE") },
       open_ { col(tbl, "OPEN") },

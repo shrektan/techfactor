@@ -7,7 +7,7 @@
 using Code = int;
 using RDate = int;
 using Timeseries = std::vector<double>;
-class Quotes;
-using Alpha_fun = std::function<double(const Quotes&)>;
+class Quote;
+using Alpha_fun = std::function<double(const Quote&)>;
 
 #endif // __GCAMCTF_TYPES__
