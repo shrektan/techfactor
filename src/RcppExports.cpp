@@ -487,6 +487,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// asset_valid
+void asset_valid(SEXP x, const std::string& classname);
+RcppExport SEXP _GCAMCTF_asset_valid(SEXP xSEXP, SEXP classnameSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type classname(classnameSEXP);
+    asset_valid(x, classname);
+    return R_NilValue;
+END_RCPP
+}
 // tf_qt_cal
 Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDateVector from_to);
 RcppExport SEXP _GCAMCTF_tf_qt_cal(SEXP qt_ptrSEXP, SEXP namesSEXP, SEXP from_toSEXP) {
@@ -557,6 +568,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},
     {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
+    {"_GCAMCTF_asset_valid", (DL_FUNC) &_GCAMCTF_asset_valid, 2},
     {"_GCAMCTF_tf_qt_cal", (DL_FUNC) &_GCAMCTF_tf_qt_cal, 3},
     {"_GCAMCTF_tf_qts_cal", (DL_FUNC) &_GCAMCTF_tf_qts_cal, 3},
     {NULL, NULL, 0}

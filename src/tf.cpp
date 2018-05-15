@@ -102,23 +102,20 @@ SEXP tf_quotes_xptr(Rcpp::List qt_tbls)
 }
 
 
-template<typename T>
-void asset_valid(Rcpp::XPtr<T> x, const std::string& classname)
+// [[Rcpp::export("tf_assert_class")]]
+void asset_valid(SEXP x, const std::string& classname)
 {
-  const std::string msg = "The class of xptr must be " + classname;
-  if (Rf_isNull(x.attr("class"))) {
+  const std::string msg = "The class of x must be " + classname;
+  if (Rf_isNull(Rf_getAttrib(x, Rf_mkString("class")))) {
     Rcpp::stop(msg);
   } else {
-    Rcpp::StringVector classes = x.attr("class");
+    Rcpp::StringVector classes = Rf_getAttrib(x, Rf_mkString("class"));
     const bool existed =
-      std::find(classes.cbegin(), classes.cend(), Rcpp::String(classname)) ==
+      std::find(classes.cbegin(), classes.cend(), Rcpp::String(classname)) !=
       classes.cend();
-    if (!existed) {
-      Rcpp::stop(msg);
-    }
+    if (!existed) Rcpp::stop(msg);
   }
 }
-
 
 
 //' Calculate the TF for single security

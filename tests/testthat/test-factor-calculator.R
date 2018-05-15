@@ -4,6 +4,14 @@ data("tf_quote")
 dt <- data.table::copy(tf_quote)
 qt <- tf_quote_xptr(dt)
 
+test_that("assert_class works", {
+  x <- structure(list(a = 1), class = c("abc", "bcd"))
+  expect_silent(tf_assert_class(x, "abc"))
+  expect_silent(tf_assert_class(x, "bcd"))
+  expect_error(tf_assert_class(x, "ddd"), "must be ddd")
+})
+
+
 test_that("qt has class", {
   expect_is(qt, "tf_quote_xptr")
 })
