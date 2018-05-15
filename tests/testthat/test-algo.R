@@ -148,7 +148,7 @@ test_that("decaylinear", {
   x <- rnorm(10)
   expect_equal(tf_decaylinear(x), {
     wts <- seq_along(x)
-    x * wts / sum(wts)
+    weighted.mean(x, wts)
   })
 })
 

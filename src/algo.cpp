@@ -170,14 +170,14 @@ double wma(const Timeseries& x)
 
 
 // [[Rcpp::export("tf_decaylinear")]]
-Timeseries decaylinear(const Timeseries& x)
+double decaylinear(const Timeseries& x)
 {
   assert_length(x, 1);
-  if (any_na(x)) return na_vector(x.size());
+  if (any_na(x)) return NA_REAL;
   const int n = x.size();
   Timeseries weights(sequence(n));
   const double sum_weights = std::accumulate(weights.cbegin(), weights.cend(), 0.0);
-  return weights / sum_weights * x;
+  return sum(weights / sum_weights * x);
 }
 
 

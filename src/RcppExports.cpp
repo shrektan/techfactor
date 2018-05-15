@@ -165,7 +165,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // decaylinear
-Timeseries decaylinear(const Timeseries& x);
+double decaylinear(const Timeseries& x);
 RcppExport SEXP _GCAMCTF_decaylinear(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

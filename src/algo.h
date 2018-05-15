@@ -23,7 +23,7 @@ double tsrank(const Timeseries& x);
 double sign(const double x);
 double sma(const Timeseries& x, const int m);
 double wma(const Timeseries& x);
-Timeseries decaylinear(const Timeseries& x, const int days);
+double decaylinear(const Timeseries& x, const int days);
 Timeseries sequence(const int n);
 Timeseries sumac(const Timeseries& x);
 Timeseries log(const Timeseries& x);
