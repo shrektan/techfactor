@@ -82,8 +82,22 @@ Alpha_fun alpha005 = [](const Quotes& quotes) -> double {
 
 Alpha_fun alpha006 = [](const Quotes& quotes) -> double {
   // (RANK(SIGN(DELTA((((OPEN * 0.85) + (HIGH * 0.15))), 4)))* -1)
-  const auto rk_delta_price = delta(quotes.ts_open(4) * 0.85 + quotes.ts_high(4) * 0.15, 4);
-  return sign(rk_delta_price);
+  const auto rk_delta_price = delta(quotes.ts_open(5) * 0.85 + quotes.ts_high(5) * 0.15, 4);
+  return sign(sum(rk_delta_price));
+};
+
+
+Alpha_fun alpha007 = [](const Quotes& quotes) -> double {
+  // (RANK(MAX((VWAP -CLOSE), 3)) + RANK(MIN((VWAP -CLOSE), 3))) * RANK(DELTA(VOLUME, 3))
+  return 1;
+};
+
+
+Alpha_fun alpha008 = [](const Quotes& quotes) -> double {
+  // RANK(DELTA(((((HIGH + LOW) / 2) * 0.2) + (VWAP * 0.8)), 4) * -1)
+  const auto rk_compose_price = ((quotes.high(5) + quotes.low(5)) / 2) * 0.2 + quotes.vwap(5) * 0.8;
+  const auto rk_delta_compose_price = sum(delta(rk_compose_price, 4));
+  return -rk_delta_compose_price;
 };
 
 
