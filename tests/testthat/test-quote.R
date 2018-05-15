@@ -5,24 +5,24 @@ tags <- c("pclose", "open", "high", "low", "close", "vwap",
 
 data("tf_quote")
 dt <- data.table::copy(tf_quote)
-qt <- tf_quotes_xptr(dt)
+qt <- tf_quote_xptr(dt)
 
-test_that("quotes' input must be a sorted tbl", {
+test_that("quote' input must be a sorted tbl", {
   dt_copy <- data.table::copy(dt)
   setorder(dt_copy, -DATE)
   expect_error(
-    tf_quotes_xptr(dt_copy),
+    tf_quote_xptr(dt_copy),
     "x must be a sorted date vector"
   )
   setorder(dt_copy, DATE)
   dt_copy[, CLOSE := NULL]
   expect_error(
-    tf_quotes_xptr(dt_copy),
+    tf_quote_xptr(dt_copy),
     "CLOSE"
   )
 })
 
-test_that("quotes.tdates()", {
+test_that("quote.tdates()", {
   # from is lower than min
   from_to <- as.Date(c("2017-12-01", "2018-01-06"))
   expect_equivalent(
@@ -60,7 +60,7 @@ test_that("quotes.tdates()", {
 })
 
 
-test_that("quotes.set()", {
+test_that("quote.set()", {
   # too small
   expect_error(
     test_qt_today(qt, anydate(20180101)),

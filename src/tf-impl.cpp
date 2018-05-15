@@ -33,7 +33,7 @@ std::map<std::string, Alpha_fun&> tf_caculators
 
 std::map<
   std::string,
-  std::function<Rcpp::DataFrame(Quotes&, const Rcpp::newDateVector)>
+  std::function<Rcpp::DataFrame(Quote&, const Rcpp::newDateVector)>
 > tf_fast_caculators
 {
 

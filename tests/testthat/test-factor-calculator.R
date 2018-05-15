@@ -2,7 +2,7 @@ context("test-factor-calculator.R")
 
 data("tf_quote")
 dt <- data.table::copy(tf_quote)
-qt <- tf_quotes_xptr(dt)
+qt <- tf_quote_xptr(dt)
 
 test_that("tf_reg_factors", {
   expect_is(tf_reg_factors(), "character")
