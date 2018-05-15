@@ -111,7 +111,7 @@ Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDa
   auto& qt = *qt_xptr;
 
   const auto dates = qt.tdates(from_to);
-  NumericMatrix res(dates.size(), 1);
+  NumericMatrix res(dates.size(), names.size());
 
   auto res_iter = res.begin();
   for (auto c_name : names) {
