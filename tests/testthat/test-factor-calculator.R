@@ -12,6 +12,11 @@ test_that("create_xts() return the same xts object as xts::xts()", {
     create_xts(dat, dates),
     xts::xts(dat, dates)
   )
+  dimnames(dat) <- NULL
+  expect_equal(
+    create_xts(dat, dates),
+    xts::xts(dat, dates)
+  )
 })
 
 

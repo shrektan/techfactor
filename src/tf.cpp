@@ -18,6 +18,32 @@
 extern std::map<std::string, Alpha_fun&> tf_caculators;
 extern std::map<std::string, Alpha_mfun&> tf_mcaculators;
 
+
+// [[Rcpp::export]]
+Rcpp::NumericMatrix create_xts(Rcpp::NumericMatrix x_mat, Rcpp::newDateVector x_dates)
+{
+  Rcpp::NumericVector dates = Rcpp::clone(x_dates) * 86400;
+  dates.attr("tzone") = "UTC";
+  dates.attr("tclass") = "Date";
+
+  Rcpp::NumericMatrix mat = Rcpp::clone(x_mat);
+  if (!Rf_isNull(mat.attr("dimnames"))) {
+    Rcpp::List dimnames = mat.attr("dimnames");
+    if (dimnames.size() != 2) Rcpp::stop(
+      "weird to find dimnames size is %d (expect 2)."
+    );
+    dimnames[0] = R_NilValue;
+  }
+  mat.attr("index") = dates;
+  mat.attr("class") = Rcpp::CharacterVector::create("xts", "zoo");
+  mat.attr(".indexCLASS") = "Date";
+  mat.attr("tclass") = "Date";
+  mat.attr(".indexTZ") = "UTC";
+  mat.attr("tzone") = "UTC";
+  return mat;
+}
+
+
 //' The registered factor names
 //'
 //' Return all the factor names that are registered in the C++ routine.
