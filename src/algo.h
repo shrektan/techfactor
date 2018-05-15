@@ -377,7 +377,8 @@ inline std::vector<std::string> v_names(Rcpp::List qt_tbls)
   if (Rf_isNull(qt_tbls.attr("names"))) Rcpp::stop(
       "qt_tbls must have names attributes."
   );
-  return Rcpp::as<std::vector<std::string>>(qt_tbls.attr("names"));
+  Rcpp::StringVector names = qt_tbls.attr("names");
+  return Rcpp::as<std::vector<std::string>>(names);
 }
 
 
@@ -400,17 +401,13 @@ public:
   }
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
   {
-    std::vector<RDate> res;
+    std::set<RDate> set;
     for (const auto& qt : qts_) {
       auto dates = qt.tdates(from_to);
-      std::vector<RDate> merged;
-      std::set_union(
-        res.cbegin(), res.cend(),
-        dates.cbegin(), dates.cend(),
-        std::back_inserter(merged)
-      );
-      res = std::move(merged);
+      for (auto date : dates) set.insert(date);
     }
+    std::vector<RDate> res;
+    std::copy(set.cbegin(), set.cend(), std::back_inserter(res));
     return res;
   }
   int size() const { return qts_.size(); }
