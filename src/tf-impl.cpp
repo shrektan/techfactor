@@ -33,6 +33,22 @@ extern Alpha_fun alpha025;
 extern Alpha_fun alpha026;
 extern Alpha_fun alpha027;
 extern Alpha_fun alpha028;
+extern Alpha_fun alpha029;
+extern Alpha_fun alpha030;
+extern Alpha_fun alpha031;
+extern Alpha_fun alpha032;
+extern Alpha_fun alpha033;
+extern Alpha_fun alpha034;
+extern Alpha_fun alpha035;
+extern Alpha_fun alpha036;
+extern Alpha_fun alpha037;
+extern Alpha_fun alpha038;
+extern Alpha_fun alpha039;
+extern Alpha_fun alpha040;
+extern Alpha_fun alpha041;
+extern Alpha_fun alpha042;
+extern Alpha_fun alpha043;
+extern Alpha_fun alpha044;
 extern Alpha_fun alpha053;
 extern Alpha_fun alpha149;
 }
@@ -74,6 +90,22 @@ std::map<std::string, Alpha_fun&> tf_caculators
   {"alpha026", alpha_impl::alpha026},
   {"alpha027", alpha_impl::alpha027},
   {"alpha028", alpha_impl::alpha028},
+  {"alpha029", alpha_impl::alpha029},
+  {"alpha030", alpha_impl::alpha030},
+  {"alpha031", alpha_impl::alpha031},
+  {"alpha032", alpha_impl::alpha032},
+  {"alpha033", alpha_impl::alpha033},
+  {"alpha034", alpha_impl::alpha034},
+  {"alpha035", alpha_impl::alpha035},
+  {"alpha036", alpha_impl::alpha036},
+  {"alpha037", alpha_impl::alpha037},
+  {"alpha038", alpha_impl::alpha038},
+  {"alpha039", alpha_impl::alpha039},
+  {"alpha040", alpha_impl::alpha040},
+  {"alpha041", alpha_impl::alpha041},
+  {"alpha042", alpha_impl::alpha042},
+  {"alpha043", alpha_impl::alpha043},
+  {"alpha044", alpha_impl::alpha044},
   {"alpha053", alpha_impl::alpha053},
   {"alpha149", alpha_impl::alpha149}
 };
