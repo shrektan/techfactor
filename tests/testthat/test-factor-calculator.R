@@ -3,7 +3,7 @@ context("test-factor-calculator.R")
 data("tf_quote")
 dt <- data.table::copy(tf_quote)
 qt <- tf_quote_xptr(dt)
-qts <- tf_quotes_xptr(list(aa = dt, bb = dt))
+qts <- tf_quotes_xptr(list(aa = dt[-(1:5)], bb = dt[1:(.N - 5)]))
 
 test_that("assert_class works", {
   x <- structure(list(a = 1), class = c("abc", "bcd"))
@@ -87,16 +87,17 @@ test_that("tf_quotes_xptr requires named list", {
 })
 
 test_that("all factors can be run by tf_qts_cal()", {
-  qts <- tf_quotes_xptr(list(aa = dt, bb = dt))
   factors <- tf_reg_factors()
   from_to <- range(tail(dt$DATE, 10))
-  res <- tf_qts_cal(qts, factors[1], from_to)
-  expect_is(res, "xts")
-  expect_equal(nrow(res), 10)
-  expect_equal(ncol(res), length(factors))
-  expect_named(res, factors)
-  expect_equivalent(index(res), tail(dt$DATE, 10))
-  expect_true(all(is.finite(res) | is.na(res)))
-  expect_true(!any(is.nan(res)))
+  for (factor in factors) {
+    res <- tf_qts_cal(qts, factor, from_to)
+    expect_is(res, "xts")
+    expect_equal(nrow(res), 10)
+    expect_equal(ncol(res), 2)
+    expect_named(res, c("aa", "bb"))
+    expect_equivalent(index(res), tail(dt$DATE, 10))
+    expect_true(all(is.finite(res) | is.na(res)))
+    expect_true(!any(is.nan(res)))
+  }
 })
 
