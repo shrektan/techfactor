@@ -38,6 +38,18 @@ double highday(const Timeseries& x);
 double lowday(const Timeseries& x);
 
 
+template<typename T>
+std::vector<T> ts(const int n, std::function<T(const int delay)> fun)
+{
+  if (n < 1) Rcpp::stop("n (%d) must be positive.", n);
+  std::vector<T> res;
+  for (int i {n - 1}; i >= 0; --i) {
+    res.push_back(fun(i));
+  }
+  return res;
+}
+
+
 inline Timeseries col(const Rcpp::DataFrame tbl, const std::string field)
 {
   Rcpp::NumericVector res = tbl[field];
@@ -139,34 +151,75 @@ public:
     return ts_get_(bmk_open_, n, delay);
   }
 
-  double hd() const { return high() - high(1); }
-  double ld() const { return low(1) - low(); }
-
+  double hd(const int delay = 0) const { return high(delay) - high(delay + 1); }
+  double ld(const int delay = 0) const { return low(delay + 1) - low(delay); }
   double tr(const int delay = 0) const
   {
-    if (!in_bound_(1)) return NA_REAL;
+    if (!in_bound_(delay + 1)) return NA_REAL;
     return std::max(
-      std::max(high() - low(), std::abs(high() - close(1))),
-      std::abs(low() - close(1))
+      std::max(high(delay) - low(delay), std::abs(high(delay) - close(delay + 1))),
+      std::abs(low(delay) - close(delay + 1))
     );
   }
-
-  double ret() const
+  double ret(const int delay = 0) const
   {
-    if (pclose() == 0.0) return NA_REAL;
-    return close() / pclose() - 1.0;
+    if (pclose(delay) == 0.0) return NA_REAL;
+    return close(delay) / pclose(delay) - 1.0;
+  }
+  double dtm(const int delay = 0) const
+  {
+    if (!in_bound_(delay + 1)) return NA_REAL;
+    return open(delay) <= open(delay + 1) ? 0.0 :
+      std::max(high(delay) - open(delay), open(delay) - open(delay + 1));
+  }
+  double dbm(const int delay = 0) const
+  {
+    if (!in_bound_(delay + 1)) return NA_REAL;
+    return open(delay) >= open(delay + 1) ? 0.0 :
+      std::max(open(delay) - low(delay), open(delay) - open(delay + 1));
   }
 
-  double dtm() const
+  Timeseries ts_hd(const int n, const int delay = 0) const
   {
-    if (!in_bound_(1)) return NA_REAL;
-    return open() <= open(1) ? 0.0 : std::max(high() - open(), open() - open(1));
+    auto fun = [this, delay] (const int i) {
+      return this->hd(delay + i);
+    };
+    return ts<double>(n, fun);
   }
-
-  double dbm() const
+  Timeseries ts_ld(const int n, const int delay = 0) const
   {
-    if (!in_bound_(1)) return NA_REAL;
-    return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
+    auto fun = [this, delay] (const int i) {
+      return this->ld(delay + i);
+    };
+    return ts<double>(n, fun);
+  }
+  Timeseries ts_tr(const int n, const int delay = 0) const
+  {
+    auto fun = [this, delay] (const int i) {
+      return this->tr(delay + i);
+    };
+    return ts<double>(n, fun);
+  }
+  Timeseries ts_ret(const int n, const int delay = 0) const
+  {
+    auto fun = [this, delay] (const int i) {
+      return this->ret(delay + i);
+    };
+    return ts<double>(n, fun);
+  }
+  Timeseries ts_dtm(const int n, const int delay = 0) const
+  {
+    auto fun = [this, delay] (const int i) {
+      return this->dtm(delay + i);
+    };
+    return ts<double>(n, fun);
+  }
+  Timeseries ts_dbm(const int n, const int delay = 0) const
+  {
+    auto fun = [this, delay] (const int i) {
+      return this->dbm(delay + i);
+    };
+    return ts<double>(n, fun);
   }
 
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
@@ -347,16 +400,5 @@ inline std::vector<bool> operator<(const Timeseries& x, const double y)
   return res;
 }
 
-
-template<typename T>
-std::vector<T> ts(const int n, std::function<T(const int delay)> fun)
-{
-  if (n < 1) Rcpp::stop("n (%d) must be positive.", n);
-  std::vector<T> res;
-  for (int i {n - 1}; i >= 0; --i) {
-    res.push_back(fun(i));
-  }
-  return res;
-}
 
 #endif //__GCAMCTF_ALGO__

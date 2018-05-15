@@ -33,11 +33,11 @@ const std::map<std::string, std::function<double(const Quote, const int)>> tag_m
   {"bmk_close", [](const Quote& qt, const int delay) { return qt.bmk_close(delay); }},
   {"bmk_open", [](const Quote& qt, const int delay) { return qt.bmk_open(delay); }},
   {"tr", [](const Quote& qt, const int delay) { return qt.tr(delay); }},
-  {"ret", [](const Quote& qt, const int delay) { return qt.ret(); }},
-  {"hd", [](const Quote& qt, const int delay) { return qt.hd(); }},
-  {"ld", [](const Quote& qt, const int delay) { return qt.ld(); }},
-  {"dtm", [](const Quote& qt, const int delay) { return qt.dtm(); }},
-  {"dbm", [](const Quote& qt, const int delay) { return qt.dbm(); }}
+  {"ret", [](const Quote& qt, const int delay) { return qt.ret(delay); }},
+  {"hd", [](const Quote& qt, const int delay) { return qt.hd(delay); }},
+  {"ld", [](const Quote& qt, const int delay) { return qt.ld(delay); }},
+  {"dtm", [](const Quote& qt, const int delay) { return qt.dtm(delay); }},
+  {"dbm", [](const Quote& qt, const int delay) { return qt.dbm(delay); }}
 };
 
 
@@ -66,7 +66,13 @@ const std::map<
   {"volume", [](const Quote& qt, const int n, const int delay) { return qt.ts_volume(n, delay); }},
   {"amount", [](const Quote& qt, const int n, const int delay) { return qt.ts_amount(n, delay); }},
   {"bmk_close", [](const Quote& qt, const int n, const int delay) { return qt.ts_bmk_close(n, delay); }},
-  {"bmk_open", [](const Quote& qt, const int n, const int delay) { return qt.ts_bmk_open(n, delay); }}
+  {"bmk_open", [](const Quote& qt, const int n, const int delay) { return qt.ts_bmk_open(n, delay); }},
+  {"tr", [](const Quote& qt, const int n, const int delay) { return qt.ts_tr(n, delay); }},
+  {"hd", [](const Quote& qt, const int n, const int delay) { return qt.ts_hd(n, delay); }},
+  {"ld", [](const Quote& qt, const int n, const int delay) { return qt.ts_ld(n, delay); }},
+  {"ret", [](const Quote& qt, const int n, const int delay) { return qt.ts_ret(n, delay); }},
+  {"dtm", [](const Quote& qt, const int n, const int delay) { return qt.ts_dtm(n, delay); }},
+  {"dbm", [](const Quote& qt, const int n, const int delay) { return qt.ts_dbm(n, delay); }}
 };
 
 
