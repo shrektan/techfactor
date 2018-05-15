@@ -12,10 +12,10 @@ Alpha_mfun alpha121 = [](const Quotes& qts) -> Timeseries {
   auto base = rank(qts.apply(fun_base));
   auto fun_exp = [](const Quote& qt) {
     auto tsrank_cor = [&qt](const int delay1) {
-      auto cor_x = [&qt, delay0](const int delay2) {
+      auto cor_x = [&qt, delay1](const int delay2) {
         return tsrank(qt.ts_vwap(delay1 + delay2 + 20));
       };
-      auto cor_y = [&qt, delay0](const int delay2) {
+      auto cor_y = [&qt, delay1](const int delay2) {
         auto mean_vol_60 = [&qt, delay1, delay2] (const int delay3) {
           return mean(qt.ts_volume(60, delay1 + delay2 + delay3));
         };
