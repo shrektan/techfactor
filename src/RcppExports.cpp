@@ -456,7 +456,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // tf_reg_factors
-Rcpp::List tf_reg_factors();
+Rcpp::CharacterVector tf_reg_factors();
 RcppExport SEXP _GCAMCTF_tf_reg_factors() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -497,6 +497,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::StringVector >::type names(namesSEXP);
     Rcpp::traits::input_parameter< Rcpp::newDateVector >::type from_to(from_toSEXP);
     rcpp_result_gen = Rcpp::wrap(tf_qt_cal(qt_ptr, names, from_to));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tf_qts_cal
+Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_tf_qts_cal(SEXP qts_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type qts_ptr(qts_ptrSEXP);
+    Rcpp::traits::input_parameter< std::string >::type name(nameSEXP);
+    Rcpp::traits::input_parameter< Rcpp::newDateVector >::type from_to(from_toSEXP);
+    rcpp_result_gen = Rcpp::wrap(tf_qts_cal(qts_ptr, name, from_to));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -545,6 +558,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},
     {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
     {"_GCAMCTF_tf_qt_cal", (DL_FUNC) &_GCAMCTF_tf_qt_cal, 3},
+    {"_GCAMCTF_tf_qts_cal", (DL_FUNC) &_GCAMCTF_tf_qts_cal, 3},
     {NULL, NULL, 0}
 };
 

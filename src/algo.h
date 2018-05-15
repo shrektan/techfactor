@@ -372,11 +372,22 @@ inline std::vector<Quote> v_quote(Rcpp::List qt_tbls)
 }
 
 
+inline std::vector<std::string> v_names(Rcpp::List qt_tbls)
+{
+  if (Rf_isNull(qt_tbls.attr("names"))) Rcpp::stop(
+      "qt_tbls must have names attributes."
+  );
+  return Rcpp::as<std::vector<std::string>>(qt_tbls.attr("names"));
+}
+
+
 class Quotes {
 public:
   Quotes() = default;
   explicit Quotes(Rcpp::List qt_tbls)
-    : qts_ (v_quote(qt_tbls)) { }
+    : names_ (v_names(qt_tbls)),
+      qts_ (v_quote(qt_tbls))
+    { }
   void set(const RDate today) noexcept
   {
     for (auto& qt : qts_) qt.set(today);
@@ -402,7 +413,10 @@ public:
     }
     return res;
   }
+  int size() const { return qts_.size(); }
+  const std::vector<std::string>& names() const { return names_; }
 private:
+  std::vector<std::string> names_;
   std::vector<Quote> qts_;
 };
 

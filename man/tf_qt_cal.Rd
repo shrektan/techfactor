@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{tf_qt_cal}
 \alias{tf_qt_cal}
-\title{Calculate the technical factor (TF)}
+\title{Calculate the TF for single security}
 \usage{
 tf_qt_cal(qt_ptr, names, from_to)
 }
@@ -15,9 +15,8 @@ tf_qt_cal(qt_ptr, names, from_to)
 smaller than or equal to the first.}
 }
 \value{
-A \code{data.frame} with two columns \code{DATE} and \code{VALUE} . The order
-of column \code{DATE} must be in ascending order.
+An \code{xts} object in which the columns are the factors' value.
 }
 \description{
-Calculate the technical factor (TF)
+Calculate the TF for single security
 }
