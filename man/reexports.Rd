@@ -6,6 +6,8 @@
 \alias{\%>\%}
 \alias{reexports}
 \alias{anydate}
+\alias{reexports}
+\alias{index}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -16,5 +18,7 @@ below to see their documentation.
   \item{anytime}{\code{\link[anytime]{anydate}}}
 
   \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
+
+  \item{zoo}{\code{\link[zoo]{index}}}
 }}
 

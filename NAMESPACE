@@ -2,6 +2,7 @@
 
 export("%>%")
 export(anydate)
+export(index)
 export(tf_qt_cal)
 export(tf_qts_cal)
 export(tf_quote_xptr)
@@ -14,4 +15,5 @@ importFrom(data.table,frank)
 importFrom(data.table,setkey)
 importFrom(data.table,setorder)
 importFrom(magrittr,"%>%")
+importFrom(zoo,index)
 useDynLib(GCAMCTF, .registration = TRUE)

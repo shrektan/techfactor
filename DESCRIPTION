@@ -23,7 +23,8 @@ Imports:
     data.table (>= 1.10.5),
     magrittr,
     anytime,
-    xts
+    xts,
+    zoo
 Suggests: 
     testthat,
     covr,
