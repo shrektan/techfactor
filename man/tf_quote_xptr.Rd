@@ -2,9 +2,12 @@
 % Please edit documentation in R/RcppExports.R
 \name{tf_quote_xptr}
 \alias{tf_quote_xptr}
+\alias{tf_quotes_xptr}
 \title{The quote external pointer}
 \usage{
 tf_quote_xptr(qt_tbl)
+
+tf_quotes_xptr(qt_tbls)
 }
 \arguments{
 \item{qt_tbl}{A \code{data.frame} contains the daily price info

@@ -443,8 +443,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// create_xts
+Rcpp::NumericMatrix create_xts(Rcpp::NumericMatrix x_mat, Rcpp::newDateVector x_dates);
+RcppExport SEXP _GCAMCTF_create_xts(SEXP x_matSEXP, SEXP x_datesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type x_mat(x_matSEXP);
+    Rcpp::traits::input_parameter< Rcpp::newDateVector >::type x_dates(x_datesSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_xts(x_mat, x_dates));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_reg_factors
-Rcpp::StringVector tf_reg_factors();
+Rcpp::List tf_reg_factors();
 RcppExport SEXP _GCAMCTF_tf_reg_factors() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -464,28 +476,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// tf_cal
-Rcpp::List tf_cal(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to);
-RcppExport SEXP _GCAMCTF_tf_cal(SEXP qt_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP) {
+// tf_quotes_xptr
+SEXP tf_quotes_xptr(Rcpp::List qt_tbls);
+RcppExport SEXP _GCAMCTF_tf_quotes_xptr(SEXP qt_tblsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type qt_tbls(qt_tblsSEXP);
+    rcpp_result_gen = Rcpp::wrap(tf_quotes_xptr(qt_tbls));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tf_qt_cal
+Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_tf_qt_cal(SEXP qt_ptrSEXP, SEXP namesSEXP, SEXP from_toSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type qt_ptr(qt_ptrSEXP);
-    Rcpp::traits::input_parameter< std::string >::type name(nameSEXP);
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type names(namesSEXP);
     Rcpp::traits::input_parameter< Rcpp::newDateVector >::type from_to(from_toSEXP);
-    rcpp_result_gen = Rcpp::wrap(tf_cal(qt_ptr, name, from_to));
-    return rcpp_result_gen;
-END_RCPP
-}
-// create_xts
-Rcpp::NumericMatrix create_xts(Rcpp::NumericMatrix x_mat, Rcpp::newDateVector x_dates);
-RcppExport SEXP _GCAMCTF_create_xts(SEXP x_matSEXP, SEXP x_datesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type x_mat(x_matSEXP);
-    Rcpp::traits::input_parameter< Rcpp::newDateVector >::type x_dates(x_datesSEXP);
-    rcpp_result_gen = Rcpp::wrap(create_xts(x_mat, x_dates));
+    rcpp_result_gen = Rcpp::wrap(tf_qt_cal(qt_ptr, names, from_to));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -529,9 +540,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_test_ts_op", (DL_FUNC) &_GCAMCTF_test_ts_op, 3},
     {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
     {"_GCAMCTF_test_ts", (DL_FUNC) &_GCAMCTF_test_ts, 3},
+    {"_GCAMCTF_create_xts", (DL_FUNC) &_GCAMCTF_create_xts, 2},
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},
-    {"_GCAMCTF_tf_cal", (DL_FUNC) &_GCAMCTF_tf_cal, 3},
+    {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
+    {"_GCAMCTF_tf_qt_cal", (DL_FUNC) &_GCAMCTF_tf_qt_cal, 3},
     {NULL, NULL, 0}
 };
 
