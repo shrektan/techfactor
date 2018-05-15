@@ -26,18 +26,16 @@ Alpha_fun alpha002 = [](const Quote& quote) -> double {
 // SUM((CLOSE=DELAY(CLOSE,1)?0:CLOSE-(CLOSE>DELAY(CLOSE,1)?
 // MIN(LOW,DELAY(CLOSE,1)):MAX(HIGH,DELAY(CLOSE,1)))),6)
 Alpha_fun alpha003 = [](const Quote& quote) -> double {
-  Timeseries ts;
-  for (int i {5}; i >= 0; --i)
-  {
+  auto fun = [&quote](const int i) {
     if (quote.close(i) == quote.pclose(i)) {
-      ts.push_back(0.0);
+      return 0.0;
     } else if (quote.close(i) > quote.pclose(i)) {
-      ts.push_back(quote.close(i) - std::min(quote.low(i), quote.pclose(i)));
+      return quote.close(i) - std::min(quote.low(i), quote.pclose(i));
     } else {
-      ts.push_back(quote.close(i) - std::min(quote.high(i), quote.pclose(i)));
+      return quote.close(i) - std::min(quote.high(i), quote.pclose(i));
     }
-  }
-  return sum(ts);
+  };
+  return sum(ts<double>(6, fun));
 };
 
 
@@ -89,6 +87,27 @@ Alpha_fun alpha006 = [](const Quote& quote) -> double {
 // (RANK(MAX((VWAP -CLOSE), 3)) + RANK(MIN((VWAP -CLOSE), 3))) * RANK(DELTA(VOLUME, 3))
 Alpha_fun alpha007 = [](const Quote& quote) -> double {
   return 1;
+};
+
+
+// RANK(DELTA(((((HIGH + LOW) / 2) * 0.2) + (VWAP * 0.8)), 4) * -1)
+Alpha_fun alpha008 = [](const Quote& quote) -> double {
+  const auto rk_compose_price = (quote.ts_high(5) + quote.ts_low(5)) / 2 * 0.2 + quote.ts_vwap(5) * 0.8;
+  const auto rk_delta_compose_price = sum(delta(rk_compose_price, 4));
+  return -rk_delta_compose_price;
+};
+
+
+// RANK(MAX(((RET < 0) ? STD(RET, 20) : CLOSE)^2, 5))
+Alpha_fun alpha010 = [](const Quote& quote) -> double {
+  auto fun = [&quote](const int i) {
+    if (quote.ret() < 0) {
+      return quote.ret();
+    } else {
+      return quote.close(i);
+    }
+  };
+  return tsmax(ts<double>(5, fun));
 };
 
 
