@@ -290,6 +290,25 @@ Alpha_fun alpha028 = [](const Quote& quote) -> double {
 };
 
 
+// (CLOSE-DELAY(CLOSE,6))/DELAY(CLOSE,6)*VOLUME
+Alpha_fun alpha029 = [](const Quote& quote) -> double {
+  return (quote.close() - quote.close(6)) / quote.close(6) * quote.volume();
+};
+
+
+// WMA((REGRESI(CLOSE/DELAY(CLOSE)-1,MKT，60))^2,20)
+Alpha_fun alpha030 = [](const Quote& quote) -> double {
+
+  auto fun = [&quote](const int delay) {
+    Timeseries close_ret = quote.ts_close(60, delay) / quote.ts_close(60, 1 + delay) - 1;
+    Timeseries bmk_close_ret = quote.ts_bmk_close(60, delay) / quote.ts_bmk_close(60, 1 + delay) - 1;
+    double residual = std::pow(regresi(close_ret, bmk_close_ret), 2.0);
+  };
+  return wma(ts<double>(20, fun));
+};
+
+
+
 
 
 // COUNT(CLOSE>DELAY(CLOSE,1),12)/12*100
@@ -299,5 +318,9 @@ Alpha_fun alpha053 = [](const Quote& quote) -> double {
   };
   return count(ts<bool>(12, fun)) / 12.0 * 100.0;
 };
+
+
+
+
 
 }
