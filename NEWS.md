@@ -9,3 +9,4 @@
 * Refactor the cpp file structure.
 * `delta()` gains an additional param n.
 * Rename `Quotes` to `Quote` because we are going to introduce a new type => a vector of `Quote` which will be named as `Quotes`.
+* Add `Quotes` and R interface to process panel based indicators.
