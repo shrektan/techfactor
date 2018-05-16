@@ -7,6 +7,7 @@
 using Code = int;
 using RDate = int;
 using Timeseries = std::vector<double>;
+using Panel = std::vector<std::vector<double>>;
 class Quote;
 using Alpha_fun = std::function<double(const Quote&)>;
 class Quotes;

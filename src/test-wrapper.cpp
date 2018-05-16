@@ -97,7 +97,10 @@ const std::map<
   {"-", [](const Timeseries& x, const Timeseries& y) { return x - y; }},
   {"*", [](const Timeseries& x, const Timeseries& y) { return x * y; }},
   {"/", [](const Timeseries& x, const Timeseries& y) { return x / y; }},
-  {"^", [](const Timeseries& x, const Timeseries& y) { return pow(x, y); }}
+  {"^", [](const Timeseries& x, const Timeseries& y) { return pow(x, y); }},
+  {">", [](const Timeseries& x, const Timeseries& y) { return x > y; }},
+  {"<", [](const Timeseries& x, const Timeseries& y) { return x < y; }},
+  {"==", [](const Timeseries& x, const Timeseries& y) { return x == y; }}
 };
 
 
@@ -122,18 +125,24 @@ const std::map<
   {">",
    [](const Timeseries& x, const double y) {
      const auto bool_res = x > y;
-     Timeseries res(bool_res.size());
-     std::transform(bool_res.cbegin(), bool_res.cend(), res.begin(),
-                    [](const bool v) { return double(v); });
+     Timeseries res;
+     for (auto x : bool_res) res.push_back(x);
      return res;
    }
   },
   {"<",
    [](const Timeseries& x, const double y) {
      const auto bool_res = x < y;
-     Timeseries res(bool_res.size());
-     std::transform(bool_res.cbegin(), bool_res.cend(), res.begin(),
-                    [](const bool v) { return double(v); });
+     Timeseries res;
+     for (auto x : bool_res) res.push_back(x);
+     return res;
+   }
+  },
+  {"==",
+   [](const Timeseries& x, const double y) {
+     const auto bool_res = x == y;
+     Timeseries res;
+     for (auto x : bool_res) res.push_back(x);
      return res;
    }
   }
@@ -157,4 +166,36 @@ Timeseries test_ts(SEXP quote_ptr, const Rcpp::Date today, const int n)
     return tsrank(qt.ts_volume(5, delay));
   };
   return ts<double>(n, volumn);
+}
+
+
+Panel test_create_panel(const Rcpp::List x)
+{
+  const int n = x.size();
+  Panel res;
+  for (int i = 0; i < n; ++i) {
+    Rcpp::NumericVector r_elem = x[i];
+    Timeseries elem = Rcpp::as<std::vector<double>>(r_elem);
+    res.push_back(elem);
+  }
+  return res;
+}
+
+
+// [[Rcpp::export]]
+void test_assert_valid_panel(const Rcpp::List x)
+{
+  auto panel = test_create_panel(x);
+  assert_valid(panel);
+}
+
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_panel_sum(const Rcpp::List x)
+{
+  auto fun = [](const Timeseries& ts) {
+    return sum(ts);
+  };
+  auto panel = test_create_panel(x);
+  return Rcpp::wrap(apply(panel, fun));
 }

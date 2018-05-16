@@ -293,3 +293,38 @@ test_that("assert_is_sorted", {
   dates <- anydate(c(180103, 180102, 180103))
   expect_error(tf_assert_is_sorted(dates), "sorted date vector")
 })
+
+test_that("assert valid panel", {
+  expect_silent(
+    test_assert_valid_panel(
+      list(a = 1:3, b = 3:5, c = 8:10)
+    )
+  )
+  expect_silent(test_assert_valid_panel(list()))
+  expect_error(
+    test_assert_valid_panel(
+      list(a = 1:3, b = 3:6)
+    ),
+    "should have the same length"
+  )
+})
+
+
+test_that("panel apply", {
+  expect_equal(
+    test_panel_sum(list(a = 1:5, b = 3:7, c = 8:12)),
+    c(12, 15, 18, 21, 24)
+  )
+  # ensure it will check
+  expect_error(
+    test_panel_sum(
+      list(a = 1:3, b = 3:6)
+    ),
+    "should have the same length"
+  )
+  expect_equal(
+    test_panel_sum(list()),
+    numeric()
+  )
+})
+

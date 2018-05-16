@@ -367,13 +367,53 @@ inline Timeseries operator/(const Timeseries& x, const Timeseries& y)
 }
 
 
+inline Timeseries operator>(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      return double(v1 > v2);
+    });
+  return res;
+}
+
+
+inline Timeseries operator<(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      return double(v1 < v2);
+    });
+  return res;
+}
+
+
+inline Timeseries operator==(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      return double(v1 == v2);
+    });
+  return res;
+}
+
+
 inline double tf_pow(const double base, const double exp)
 {
-  if (Rcpp::NumericVector::is_na(base) ||
-      Rcpp::NumericVector::is_na(exp) ||
-      base < 0.0 ||
-      (base == 0.0 && exp < 0.0)
-  ) return NA_REAL;
+  if (ISNA(base) || ISNA(exp) || base < 0.0 || (base == 0.0 && exp < 0.0)) {
+    return NA_REAL;
+  }
   return std::pow(base, exp);
 }
 
@@ -463,6 +503,17 @@ inline std::vector<bool> operator<(const Timeseries& x, const double y)
 }
 
 
+inline std::vector<bool> operator==(const Timeseries& x, const double y)
+{
+  std::vector<bool> res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v == y; }
+  );
+  return res;
+}
+
+
 inline Timeseries pow(const Timeseries& base, const double exp)
 {
   Timeseries res(base.size());
@@ -474,6 +525,31 @@ inline Timeseries pow(const Timeseries& base, const double exp)
       return NA_REAL;
     }
   );
+  return res;
+}
+
+
+inline void assert_valid(const Panel& x)
+{
+  std::set<int> vec_n;
+  for (const auto& elem : x) vec_n.insert(elem.size());
+  if (vec_n.size() >= 2) Rcpp::stop(
+    "panel data should have the same length in each slot."
+  );
+}
+
+
+inline Timeseries apply(const Panel& x, std::function<double(const Timeseries&)> fun)
+{
+  assert_valid(x);
+  Timeseries res;
+  if (x.size() == 0) return res;
+  const int n = x[0].size();
+  for (int i = 0; i < n; ++i) {
+    Timeseries elem;
+    for (const auto& sub_x : x) elem.push_back(sub_x[i]);
+    res.push_back(fun(elem));
+  }
   return res;
 }
 
@@ -530,10 +606,32 @@ public:
   explicit Quotes(const Quotes_raw& raw, const RDate today)
     : raw_ (raw),
       qts_ (gen_qts_(raw, today)) { }
+  explicit Quotes(const Quotes_raw& raw, const std::vector<Quote>& qts, const int days)
+    : raw_ (raw),
+      qts_ (gen_qts_(qts, days)) { }
+
+  Quotes clock_back(const int days) const
+  {
+    if (days < 0) Rcpp::stop("days (%d) must be non negative.", days);
+    return Quotes(raw_, qts_, days);
+  }
+
   Timeseries apply(std::function<double(const Quote&)> fun) const
   {
     Timeseries res;
     std::transform(qts_.cbegin(), qts_.cend(), std::back_inserter(res), fun);
+    return res;
+  }
+
+  // template function is possible but not necessary
+  std::vector<Timeseries> tsapply(
+      const int n, std::function<Timeseries(const Quotes&)> fun) const
+  {
+    if (n < 1) Rcpp::stop("n (%d) must be positive.", n);
+    std::vector<Timeseries> res;
+    for (int i {n - 1}; i >= 0; --i) {
+      res.push_back(fun(clock_back(i)));
+    }
     return res;
   }
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
@@ -548,9 +646,13 @@ private:
   std::vector<Quote> gen_qts_(const Quotes_raw& raw, const RDate today) const
   {
     std::vector<Quote> res;
-    for (const auto& qt : raw.qts_) {
-      res.emplace_back(qt, today);
-    }
+    for (const auto& qt : raw.qts_) res.emplace_back(qt, today);
+    return res;
+  }
+  std::vector<Quote> gen_qts_(const std::vector<Quote>& qts, const int days) const
+  {
+    std::vector<Quote> res;
+    for (const auto& qt : qts) res.push_back(qt.clock_back(days));
     return res;
   }
 };
