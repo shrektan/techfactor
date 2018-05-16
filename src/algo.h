@@ -581,10 +581,32 @@ public:
   explicit Quotes(const Quotes_raw& raw, const RDate today)
     : raw_ (raw),
       qts_ (gen_qts_(raw, today)) { }
+  explicit Quotes(const Quotes_raw& raw, const std::vector<Quote>& qts, const int days)
+    : raw_ (raw),
+      qts_ (gen_qts_(qts, days)) { }
+
+  Quotes clock_back(const int days) const
+  {
+    if (days < 0) Rcpp::stop("days (%d) must be non negative.", days);
+    return Quotes(raw_, qts_, days);
+  }
+
   Timeseries apply(std::function<double(const Quote&)> fun) const
   {
     Timeseries res;
     std::transform(qts_.cbegin(), qts_.cend(), std::back_inserter(res), fun);
+    return res;
+  }
+
+  // template function is possible but not necessary
+  std::vector<Timeseries> tsapply(
+      const int n, std::function<Timeseries(const Quotes&)> fun) const
+  {
+    if (n < 1) Rcpp::stop("n (%d) must be positive.", n);
+    std::vector<Timeseries> res;
+    for (int i {n - 1}; i >= 0; --i) {
+      res.push_back(fun(clock_back(i)));
+    }
     return res;
   }
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
@@ -599,9 +621,13 @@ private:
   std::vector<Quote> gen_qts_(const Quotes_raw& raw, const RDate today) const
   {
     std::vector<Quote> res;
-    for (const auto& qt : raw.qts_) {
-      res.emplace_back(qt, today);
-    }
+    for (const auto& qt : raw.qts_) res.emplace_back(qt, today);
+    return res;
+  }
+  std::vector<Quote> gen_qts_(const std::vector<Quote>& qts, const int days) const
+  {
+    std::vector<Quote> res;
+    for (const auto& qt : qts) res.push_back(qt.clock_back(days));
     return res;
   }
 };
