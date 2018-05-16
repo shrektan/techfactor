@@ -76,12 +76,26 @@ Alpha_mfun alpha123 = [](const Quotes& qts) -> Timeseries {
     return corr(qt.ts_low(6), qt.ts_volume(6));
   };
   auto right = rank(qts.apply(corr6));
-  std::vector<bool> left_right = (left < right);
-  Timeseries res;
-  for (auto x : left_right) res.push_back(x * -1.0);
-  return res;
+  return (left < right) * -1.0;
 };
 
+
+// (CLOSE -VWAP) / DECAYLINEAR(RANK(TSMAX(CLOSE, 30)),2)
+Alpha_mfun alpha124 = [](const Quotes& qts) -> Timeseries {
+  auto close_vwap = [](const Quote& qt) {
+    return qt.close() - qt.vwap();
+  };
+  auto left = qts.apply(close_vwap);
+
+  auto tsmax_close_30 = [](const Quote& qt) {
+    return tsmax(qt.ts_close(30));
+  };
+  auto rk_30 = [](const int delay) {
+    return rank(qts.apply(tsmax_close_30));
+  };
+
+
+};
 
 Alpha_fun alpha149 = [](const Quote& qt) -> double {
   const auto dr = qt.ts_close(252) / qt.ts_close(252, 1) - 1.0;
