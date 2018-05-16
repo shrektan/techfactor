@@ -6,7 +6,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 Rcpp::newDateVector test_qt_tdates(SEXP quote_ptr, const Rcpp::newDateVector from_to)
 {
-  Rcpp::XPtr<Quote> xptr {quote_ptr};
+  Rcpp::XPtr<Quote_raw> xptr {quote_ptr};
   const auto dates = xptr->tdates(from_to);
   return Rcpp::wrap(dates);
 }
@@ -15,9 +15,9 @@ Rcpp::newDateVector test_qt_tdates(SEXP quote_ptr, const Rcpp::newDateVector fro
 // [[Rcpp::export]]
 Rcpp::Date test_qt_today(SEXP quote_ptr, const Rcpp::Date today)
 {
-  Rcpp::XPtr<Quote> xptr {quote_ptr};
-  xptr->set(today);
-  return xptr->today();
+  Rcpp::XPtr<Quote_raw> xptr {quote_ptr};
+  Quote qt {*xptr, int(today)};
+  return qt.today();
 }
 
 const std::map<std::string, std::function<double(const Quote, const int)>> tag_map
@@ -46,9 +46,9 @@ double test_qt_get(SEXP quote_ptr, const Rcpp::Date today,
                    const std::string tag, const int delay)
 {
   if (tag_map.count(tag) == 0) Rcpp::stop("tag %s is not valid.", tag);
-  Rcpp::XPtr<Quote> xptr {quote_ptr};
-  xptr->set(today);
-  return tag_map.at(tag)(*xptr, delay);
+  Rcpp::XPtr<Quote_raw> xptr {quote_ptr};
+  Quote qt {*xptr, int(today)};
+  return tag_map.at(tag)(qt, delay);
 }
 
 
@@ -82,9 +82,9 @@ Timeseries test_qt_ts_get(
     const int n, const int delay)
 {
   if (tag_ts_map.count(tag) == 0) Rcpp::stop("tag %s is not valid.", tag);
-  Rcpp::XPtr<Quote> xptr {quote_ptr};
-  xptr->set(today);
-  return tag_ts_map.at(tag)(*xptr, n, delay);
+  Rcpp::XPtr<Quote_raw> xptr {quote_ptr};
+  Quote qt {*xptr, int(today)};
+  return tag_ts_map.at(tag)(qt, n, delay);
 }
 
 
@@ -151,10 +151,10 @@ Timeseries test_ts_scalar_op(const Timeseries& x, const double y, const std::str
 // [[Rcpp::export]]
 Timeseries test_ts(SEXP quote_ptr, const Rcpp::Date today, const int n)
 {
-  Rcpp::XPtr<Quote> xptr {quote_ptr};
-  xptr->set(today);
-  auto volumn = [xptr] (const int delay) {
-    return tsrank(xptr->ts_volume(5, delay));
+  Rcpp::XPtr<Quote_raw> xptr {quote_ptr};
+  Quote qt {*xptr, int(today)};
+  auto volumn = [&qt] (const int delay) {
+    return tsrank(qt.ts_volume(5, delay));
   };
   return ts<double>(n, volumn);
 }

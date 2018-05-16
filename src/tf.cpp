@@ -83,8 +83,8 @@ Rcpp::CharacterVector tf_reg_factors()
 // [[Rcpp::export]]
 SEXP tf_quote_xptr(Rcpp::DataFrame qt_tbl)
 {
-  Quote* ptr = new Quote {qt_tbl};
-  auto res = Rcpp::XPtr<Quote>(ptr, true);
+  Quote_raw* ptr = new Quote_raw {qt_tbl};
+  auto res = Rcpp::XPtr<Quote_raw>(ptr, true);
   res.attr("class") = Rcpp::StringVector::create("tf_quote_xptr");
   return res;
 }
@@ -95,8 +95,8 @@ SEXP tf_quote_xptr(Rcpp::DataFrame qt_tbl)
 // [[Rcpp::export]]
 SEXP tf_quotes_xptr(Rcpp::List qt_tbls)
 {
-  Quotes* ptr = new Quotes {qt_tbls};
-  auto res = Rcpp::XPtr<Quotes>(ptr, true);
+  Quotes_raw* ptr = new Quotes_raw {qt_tbls};
+  auto res = Rcpp::XPtr<Quotes_raw>(ptr, true);
   res.attr("class") = Rcpp::StringVector::create("tf_quotes_xptr");
   return res;
 }
@@ -133,7 +133,7 @@ Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDa
   using namespace Rcpp;
   asset_valid(qt_ptr, "tf_quote_xptr");
   assert_valid(from_to);
-  XPtr<Quote> qt_xptr {qt_ptr};
+  XPtr<Quote_raw> qt_xptr {qt_ptr};
   auto& qt = *qt_xptr;
 
   const auto dates = qt.tdates(from_to);
@@ -147,8 +147,7 @@ Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDa
       std::transform(
         dates.cbegin(), dates.cend(), res_iter,
         [&qt, &calculator] (const RDate date) {
-          qt.set(date);
-          return calculator(qt);
+          return calculator(Quote(qt, date));
         }
       );
       std::advance(res_iter, dates.size());
@@ -183,7 +182,7 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
   using namespace Rcpp;
   asset_valid(qts_ptr, "tf_quotes_xptr");
   assert_valid(from_to);
-  XPtr<Quotes> qts_xptr {qts_ptr};
+  XPtr<Quotes_raw> qts_xptr {qts_ptr};
   auto& qts = *qts_xptr;
   const auto dates = qts.tdates(from_to);
   NumericMatrix res(qts.size(), dates.size());
@@ -191,8 +190,7 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
   if (tf_mcaculators.count(name)) {
     auto mcalculator = tf_mcaculators.at(name);
     for (const auto date : dates) {
-      qts.set(date);
-      const auto fv = mcalculator(qts);
+      const auto fv = mcalculator(Quotes(qts, date));
       std::copy(fv.cbegin(), fv.cend(), res_iter);
       std::advance(res_iter, fv.size());
     }
@@ -203,8 +201,7 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
       return calculator(qt);
     };
     for (const auto date : dates) {
-      qts.set(date);
-      const auto fv = qts.apply(fun);
+      const auto fv = Quotes(qts, date).apply(fun);
       std::copy(fv.cbegin(), fv.cend(), res_iter);
       std::advance(res_iter, fv.size());
     }
