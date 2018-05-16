@@ -167,3 +167,35 @@ Timeseries test_ts(SEXP quote_ptr, const Rcpp::Date today, const int n)
   };
   return ts<double>(n, volumn);
 }
+
+
+Panel test_create_panel(const Rcpp::List x)
+{
+  const int n = x.size();
+  Panel res;
+  for (int i = 0; i < n; ++i) {
+    Rcpp::NumericVector r_elem = x[i];
+    Timeseries elem = Rcpp::as<std::vector<double>>(r_elem);
+    res.push_back(elem);
+  }
+  return res;
+}
+
+
+// [[Rcpp::export]]
+void test_assert_valid_panel(const Rcpp::List x)
+{
+  auto panel = test_create_panel(x);
+  assert_valid(panel);
+}
+
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_panel_sum(const Rcpp::List x)
+{
+  auto fun = [](const Timeseries& ts) {
+    return sum(ts);
+  };
+  auto panel = test_create_panel(x);
+  return Rcpp::wrap(apply(panel, fun));
+}

@@ -529,6 +529,25 @@ inline Timeseries pow(const Timeseries& base, const double exp)
 }
 
 
+inline void assert_valid(const Panel& x)
+{
+  std::set<int> vec_n;
+  for (const auto& elem : x) vec_n.insert(elem.size());
+  if (vec_n.size() >= 2) Rcpp::stop(
+    "panel data should have the same length in each slot."
+  );
+}
+
+
+inline Timeseries apply(const Panel& x, std::function<double(const Timeseries&)> fun)
+{
+  assert_valid(x);
+  Timeseries res;
+  for (const auto& elem : x) res.push_back(fun(elem));
+  return res;
+}
+
+
 inline std::vector<Quote_raw> v_quote(Rcpp::List qt_tbls)
 {
   std::vector<Quote_raw> res;

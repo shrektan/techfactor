@@ -153,6 +153,14 @@ test_ts <- function(quote_ptr, today, n) {
     .Call(`_GCAMCTF_test_ts`, quote_ptr, today, n)
 }
 
+test_assert_valid_panel <- function(x) {
+    invisible(.Call(`_GCAMCTF_test_assert_valid_panel`, x))
+}
+
+test_panel_sum <- function(x) {
+    .Call(`_GCAMCTF_test_panel_sum`, x)
+}
+
 create_xts <- function(x_mat, x_dates) {
     .Call(`_GCAMCTF_create_xts`, x_mat, x_dates)
 }
