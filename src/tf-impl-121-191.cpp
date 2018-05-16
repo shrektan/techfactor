@@ -11,19 +11,19 @@ Alpha_mfun alpha121 = [](const Quotes& qts) -> Timeseries {
   };
   auto base = rank(qts.apply(fun_base));
 
-  auto fun_exp = [](const Quote& qt) {
-    auto tsrank_cor = [](const Quote& qt) {
-      auto cor_x = [](const Quote& qt) {
-        return tsrank(qt.ts_vwap(20));
-      };
-      auto cor_y = [](const Quote& qt) {
-        auto mean_vol_60 = [] (const Quote& qt) {
-          return mean(qt.ts_volume(60));
-        };
-        return tsrank(qt.ts<double>(2, mean_vol_60));
-      };
-      return corr(qt.ts<double>(18, cor_x), qt.ts<double>(18, cor_y));
-    };
+  auto cor_x = [](const Quote& qt) {
+    return tsrank(qt.ts_vwap(20));
+  };
+  auto mean_vol_60 = [] (const Quote& qt) {
+    return mean(qt.ts_volume(60));
+  };
+  auto cor_y = [mean_vol_60](const Quote& qt) {
+    return tsrank(qt.ts<double>(2, mean_vol_60));
+  };
+  auto tsrank_cor = [cor_x, cor_y](const Quote& qt) {
+    return corr(qt.ts<double>(18, cor_x), qt.ts<double>(18, cor_y));
+  };
+  auto fun_exp = [tsrank_cor](const Quote& qt) {
     return tsrank(qt.ts<double>(3, tsrank_cor));
   };
   auto exp = qts.apply(fun_exp);
@@ -34,16 +34,16 @@ Alpha_mfun alpha121 = [](const Quotes& qts) -> Timeseries {
 // (SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2)-DELAY(SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2),1))/
 // DELAY(SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2),1)
 Alpha_fun alpha122 = [](const Quote& qt) -> double {
-  auto tripple_sma = [&qt](const int delay) {
-    auto sma_3 = [](const Quote& qt) {
-      auto sma_2 = [](const Quote& qt) {
-        auto sma_1 = [](const Quote& qt) {
-          return sma(qt.ts_close(13), 2);
-        };
-        return sma(qt.ts<double>(13, sma_1), 2);
-      };
-      return sma(qt.ts<double>(13, sma_2), 2);
-    };
+  auto sma_1 = [](const Quote& qt) {
+    return sma(qt.ts_close(13), 2);
+  };
+  auto sma_2 = [sma_1](const Quote& qt) {
+    return sma(qt.ts<double>(13, sma_1), 2);
+  };
+  auto sma_3 = [sma_2](const Quote& qt) {
+    return sma(qt.ts<double>(13, sma_2), 2);
+  };
+  auto tripple_sma = [sma_3, &qt](const int delay) {
     return sma_3(qt.clock_back(delay));
   };
   const double second = tripple_sma(1);
@@ -95,12 +95,7 @@ Alpha_mfun alpha124 = [](const Quotes& qts) -> Timeseries {
   };
 
   auto rk = qts.tsapply(2, rk_30);
-  Timeseries right;
-  for (int i {0}; i < qts.size(); ++i) {
-    Timeseries right_sec;
-    for (auto& rk_day : rk) right_sec.push_back(rk_day[i]);
-    right.push_back(decaylinear(right_sec));
-  }
+  Timeseries right = apply(rk, decaylinear);
   return left / right;
 };
 
