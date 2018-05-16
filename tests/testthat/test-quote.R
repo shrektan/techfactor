@@ -283,6 +283,18 @@ test_that("ts_op_ts", {
     }
   )
   expect_false(is.nan(test_ts_op(-4, -0.5, "^")))
+  expect_equal(
+    test_ts_op(x, y, ">"),
+    as.double(x > y)
+  )
+  expect_equal(
+    test_ts_op(x, y, "=="),
+    as.double(x == y)
+  )
+  expect_equal(
+    test_ts_op(x, y, "<"),
+    as.double(x < y)
+  )
 })
 
 
@@ -330,6 +342,14 @@ test_that("ts_op_scalar", {
     purrr::map(y, ~test_ts_scalar_op(x, ., "<")),
     purrr::map(y, ~{
       res <- as.double(`<`(x, .))
+      res[is.na(res)] <- 0.0
+      res
+    })
+  )
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "==")),
+    purrr::map(y, ~{
+      res <- as.double(`==`(x, .))
       res[is.na(res)] <- 0.0
       res
     })
