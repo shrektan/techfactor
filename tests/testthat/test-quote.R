@@ -5,24 +5,24 @@ tags <- c("pclose", "open", "high", "low", "close", "vwap",
 
 data("tf_quote")
 dt <- data.table::copy(tf_quote)
-qt <- tf_quotes_xptr(dt)
+qt <- tf_quote_xptr(dt)
 
-test_that("quotes' input must be a sorted tbl", {
+test_that("quote' input must be a sorted tbl", {
   dt_copy <- data.table::copy(dt)
   setorder(dt_copy, -DATE)
   expect_error(
-    tf_quotes_xptr(dt_copy),
+    tf_quote_xptr(dt_copy),
     "x must be a sorted date vector"
   )
   setorder(dt_copy, DATE)
   dt_copy[, CLOSE := NULL]
   expect_error(
-    tf_quotes_xptr(dt_copy),
+    tf_quote_xptr(dt_copy),
     "CLOSE"
   )
 })
 
-test_that("quotes.tdates()", {
+test_that("quote.tdates()", {
   # from is lower than min
   from_to <- as.Date(c("2017-12-01", "2018-01-06"))
   expect_equivalent(
@@ -60,7 +60,7 @@ test_that("quotes.tdates()", {
 })
 
 
-test_that("quotes.set()", {
+test_that("quote.set()", {
   # too small
   expect_error(
     test_qt_today(qt, anydate(20180101)),
@@ -169,76 +169,90 @@ test_that("qt.ts_get()", {
 
 test_that("ts_qt_misc_getter", {
   date <- anydate(20180504)
+  date2 <- anydate(20180502)
   expect_equal(
-    test_qt_get(qt, date, "tr", 0),
+    c(test_qt_get(qt, date, "tr", 0), test_qt_get(qt, date, "tr", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
-      max(
-        max(crt$HIGH - crt$LOW, abs(crt$HIGH - prev$CLOSE)),
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
+      pmax(
+        pmax(crt$HIGH - crt$LOW, abs(crt$HIGH - prev$CLOSE)),
         abs(crt$LOW - prev$CLOSE)
       )
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "ret", 0),
+    c(test_qt_get(qt, date, "ret", 0), test_qt_get(qt, date, "ret", 2)),
     {
-      crt <- dt[J(date)]
+      crt <- dt[J(c(date, date2))]
       crt$CLOSE / crt$PCLOSE - 1.0
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "dtm", 0),
+    c(test_qt_get(qt, date, "dtm", 0), test_qt_get(qt, date, "dtm", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
-      if (crt$OPEN <= prev$OPEN) {
-        0
-      } else {
-        max(
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
+      ifelse(
+        crt$OPEN <= prev$OPEN,
+        0,
+        pmax(
           crt$HIGH - crt$OPEN,
           crt$OPEN - prev$OPEN
         )
-      }
+      )
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "dbm", 0),
+    c(test_qt_get(qt, date, "dbm", 0), test_qt_get(qt, date, "dbm", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
-      if (crt$OPEN >= prev$OPEN) {
-        0
-      } else {
-        max(
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
+      ifelse(
+        crt$OPEN >= prev$OPEN,
+        0,
+        pmax(
           crt$OPEN - crt$LOW,
           crt$OPEN - prev$OPEN
         )
-      }
+      )
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "hd", 0),
+    c(test_qt_get(qt, date, "hd", 0), test_qt_get(qt, date, "hd", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
       crt$HIGH - prev$HIGH
     }
   )
   expect_equal(
-    test_qt_get(qt, date, "ld", 0),
+    c(test_qt_get(qt, date, "ld", 0), test_qt_get(qt, date, "ld", 2)),
     {
-      crt <- dt[J(date)]
-      prev <- dt[J(date - 1), roll = TRUE]
+      crt <- dt[J(c(date, date2))]
+      prev <- dt[J(c(date, date2) - 1), roll = TRUE]
       prev$LOW - crt$LOW
     }
   )
 })
 
 
+test_that("ts_qt_misc_ts_getter", {
+  date <- anydate(20180504)
+  vars <- c("tr", "ret", "dtm", "dbm", "hd", "ld")
+  purrr::walk(vars, ~{
+    var <- .x
+    expect_equal(
+      test_qt_ts_get(qt, date, var, 5, 2),
+      purrr::map_dbl(4:0, ~test_qt_get(qt, date, var, 2 + .x))
+    )
+  })
+})
+
+
 test_that("ts_op_ts", {
-  x <- c(-1.0, 0.0, 1.0, 2.0, NA, 3.0, NA, 0.0)
-  y <- c(-0.1, 0.1, 0.0, 1.0, 1.2, NA, NA, 0.0)
+  x <- c(-1.0, 0.0, 1.0, 2.0, NA, 3.0, NA, 0.0, -3.0, 2.3, 0.0)
+  y <- c(-0.1, 0.1, 0.0, 1.0, 1.2, NA, NA, 0.0, 2.3, -3.0, -2.0)
   expect_equal(
     test_ts_op(x, y, "+"),
     x + y
@@ -260,6 +274,15 @@ test_that("ts_op_ts", {
       res
     }
   )
+  expect_equal(
+    test_ts_op(x, y, "^"),
+    {
+      res <- x ^ y
+      res[!is.finite(res)] <- NA_real_
+      res
+    }
+  )
+  expect_false(is.nan(test_ts_op(-4, -0.5, "^")))
 })
 
 
@@ -277,6 +300,14 @@ test_that("ts_op_scalar", {
   expect_equal(
     purrr::map(y, ~test_ts_scalar_op(x, ., "*")),
     purrr::map(y, ~`*`(x, .))
+  )
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "^")),
+    purrr::map(y, ~{
+      res <- `^`(x, .)
+      res[is.infinite(res)] <- NA_real_
+      res
+    })
   )
   # return NA if any NA or find zero in the denominator
   expect_equal(

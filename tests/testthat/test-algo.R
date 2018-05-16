@@ -148,7 +148,7 @@ test_that("decaylinear", {
   x <- rnorm(10)
   expect_equal(tf_decaylinear(x), {
     wts <- seq_along(x)
-    x * wts / sum(wts)
+    weighted.mean(x, wts)
   })
 })
 
@@ -230,9 +230,9 @@ test_that("regresi", {
                "The size of x and y must be the same.", fixed = TRUE)
   x <- rnorm(10)
   y <- rnorm(10)
-  expect_equivalent(tf_regresi(y, x), resid(lm(y ~ x)))
-  expect_equal(tf_regresi(c(NA, x), c(1, y)), rep(NA_real_, 11))
-  expect_equal(tf_regresi(c(1, x), c(NA, y)), rep(NA_real_, 11))
+  expect_equivalent(tf_regresi(y, x), tail(resid(lm(y ~ x)), 1))
+  expect_equal(tf_regresi(c(NA, x), c(1, y)), NA_real_)
+  expect_equal(tf_regresi(c(1, x), c(NA, y)), NA_real_)
 })
 
 test_that("filter", {

@@ -165,7 +165,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // decaylinear
-Timeseries decaylinear(const Timeseries& x);
+double decaylinear(const Timeseries& x);
 RcppExport SEXP _GCAMCTF_decaylinear(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -254,7 +254,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // regresi
-Timeseries regresi(const Timeseries& y, const Timeseries& x);
+double regresi(const Timeseries& y, const Timeseries& x);
 RcppExport SEXP _GCAMCTF_regresi(SEXP ySEXP, SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -352,55 +352,55 @@ BEGIN_RCPP
 END_RCPP
 }
 // test_qt_tdates
-Rcpp::newDateVector test_qt_tdates(SEXP quotes_ptr, const Rcpp::newDateVector from_to);
-RcppExport SEXP _GCAMCTF_test_qt_tdates(SEXP quotes_ptrSEXP, SEXP from_toSEXP) {
+Rcpp::newDateVector test_qt_tdates(SEXP quote_ptr, const Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_test_qt_tdates(SEXP quote_ptrSEXP, SEXP from_toSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type quote_ptr(quote_ptrSEXP);
     Rcpp::traits::input_parameter< const Rcpp::newDateVector >::type from_to(from_toSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_qt_tdates(quotes_ptr, from_to));
+    rcpp_result_gen = Rcpp::wrap(test_qt_tdates(quote_ptr, from_to));
     return rcpp_result_gen;
 END_RCPP
 }
 // test_qt_today
-Rcpp::Date test_qt_today(SEXP quotes_ptr, const Rcpp::Date today);
-RcppExport SEXP _GCAMCTF_test_qt_today(SEXP quotes_ptrSEXP, SEXP todaySEXP) {
+Rcpp::Date test_qt_today(SEXP quote_ptr, const Rcpp::Date today);
+RcppExport SEXP _GCAMCTF_test_qt_today(SEXP quote_ptrSEXP, SEXP todaySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type quote_ptr(quote_ptrSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
-    rcpp_result_gen = Rcpp::wrap(test_qt_today(quotes_ptr, today));
+    rcpp_result_gen = Rcpp::wrap(test_qt_today(quote_ptr, today));
     return rcpp_result_gen;
 END_RCPP
 }
 // test_qt_get
-double test_qt_get(SEXP quotes_ptr, const Rcpp::Date today, const std::string tag, const int delay);
-RcppExport SEXP _GCAMCTF_test_qt_get(SEXP quotes_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP delaySEXP) {
+double test_qt_get(SEXP quote_ptr, const Rcpp::Date today, const std::string tag, const int delay);
+RcppExport SEXP _GCAMCTF_test_qt_get(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP delaySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type quote_ptr(quote_ptrSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
     Rcpp::traits::input_parameter< const std::string >::type tag(tagSEXP);
     Rcpp::traits::input_parameter< const int >::type delay(delaySEXP);
-    rcpp_result_gen = Rcpp::wrap(test_qt_get(quotes_ptr, today, tag, delay));
+    rcpp_result_gen = Rcpp::wrap(test_qt_get(quote_ptr, today, tag, delay));
     return rcpp_result_gen;
 END_RCPP
 }
 // test_qt_ts_get
-Timeseries test_qt_ts_get(SEXP quotes_ptr, const Rcpp::Date today, const std::string tag, const int n, const int delay);
-RcppExport SEXP _GCAMCTF_test_qt_ts_get(SEXP quotes_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP nSEXP, SEXP delaySEXP) {
+Timeseries test_qt_ts_get(SEXP quote_ptr, const Rcpp::Date today, const std::string tag, const int n, const int delay);
+RcppExport SEXP _GCAMCTF_test_qt_ts_get(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP nSEXP, SEXP delaySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type quote_ptr(quote_ptrSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
     Rcpp::traits::input_parameter< const std::string >::type tag(tagSEXP);
     Rcpp::traits::input_parameter< const int >::type n(nSEXP);
     Rcpp::traits::input_parameter< const int >::type delay(delaySEXP);
-    rcpp_result_gen = Rcpp::wrap(test_qt_ts_get(quotes_ptr, today, tag, n, delay));
+    rcpp_result_gen = Rcpp::wrap(test_qt_ts_get(quote_ptr, today, tag, n, delay));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -431,20 +431,32 @@ BEGIN_RCPP
 END_RCPP
 }
 // test_ts
-Timeseries test_ts(SEXP quotes_ptr, const Rcpp::Date today, const int n);
-RcppExport SEXP _GCAMCTF_test_ts(SEXP quotes_ptrSEXP, SEXP todaySEXP, SEXP nSEXP) {
+Timeseries test_ts(SEXP quote_ptr, const Rcpp::Date today, const int n);
+RcppExport SEXP _GCAMCTF_test_ts(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type quotes_ptr(quotes_ptrSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type quote_ptr(quote_ptrSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
     Rcpp::traits::input_parameter< const int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_ts(quotes_ptr, today, n));
+    rcpp_result_gen = Rcpp::wrap(test_ts(quote_ptr, today, n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// create_xts
+Rcpp::NumericMatrix create_xts(Rcpp::NumericMatrix x_mat, Rcpp::newDateVector x_dates);
+RcppExport SEXP _GCAMCTF_create_xts(SEXP x_matSEXP, SEXP x_datesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type x_mat(x_matSEXP);
+    Rcpp::traits::input_parameter< Rcpp::newDateVector >::type x_dates(x_datesSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_xts(x_mat, x_dates));
     return rcpp_result_gen;
 END_RCPP
 }
 // tf_reg_factors
-Rcpp::StringVector tf_reg_factors();
+Rcpp::CharacterVector tf_reg_factors();
 RcppExport SEXP _GCAMCTF_tf_reg_factors() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -453,27 +465,62 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// tf_quotes_xptr
-SEXP tf_quotes_xptr(Rcpp::DataFrame qt_tbl);
-RcppExport SEXP _GCAMCTF_tf_quotes_xptr(SEXP qt_tblSEXP) {
+// tf_quote_xptr
+SEXP tf_quote_xptr(Rcpp::DataFrame qt_tbl);
+RcppExport SEXP _GCAMCTF_tf_quote_xptr(SEXP qt_tblSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame >::type qt_tbl(qt_tblSEXP);
-    rcpp_result_gen = Rcpp::wrap(tf_quotes_xptr(qt_tbl));
+    rcpp_result_gen = Rcpp::wrap(tf_quote_xptr(qt_tbl));
     return rcpp_result_gen;
 END_RCPP
 }
-// tf_cal
-Rcpp::List tf_cal(SEXP qt_ptr, std::string name, Rcpp::newDateVector from_to);
-RcppExport SEXP _GCAMCTF_tf_cal(SEXP qt_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP) {
+// tf_quotes_xptr
+SEXP tf_quotes_xptr(Rcpp::List qt_tbls);
+RcppExport SEXP _GCAMCTF_tf_quotes_xptr(SEXP qt_tblsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type qt_tbls(qt_tblsSEXP);
+    rcpp_result_gen = Rcpp::wrap(tf_quotes_xptr(qt_tbls));
+    return rcpp_result_gen;
+END_RCPP
+}
+// asset_valid
+void asset_valid(SEXP x, const std::string& classname);
+RcppExport SEXP _GCAMCTF_asset_valid(SEXP xSEXP, SEXP classnameSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type classname(classnameSEXP);
+    asset_valid(x, classname);
+    return R_NilValue;
+END_RCPP
+}
+// tf_qt_cal
+Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_tf_qt_cal(SEXP qt_ptrSEXP, SEXP namesSEXP, SEXP from_toSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type qt_ptr(qt_ptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type names(namesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::newDateVector >::type from_to(from_toSEXP);
+    rcpp_result_gen = Rcpp::wrap(tf_qt_cal(qt_ptr, names, from_to));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tf_qts_cal
+Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_tf_qts_cal(SEXP qts_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type qts_ptr(qts_ptrSEXP);
     Rcpp::traits::input_parameter< std::string >::type name(nameSEXP);
     Rcpp::traits::input_parameter< Rcpp::newDateVector >::type from_to(from_toSEXP);
-    rcpp_result_gen = Rcpp::wrap(tf_cal(qt_ptr, name, from_to));
+    rcpp_result_gen = Rcpp::wrap(tf_qts_cal(qts_ptr, name, from_to));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -517,9 +564,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_test_ts_op", (DL_FUNC) &_GCAMCTF_test_ts_op, 3},
     {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
     {"_GCAMCTF_test_ts", (DL_FUNC) &_GCAMCTF_test_ts, 3},
+    {"_GCAMCTF_create_xts", (DL_FUNC) &_GCAMCTF_create_xts, 2},
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
+    {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},
     {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
-    {"_GCAMCTF_tf_cal", (DL_FUNC) &_GCAMCTF_tf_cal, 3},
+    {"_GCAMCTF_asset_valid", (DL_FUNC) &_GCAMCTF_asset_valid, 2},
+    {"_GCAMCTF_tf_qt_cal", (DL_FUNC) &_GCAMCTF_tf_qt_cal, 3},
+    {"_GCAMCTF_tf_qts_cal", (DL_FUNC) &_GCAMCTF_tf_qts_cal, 3},
     {NULL, NULL, 0}
 };
 

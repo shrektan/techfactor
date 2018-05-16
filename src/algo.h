@@ -23,7 +23,7 @@ double tsrank(const Timeseries& x);
 double sign(const double x);
 double sma(const Timeseries& x, const int m);
 double wma(const Timeseries& x);
-Timeseries decaylinear(const Timeseries& x, const int days);
+double decaylinear(const Timeseries& x);
 Timeseries sequence(const int n);
 Timeseries sumac(const Timeseries& x);
 Timeseries log(const Timeseries& x);
@@ -32,10 +32,22 @@ double covariance(const Timeseries& x, const Timeseries& y);
 double prod(const Timeseries& x);
 double count(const std::vector<bool>& x);
 double regbeta(const Timeseries& x, const Timeseries& y);
-Timeseries regresi(const Timeseries& x, const Timeseries& y);
+double regresi(const Timeseries& x, const Timeseries& y);
 Timeseries filter(const Timeseries& x, const std::vector<bool>& cond);
 double highday(const Timeseries& x);
 double lowday(const Timeseries& x);
+
+
+template<typename T>
+std::vector<T> ts(const int n, std::function<T(const int delay)> fun)
+{
+  if (n < 1) Rcpp::stop("n (%d) must be positive.", n);
+  std::vector<T> res;
+  for (int i {n - 1}; i >= 0; --i) {
+    res.push_back(fun(i));
+  }
+  return res;
+}
 
 
 inline Timeseries col(const Rcpp::DataFrame tbl, const std::string field)
@@ -53,10 +65,10 @@ inline std::vector<RDate> col_date(const Rcpp::DataFrame tbl, const std::string 
 
 void assert_sorted(const std::vector<RDate>& x);
 
-class Quotes {
+class Quote {
 public:
-  Quotes() = default;
-  explicit Quotes(const Rcpp::DataFrame tbl)
+  Quote() = default;
+  explicit Quote(const Rcpp::DataFrame tbl)
     : dates_ { col_date(tbl, "DATE") },
       pclose_ { col(tbl, "PCLOSE") },
       open_ { col(tbl, "OPEN") },
@@ -139,34 +151,75 @@ public:
     return ts_get_(bmk_open_, n, delay);
   }
 
-  double hd() const { return high() - high(1); }
-  double ld() const { return low(1) - low(); }
-
+  double hd(const int delay = 0) const { return high(delay) - high(delay + 1); }
+  double ld(const int delay = 0) const { return low(delay + 1) - low(delay); }
   double tr(const int delay = 0) const
   {
-    if (!in_bound_(1)) return NA_REAL;
+    if (!in_bound_(delay + 1)) return NA_REAL;
     return std::max(
-      std::max(high() - low(), std::abs(high() - close(1))),
-      std::abs(low() - close(1))
+      std::max(high(delay) - low(delay), std::abs(high(delay) - close(delay + 1))),
+      std::abs(low(delay) - close(delay + 1))
     );
   }
-
-  double ret() const
+  double ret(const int delay = 0) const
   {
-    if (pclose() == 0.0) return NA_REAL;
-    return close() / pclose() - 1.0;
+    if (pclose(delay) == 0.0) return NA_REAL;
+    return close(delay) / pclose(delay) - 1.0;
+  }
+  double dtm(const int delay = 0) const
+  {
+    if (!in_bound_(delay + 1)) return NA_REAL;
+    return open(delay) <= open(delay + 1) ? 0.0 :
+      std::max(high(delay) - open(delay), open(delay) - open(delay + 1));
+  }
+  double dbm(const int delay = 0) const
+  {
+    if (!in_bound_(delay + 1)) return NA_REAL;
+    return open(delay) >= open(delay + 1) ? 0.0 :
+      std::max(open(delay) - low(delay), open(delay) - open(delay + 1));
   }
 
-  double dtm() const
+  Timeseries ts_hd(const int n, const int delay = 0) const
   {
-    if (!in_bound_(1)) return NA_REAL;
-    return open() <= open(1) ? 0.0 : std::max(high() - open(), open() - open(1));
+    auto fun = [this, delay] (const int i) {
+      return this->hd(delay + i);
+    };
+    return ts<double>(n, fun);
   }
-
-  double dbm() const
+  Timeseries ts_ld(const int n, const int delay = 0) const
   {
-    if (!in_bound_(1)) return NA_REAL;
-    return open() >= open(1) ? 0.0 : std::max(open() - low(), open() - open(1));
+    auto fun = [this, delay] (const int i) {
+      return this->ld(delay + i);
+    };
+    return ts<double>(n, fun);
+  }
+  Timeseries ts_tr(const int n, const int delay = 0) const
+  {
+    auto fun = [this, delay] (const int i) {
+      return this->tr(delay + i);
+    };
+    return ts<double>(n, fun);
+  }
+  Timeseries ts_ret(const int n, const int delay = 0) const
+  {
+    auto fun = [this, delay] (const int i) {
+      return this->ret(delay + i);
+    };
+    return ts<double>(n, fun);
+  }
+  Timeseries ts_dtm(const int n, const int delay = 0) const
+  {
+    auto fun = [this, delay] (const int i) {
+      return this->dtm(delay + i);
+    };
+    return ts<double>(n, fun);
+  }
+  Timeseries ts_dbm(const int n, const int delay = 0) const
+  {
+    auto fun = [this, delay] (const int i) {
+      return this->dbm(delay + i);
+    };
+    return ts<double>(n, fun);
   }
 
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
@@ -279,6 +332,33 @@ inline Timeseries operator/(const Timeseries& x, const Timeseries& y)
 }
 
 
+inline double tf_pow(const double base, const double exp)
+{
+  if (Rcpp::NumericVector::is_na(base) ||
+      Rcpp::NumericVector::is_na(exp) ||
+      base < 0.0 ||
+      (base == 0.0 && exp < 0.0)
+  ) return NA_REAL;
+  return std::pow(base, exp);
+}
+
+
+inline Timeseries pow(const Timeseries& base, const Timeseries& exp)
+{
+  Timeseries res(base.size());
+  std::transform(
+    base.cbegin(), base.cend(),
+    exp.cbegin(), res.begin(),
+    [](const double base_, const double exp_) {
+      double res = std::pow(base_, exp_);
+      if (R_finite(res)) return res;
+      return NA_REAL;
+    }
+  );
+  return res;
+}
+
+
 inline Timeseries operator+(const Timeseries& x, const double y)
 {
   Timeseries res(x.size());
@@ -348,15 +428,76 @@ inline std::vector<bool> operator<(const Timeseries& x, const double y)
 }
 
 
-template<typename T>
-std::vector<T> ts(const int n, std::function<T(const int delay)> fun)
+inline Timeseries pow(const Timeseries& base, const double exp)
 {
-  if (n < 1) Rcpp::stop("n (%d) must be positive.", n);
-  std::vector<T> res;
-  for (int i {n - 1}; i >= 0; --i) {
-    res.push_back(fun(i));
+  Timeseries res(base.size());
+  std::transform(
+    base.cbegin(), base.cend(),
+    res.begin(), [exp](const double v) {
+      double res = std::pow(v, exp);
+      if (R_finite(res)) return res;
+      return NA_REAL;
+    }
+  );
+  return res;
+}
+
+
+inline std::vector<Quote> v_quote(Rcpp::List qt_tbls)
+{
+  std::vector<Quote> res;
+  const int n = qt_tbls.size();
+  for (int i {0}; i < n; ++i) {
+    Rcpp::DataFrame qt_tbl = Rcpp::wrap(qt_tbls[i]);
+    res.emplace_back(qt_tbl);
   }
   return res;
 }
+
+
+inline std::vector<std::string> v_names(Rcpp::List qt_tbls)
+{
+  if (Rf_isNull(qt_tbls.attr("names"))) Rcpp::stop(
+      "qt_tbls must have names attributes."
+  );
+  Rcpp::StringVector names = qt_tbls.attr("names");
+  return Rcpp::as<std::vector<std::string>>(names);
+}
+
+
+class Quotes {
+public:
+  Quotes() = default;
+  explicit Quotes(Rcpp::List qt_tbls)
+    : names_ (v_names(qt_tbls)),
+      qts_ (v_quote(qt_tbls))
+    { }
+  void set(const RDate today) noexcept
+  {
+    for (auto& qt : qts_) qt.set(today);
+  }
+  Timeseries apply(std::function<double(const Quote&)> fun) const
+  {
+    Timeseries res;
+    std::transform(qts_.cbegin(), qts_.cend(), std::back_inserter(res), fun);
+    return res;
+  }
+  std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
+  {
+    std::set<RDate> set;
+    for (const auto& qt : qts_) {
+      auto dates = qt.tdates(from_to);
+      for (auto date : dates) set.insert(date);
+    }
+    std::vector<RDate> res;
+    std::copy(set.cbegin(), set.cend(), std::back_inserter(res));
+    return res;
+  }
+  int size() const { return qts_.size(); }
+  const std::vector<std::string>& names() const { return names_; }
+private:
+  std::vector<std::string> names_;
+  std::vector<Quote> qts_;
+};
 
 #endif //__GCAMCTF_ALGO__

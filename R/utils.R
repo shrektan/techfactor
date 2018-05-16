@@ -14,6 +14,11 @@ magrittr::`%>%`
 anytime::anydate
 
 
+#' @importFrom zoo index
+#' @export
+zoo::index
+
+
 #' The sample quote data used in GCAMCTF
 #'
 #' The data is a realistic China-A security quote of 81 days

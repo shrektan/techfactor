@@ -170,14 +170,14 @@ double wma(const Timeseries& x)
 
 
 // [[Rcpp::export("tf_decaylinear")]]
-Timeseries decaylinear(const Timeseries& x)
+double decaylinear(const Timeseries& x)
 {
   assert_length(x, 1);
-  if (any_na(x)) return na_vector(x.size());
+  if (any_na(x)) return NA_REAL;
   const int n = x.size();
   Timeseries weights(sequence(n));
   const double sum_weights = std::accumulate(weights.cbegin(), weights.cend(), 0.0);
-  return weights / sum_weights * x;
+  return sum(weights / sum_weights * x);
 }
 
 
@@ -247,19 +247,12 @@ double regbeta(const Timeseries& y, const Timeseries& x)
 
 
 // [[Rcpp::export("tf_regresi")]]
-Timeseries regresi(const Timeseries& y, const Timeseries& x)
+double regresi(const Timeseries& y, const Timeseries& x)
 {
   assert_length(x, 2);
   const double beta = regbeta(y, x);
   const double intercept = mean(y) - mean(x) * beta;
-  Timeseries res(y.size());
-  std::transform(
-    y.cbegin(), y.cend(), x.cbegin(),
-    res.begin(), [beta, intercept](const double v_y, const double v_x) {
-      return v_y - v_x * beta - intercept;
-    }
-  );
-  return res;
+  return *y.rbegin() - *x.rbegin() * beta - intercept;
 }
 
 
