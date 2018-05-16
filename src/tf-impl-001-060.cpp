@@ -5,27 +5,26 @@ namespace alpha_impl
 {
 
 // (-1 * CORR(RANK(DELTA(LOG(VOLUME), 1)), RANK(((CLOSE -OPEN) / OPEN)), 6))
-Alpha_mfun alpha001 = [](const Quotes& quotes) -> Timeseries {
+Alpha_mfun alpha001 = [](const Quotes& qts) -> Timeseries {
 
   const int num_day = 6;
-  auto rk_d_log_vol = [&quotes](const int delay) {
-    auto d_log_vol = [delay](const Quote& qt) {
-      return log(qt.volume(delay)) - log(qt.volume(delay + 1));
-    };
-    return rank(quotes.apply(d_log_vol));
+  auto d_log_vol = [](const Quote& qt) {
+    return log(qt.volume()) - log(qt.volume(1));
   };
-  auto rk1 = ts<Timeseries>(num_day, rk_d_log_vol);
-
-  auto rk_c_p = [&quotes](const int delay) {
-    auto c_p = [delay](const Quote& qt) {
-      return (qt.close(delay) - qt.close(delay)) / qt.open(delay);
-    };
-    return rank(quotes.apply(c_p));
+  auto rk_d_log_vol = [d_log_vol](const Quotes& qts) {
+    return rank(qts.apply(d_log_vol));
   };
-  auto rk2 = ts<Timeseries>(num_day, rk_c_p);
+  auto c_p = [](const Quote& qt) {
+    return (qt.close() - qt.close()) / qt.open();
+  };
+  auto rk_c_p = [c_p](const Quotes& qts) {
+    return rank(qts.apply(c_p));
+  };
+  auto rk1 = qts.tsapply(num_day, rk_d_log_vol);
+  auto rk2 = qts.tsapply(num_day, rk_c_p);
 
   Timeseries res;
-  const int num_secu = quotes.size();
+  const int num_secu = qts.size();
   for (int i = 0; i < num_secu; ++i) {
     Timeseries sub_rk1, sub_rk2;
     for (int j = 0; j < num_day; ++j) {

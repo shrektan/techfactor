@@ -21,30 +21,19 @@ extern Alpha_fun alpha021;
 extern Alpha_fun alpha022;
 extern Alpha_fun alpha023;
 extern Alpha_fun alpha024;
-extern Alpha_fun alpha025;
 extern Alpha_fun alpha026;
 extern Alpha_fun alpha027;
 extern Alpha_fun alpha028;
 extern Alpha_fun alpha029;
 extern Alpha_fun alpha030;
 extern Alpha_fun alpha031;
-extern Alpha_fun alpha032;
-extern Alpha_fun alpha033;
 extern Alpha_fun alpha034;
-extern Alpha_fun alpha035;
-extern Alpha_fun alpha036;
-extern Alpha_fun alpha037;
 extern Alpha_fun alpha038;
-extern Alpha_fun alpha039;
 extern Alpha_fun alpha040;
-extern Alpha_fun alpha041;
-extern Alpha_fun alpha042;
 extern Alpha_fun alpha043;
 extern Alpha_fun alpha044;
-extern Alpha_fun alpha045;
 extern Alpha_fun alpha046;
 extern Alpha_fun alpha047;
-extern Alpha_fun alpha048;
 extern Alpha_fun alpha049;
 extern Alpha_fun alpha053;
 extern Alpha_fun alpha149;
@@ -75,30 +64,19 @@ std::map<std::string, Alpha_fun&> tf_caculators
   {"alpha022", alpha_impl::alpha022},
   {"alpha023", alpha_impl::alpha023},
   {"alpha024", alpha_impl::alpha024},
-  {"alpha025", alpha_impl::alpha025},
   {"alpha026", alpha_impl::alpha026},
   {"alpha027", alpha_impl::alpha027},
   {"alpha028", alpha_impl::alpha028},
   {"alpha029", alpha_impl::alpha029},
   {"alpha030", alpha_impl::alpha030},
   {"alpha031", alpha_impl::alpha031},
-  {"alpha032", alpha_impl::alpha032},
-  {"alpha033", alpha_impl::alpha033},
   {"alpha034", alpha_impl::alpha034},
-  {"alpha035", alpha_impl::alpha035},
-  {"alpha036", alpha_impl::alpha036},
-  {"alpha037", alpha_impl::alpha037},
   {"alpha038", alpha_impl::alpha038},
-  {"alpha039", alpha_impl::alpha039},
   {"alpha040", alpha_impl::alpha040},
-  {"alpha041", alpha_impl::alpha041},
-  {"alpha042", alpha_impl::alpha042},
   {"alpha043", alpha_impl::alpha043},
   {"alpha044", alpha_impl::alpha044},
-  {"alpha045", alpha_impl::alpha045},
   {"alpha046", alpha_impl::alpha046},
   {"alpha047", alpha_impl::alpha047},
-  {"alpha048", alpha_impl::alpha048},
   {"alpha049", alpha_impl::alpha049},
   {"alpha053", alpha_impl::alpha053},
   {"alpha149", alpha_impl::alpha149}
