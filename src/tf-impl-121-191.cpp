@@ -35,20 +35,51 @@ Alpha_mfun alpha121 = [](const Quotes& qts) -> Timeseries {
 // DELAY(SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2),1)
 Alpha_fun alpha122 = [](const Quote& qt) -> double {
   auto tripple_sma = [&qt](const int delay) {
-    Timeseries outer;
-    for (int i {12}; i >= 0; --i) {
-      Timeseries inner;
-      for (int j {12}; j >= 0; --j) {
-        inner.push_back(sma(log(qt.ts_close(i + j + delay)), 2));
-      }
-      outer.push_back(sma(inner, 2));
-    }
-    return sma(outer, 2);
+    auto sma_3 = [](const Quote& qt) {
+      auto sma_2 = [](const Quote& qt) {
+        auto sma_1 = [](const Quote& qt) {
+          return sma(qt.ts_close(13), 2);
+        };
+        return sma(qt.ts<double>(13, sma_1), 2);
+      };
+      return sma(qt.ts<double>(13, sma_2), 2);
+    };
+    return sma_3(qt.clock_back(delay));
   };
   const double second = tripple_sma(1);
   if (second == 0) return NA_REAL;
   const double first = tripple_sma(0);
   return first / second - 1.0;
+};
+
+
+// ((RANK(CORR(SUM(((HIGH + LOW) / 2), 20), SUM(MEAN(VOLUME,60), 20), 9)) <
+// RANK(CORR(LOW, VOLUME, 6))) * -1)
+Alpha_mfun alpha123 = [](const Quotes& qts) -> Timeseries {
+  auto sum_hl20 = [](const Quote& qt) {
+    return sum((qt.ts_high(20) + qt.ts_low(20)) / 2.0);
+  };
+  auto mean_vol60 = [](const Quote& qt) {
+    return mean(qt.ts_volume(60));
+  };
+  auto sum_mv60_20 = [mean_vol60](const Quote& qt) {
+    return sum(qt.ts<double>(20, mean_vol60));
+  };
+  auto corr9 = [sum_hl20, sum_mv60_20](const Quote& qt) {
+    auto v1 = qt.ts<double>(9, sum_hl20);
+    auto v2 = qt.ts<double>(9, sum_mv60_20);
+    return corr(v1, v2);
+  };
+  auto left = rank(qts.apply(corr9));
+
+  auto corr6 = [](const Quote& qt) {
+    return corr(qt.ts_low(6), qt.ts_volume(6));
+  };
+  auto right = rank(qts.apply(corr6));
+  std::vector<bool> left_right = (left < right);
+  Timeseries res;
+  for (auto x : left_right) res.push_back(x * -1.0);
+  return res;
 };
 
 
