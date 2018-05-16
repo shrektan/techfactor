@@ -443,6 +443,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_assert_valid_panel
+void test_assert_valid_panel(const Rcpp::List x);
+RcppExport SEXP _GCAMCTF_test_assert_valid_panel(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type x(xSEXP);
+    test_assert_valid_panel(x);
+    return R_NilValue;
+END_RCPP
+}
+// test_panel_sum
+Rcpp::NumericVector test_panel_sum(const Rcpp::List x);
+RcppExport SEXP _GCAMCTF_test_panel_sum(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_panel_sum(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // create_xts
 Rcpp::NumericMatrix create_xts(Rcpp::NumericMatrix x_mat, Rcpp::newDateVector x_dates);
 RcppExport SEXP _GCAMCTF_create_xts(SEXP x_matSEXP, SEXP x_datesSEXP) {
@@ -564,6 +585,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_test_ts_op", (DL_FUNC) &_GCAMCTF_test_ts_op, 3},
     {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
     {"_GCAMCTF_test_ts", (DL_FUNC) &_GCAMCTF_test_ts, 3},
+    {"_GCAMCTF_test_assert_valid_panel", (DL_FUNC) &_GCAMCTF_test_assert_valid_panel, 1},
+    {"_GCAMCTF_test_panel_sum", (DL_FUNC) &_GCAMCTF_test_panel_sum, 1},
     {"_GCAMCTF_create_xts", (DL_FUNC) &_GCAMCTF_create_xts, 2},
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},
