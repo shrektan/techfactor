@@ -90,12 +90,20 @@ Alpha_mfun alpha124 = [](const Quotes& qts) -> Timeseries {
   auto tsmax_close_30 = [](const Quote& qt) {
     return tsmax(qt.ts_close(30));
   };
-  auto rk_30 = [](const int delay) {
+  auto rk_30 = [tsmax_close_30](const Quotes& qts) {
     return rank(qts.apply(tsmax_close_30));
   };
 
-
+  auto rk = qts.tsapply(2, rk_30);
+  Timeseries right;
+  for (int i {0}; i < qts.size(); ++i) {
+    Timeseries right_sec;
+    for (auto& rk_day : rk) right_sec.push_back(rk_day[i]);
+    right.push_back(decaylinear(right_sec));
+  }
+  return left / right;
 };
+
 
 Alpha_fun alpha149 = [](const Quote& qt) -> double {
   const auto dr = qt.ts_close(252) / qt.ts_close(252, 1) - 1.0;
