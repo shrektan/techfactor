@@ -5,7 +5,11 @@ namespace alpha_impl
 {
 
 // (-1 * CORR(RANK(DELTA(LOG(VOLUME), 1)), RANK(((CLOSE -OPEN) / OPEN)), 6))
-Alpha_fun alpha001 = [](const Quote& quote) -> double {
+Alpha_mfun alpha001 = [](const Quotes& quotes) -> Timeseries {
+  auto fun_base = [](const Quote& quote) {
+
+  };
+
   const auto rk_delta_log_vol = rank(delta(log(quote.ts_close(7)), 1));
   const auto rk_close_open = rank((quote.ts_close(6) - quote.ts_open(6)) / quote.ts_open(6));
   return corr(rk_delta_log_vol, rk_close_open) * -1;
