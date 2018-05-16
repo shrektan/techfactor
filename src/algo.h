@@ -492,6 +492,19 @@ struct Quotes_raw {
   { }
   std::vector<std::string> names_;
   std::vector<Quote_raw> qts_;
+  std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
+  {
+    std::set<RDate> set;
+    for (const auto& qt : qts_) {
+      auto dates = qt.tdates(from_to);
+      for (auto date : dates) set.insert(date);
+    }
+    std::vector<RDate> res;
+    std::copy(set.cbegin(), set.cend(), std::back_inserter(res));
+    return res;
+  }
+  int size() const { return qts_.size(); }
+  const std::vector<std::string>& names() const { return names_; }
 };
 
 
@@ -500,7 +513,6 @@ public:
   Quotes() = default;
   explicit Quotes(const Quotes_raw& raw, const RDate today)
     : raw_ (raw),
-      names_ (raw.names_),
       qts_ (gen_qts_(raw, today)) { }
   Timeseries apply(std::function<double(const Quote&)> fun) const
   {
@@ -512,11 +524,10 @@ public:
   {
     return raw_.tdates(from_to);
   }
-  int size() const { return qts_.size(); }
-  const std::vector<std::string>& names() const { return names_; }
+  int size() const { return raw_.size(); }
+  const std::vector<std::string>& names() const { return raw_.names(); }
 private:
   const Quotes_raw& raw_;
-  const std::vector<std::string>& names_;
   std::vector<Quote> qts_;
   std::vector<Quote> gen_qts_(const Quotes_raw& raw, const RDate today) const
   {

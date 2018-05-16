@@ -201,8 +201,7 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
       return calculator(qt);
     };
     for (const auto date : dates) {
-      qts.set(date);
-      const auto fv = qts.apply(fun);
+      const auto fv = Quotes(qts, date).apply(fun);
       std::copy(fv.cbegin(), fv.cend(), res_iter);
       std::advance(res_iter, fv.size());
     }
