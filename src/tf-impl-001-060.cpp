@@ -748,7 +748,8 @@ Alpha_mfun alpha048 = [](const Quotes& quotes) -> Timeseries {
 // SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?
 // 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12) /
 // (SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?
-// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)+SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)+
+// SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?
 // 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))
 Alpha_fun alpha049 = [](const Quote& qt) -> double {
   auto sum1 = [&qt](const int delay) {
@@ -756,14 +757,20 @@ Alpha_fun alpha049 = [](const Quote& qt) -> double {
       return 0.0;
     } else {
       return(std::max(std::abs(qt.high(delay) - qt.high(delay + 1)),
-             std::abs(qt.low(delay) - qt.low(delay + 1))));
+                      std::abs(qt.low(delay) - qt.low(delay + 1))));
     };
   };
   auto sum2 = [&qt](const int delay) {
-    if ((qt.high(delay) + qt.low(delay)) > (qt.high(delay + 1) + qt.low(delay + 1))) {
-
-    }
+    if ((qt.high(delay) + qt.low(delay)) <= (qt.high(delay + 1) + qt.low(delay + 1))) {
+      return 0.0;
+    } else {
+      return(std::max(std::abs(qt.high(delay) - qt.high(delay + 1)),
+                      std::abs(qt.low(delay) - qt.low(delay + 1))));
+    };
   };
+  auto sum_ts1 = sum(ts<double>(12, sum1));
+  auto sum_ts2 = sum(ts<double>(12, sum2));
+  return sum_ts1 / (sum_ts1 + sum_ts2);
 };
 
 
