@@ -113,9 +113,14 @@ public:
   explicit Quote (const Quote_raw& raw, const RDate today)
     : raw_ { raw }, today_index_ { match_(today) } { }
 
-  Quote produce(const RDate today)
+  // this constructor is supposed to be called only by clock_back()
+  explicit Quote (const int today_index, const Quote_raw& raw)
+    : raw_ { raw }, today_index_ { today_index } { }
+
+  Quote clock_back(const int days) const
   {
-    return Quote(raw_, today);
+    if (days < 0) Rcpp::stop("days (%d) must be non negative.", days);
+    return Quote(today_index_ - days, raw_);
   }
   // it's mainly for tests
   RDate today()
@@ -207,43 +212,43 @@ public:
 
   Timeseries ts_hd(const int n, const int delay = 0) const
   {
-    auto fun = [this, delay] (const int i) {
-      return this->hd(delay + i);
+    auto fun = [delay] (const Quote& qt) {
+      return qt.hd(delay);
     };
     return ts<double>(n, fun);
   }
   Timeseries ts_ld(const int n, const int delay = 0) const
   {
-    auto fun = [this, delay] (const int i) {
-      return this->ld(delay + i);
+    auto fun = [delay] (const Quote& qt) {
+      return qt.ld(delay);
     };
     return ts<double>(n, fun);
   }
   Timeseries ts_tr(const int n, const int delay = 0) const
   {
-    auto fun = [this, delay] (const int i) {
-      return this->tr(delay + i);
+    auto fun = [delay] (const Quote& qt) {
+      return qt.tr(delay);
     };
     return ts<double>(n, fun);
   }
   Timeseries ts_ret(const int n, const int delay = 0) const
   {
-    auto fun = [this, delay] (const int i) {
-      return this->ret(delay + i);
+    auto fun = [delay] (const Quote& qt) {
+      return qt.ret(delay);
     };
     return ts<double>(n, fun);
   }
   Timeseries ts_dtm(const int n, const int delay = 0) const
   {
-    auto fun = [this, delay] (const int i) {
-      return this->dtm(delay + i);
+    auto fun = [delay] (const Quote& qt) {
+      return qt.dtm(delay);
     };
     return ts<double>(n, fun);
   }
   Timeseries ts_dbm(const int n, const int delay = 0) const
   {
-    auto fun = [this, delay] (const int i) {
-      return this->dbm(delay + i);
+    auto fun = [delay] (const Quote& qt) {
+      return qt.dbm(delay);
     };
     return ts<double>(n, fun);
   }
@@ -251,6 +256,17 @@ public:
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
   {
     return raw_.tdates(from_to);
+  }
+
+  template<typename T>
+  std::vector<T> ts(const int n, std::function<T(const Quote&)> fun) const
+  {
+    if (n < 1) Rcpp::stop("n (%d) must be positive.", n);
+    std::vector<T> res;
+    for (int i {n - 1}; i >= 0; --i) {
+      res.push_back(fun(clock_back(i)));
+    }
+    return res;
   }
 
 private:
