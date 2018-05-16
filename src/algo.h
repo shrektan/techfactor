@@ -543,7 +543,13 @@ inline Timeseries apply(const Panel& x, std::function<double(const Timeseries&)>
 {
   assert_valid(x);
   Timeseries res;
-  for (const auto& elem : x) res.push_back(fun(elem));
+  if (x.size() == 0) return res;
+  const int n = x[0].size();
+  for (int i = 0; i < n; ++i) {
+    Timeseries elem;
+    for (const auto& sub_x : x) elem.push_back(sub_x[i]);
+    res.push_back(fun(elem));
+  }
   return res;
 }
 

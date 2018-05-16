@@ -312,8 +312,8 @@ test_that("assert valid panel", {
 
 test_that("panel apply", {
   expect_equal(
-    test_panel_sum(list(a = 1:3, b = 3:5, c = 8:10)),
-    c(6, 12, 27)
+    test_panel_sum(list(a = 1:5, b = 3:7, c = 8:12)),
+    c(12, 15, 18, 21, 24)
   )
   # ensure it will check
   expect_error(
