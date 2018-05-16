@@ -367,13 +367,53 @@ inline Timeseries operator/(const Timeseries& x, const Timeseries& y)
 }
 
 
+inline Timeseries operator>(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      return double(v1 > v2);
+    });
+  return res;
+}
+
+
+inline Timeseries operator<(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      return double(v1 < v2);
+    });
+  return res;
+}
+
+
+inline Timeseries operator==(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      return double(v1 == v2);
+    });
+  return res;
+}
+
+
 inline double tf_pow(const double base, const double exp)
 {
-  if (Rcpp::NumericVector::is_na(base) ||
-      Rcpp::NumericVector::is_na(exp) ||
-      base < 0.0 ||
-      (base == 0.0 && exp < 0.0)
-  ) return NA_REAL;
+  if (ISNA(base) || ISNA(exp) || base < 0.0 || (base == 0.0 && exp < 0.0)) {
+    return NA_REAL;
+  }
   return std::pow(base, exp);
 }
 
@@ -458,6 +498,17 @@ inline std::vector<bool> operator<(const Timeseries& x, const double y)
   std::transform(
     x.cbegin(), x.cend(),
     res.begin(), [y](const double v) { return v < y; }
+  );
+  return res;
+}
+
+
+inline std::vector<bool> operator==(const Timeseries& x, const double y)
+{
+  std::vector<bool> res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v == y; }
   );
   return res;
 }

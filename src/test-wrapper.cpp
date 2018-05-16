@@ -97,7 +97,10 @@ const std::map<
   {"-", [](const Timeseries& x, const Timeseries& y) { return x - y; }},
   {"*", [](const Timeseries& x, const Timeseries& y) { return x * y; }},
   {"/", [](const Timeseries& x, const Timeseries& y) { return x / y; }},
-  {"^", [](const Timeseries& x, const Timeseries& y) { return pow(x, y); }}
+  {"^", [](const Timeseries& x, const Timeseries& y) { return pow(x, y); }},
+  {">", [](const Timeseries& x, const Timeseries& y) { return x > y; }},
+  {"<", [](const Timeseries& x, const Timeseries& y) { return x < y; }},
+  {"==", [](const Timeseries& x, const Timeseries& y) { return x == y; }}
 };
 
 
@@ -122,18 +125,24 @@ const std::map<
   {">",
    [](const Timeseries& x, const double y) {
      const auto bool_res = x > y;
-     Timeseries res(bool_res.size());
-     std::transform(bool_res.cbegin(), bool_res.cend(), res.begin(),
-                    [](const bool v) { return double(v); });
+     Timeseries res;
+     for (auto x : bool_res) res.push_back(x);
      return res;
    }
   },
   {"<",
    [](const Timeseries& x, const double y) {
      const auto bool_res = x < y;
-     Timeseries res(bool_res.size());
-     std::transform(bool_res.cbegin(), bool_res.cend(), res.begin(),
-                    [](const bool v) { return double(v); });
+     Timeseries res;
+     for (auto x : bool_res) res.push_back(x);
+     return res;
+   }
+  },
+  {"==",
+   [](const Timeseries& x, const double y) {
+     const auto bool_res = x == y;
+     Timeseries res;
+     for (auto x : bool_res) res.push_back(x);
      return res;
    }
   }
