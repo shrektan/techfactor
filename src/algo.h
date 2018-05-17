@@ -11,7 +11,7 @@ bool any_na(const Timeseries& x);
 void assert_no_na(const Timeseries& x);
 Timeseries na_vector(const int length);
 
-Timeseries delta(const Timeseries& x, const int n = 1);
+double delta(const Timeseries& x);
 double corr(const Timeseries& x, const Timeseries& y);
 Timeseries rank(const Timeseries& x);
 double sum(const Timeseries& x);
