@@ -921,12 +921,38 @@ Alpha_mfun alpha054 = [](const Quotes& qts) -> Timeseries {
 
 
 // SUM(16*(CLOSE-DELAY(CLOSE,1)+(CLOSE-OPEN)/2+DELAY(CLOSE,1)-DELAY(OPEN,1))/
-// ((ABS(HIGH-DELAY(CLOSE,1))>ABS(LOW-DELAY(CLOSE,1)) &
+// (ABS(HIGH-DELAY(CLOSE,1))>ABS(LOW-DELAY(CLOSE,1)) &
 // ABS(HIGH-DELAY(CLOSE,1))>ABS(HIGH-DELAY(LOW,1))?
 // ABS(HIGH-DELAY(CLOSE,1))+ABS(LOW-DELAY(CLOSE,1))/2+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4:
-// (ABS(LOW-DELAY(CLOSE,1))>ABS(HIGH-DELAY(LOW,1)) & ABS(LOW-DELAY(CLOSE,1))>ABS(HIGH-DELAY(CLOSE,1))?
+// (ABS(LOW-DELAY(CLOSE,1))>ABS(HIGH-DELAY(LOW,1)) &
+// ABS(LOW-DELAY(CLOSE,1))>ABS(HIGH-DELAY(CLOSE,1))?
 // ABS(LOW-DELAY(CLOSE,1))+ABS(HIGH-DELAY(CLOSE,1))/2+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4:
-// ABS(HIGH-DELAY(LOW,1))+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4)))*MAX(ABS(HIGH-DELAY(CLOSE,1)),ABS(LOW-DELAY(CLOSE,1))),20)
+// ABS(HIGH-DELAY(LOW,1))+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4))*
+// MAX(ABS(HIGH-DELAY(CLOSE,1)),ABS(LOW-DELAY(CLOSE,1))),20)
+Alpha_fun alpha055 = [](const Quote& qt) -> double {
+  auto base_fun = [](const Quote& qt) {
+    double param1;
+    double param2;
+    double param3;
+    param1 = qt.close() - qt.close(1) + (qt.close() - qt.open()) / 2 +
+             qt.close(1) - qt.open(1);
+    param3 = std::max(std::abs(qt.high() - qt.close(1)),
+                      std::abs(qt.low() - qt.close(1)));
+    if ((std::abs(qt.high() - qt.close(1)) > std::abs(qt.low() - qt.close(1))) &&
+        (std::abs(qt.high() - qt.close(1)) > std::abs(qt.high() - qt.low(1)))) {
+      param2 = std::abs(qt.high() - qt.close(1)) + std::abs(qt.low() - qt.close(1)) / 2 +
+               std::abs(qt.close(1) - qt.open(1)) / 4;
+    } else if ((std::abs(qt.low() - qt.close(1)) > std::abs(qt.high() - qt.low(1))) &&
+               (std::abs(qt.low() - qt.close(1)) > std::abs(qt.high() - qt.close(1)))) {
+      param2 = std::abs(qt.low() - qt.close(1)) + std::abs(qt.high() - qt.close(1)) / 2 +
+               std::abs(qt.close(1) - qt.open(1)) / 4;
+    } else {
+      param2 = std::abs(qt.high() - qt.low(1)) + std::abs(qt.close(1) - qt.open(1)) / 4;
+    }
+    return 16.0 * param1 / param2 * param3;
+  };
+  return sum(qt.ts<double>(20, base_fun));
+};
 
 
 }
