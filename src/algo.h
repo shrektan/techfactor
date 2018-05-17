@@ -333,117 +333,15 @@ private:
 };
 
 
-inline Timeseries operator+(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-  Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), y.cbegin(), res.begin(), std::plus<double>());
-  return res;
-}
-
-
-inline Timeseries operator-(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-  Timeseries res(x.size());
-  std::transform(x.cbegin(), x.cend(), y.cbegin(), res.begin(), std::minus<double>());
-  return res;
-}
-
-
-inline Timeseries operator*(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(), y.cbegin(),
-    res.begin(), std::multiplies<double>()
-  );
-  return res;
-}
-
-
-inline Timeseries operator/(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(), y.cbegin(),
-    res.begin(), [](const double v1, const double v2) {
-      if (v2 == 0) return NA_REAL;
-      return v1 / v2;
-    });
-  return res;
-}
-
-
-inline Timeseries operator>(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(), y.cbegin(),
-    res.begin(), [](const double v1, const double v2) {
-      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
-      return double(v1 > v2);
-    });
-  return res;
-}
-
-
-inline Timeseries operator<(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(), y.cbegin(),
-    res.begin(), [](const double v1, const double v2) {
-      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
-      return double(v1 < v2);
-    });
-  return res;
-}
-
-
-inline Timeseries operator==(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(), y.cbegin(),
-    res.begin(), [](const double v1, const double v2) {
-      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
-      return double(v1 == v2);
-    });
-  return res;
-}
-
-
-inline double tf_pow(const double base, const double exp)
-{
-  if (ISNAN(base) || ISNAN(exp) || base < 0.0 || (base == 0.0 && exp < 0.0)) {
-    return NA_REAL;
-  }
-  return std::pow(base, exp);
-}
-
-
-inline Timeseries pow(const Timeseries& base, const Timeseries& exp)
-{
-  Timeseries res(base.size());
-  std::transform(
-    base.cbegin(), base.cend(),
-    exp.cbegin(), res.begin(),
-    [](const double base_, const double exp_) {
-      double res = std::pow(base_, exp_);
-      if (R_finite(res)) return res;
-      return NA_REAL;
-    }
-  );
-  return res;
-}
-
-
+Timeseries operator+(const Timeseries& x, const Timeseries& y);
+Timeseries operator-(const Timeseries& x, const Timeseries& y);
+Timeseries operator*(const Timeseries& x, const Timeseries& y);
+Timeseries operator/(const Timeseries& x, const Timeseries& y);
+Timeseries operator>(const Timeseries& x, const Timeseries& y);
+Timeseries operator<(const Timeseries& x, const Timeseries& y);
+Timeseries operator==(const Timeseries& x, const Timeseries& y);
+double tf_pow(const double base, const double exp);
+Timeseries pow(const Timeseries& base, const Timeseries& exp);
 Timeseries pmin(const Timeseries& x, const double y);
 Timeseries pmax(const Timeseries& x, const double y);
 Timeseries pmin(const Timeseries& x, const Timeseries& y);
