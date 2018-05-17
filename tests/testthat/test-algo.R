@@ -14,15 +14,12 @@ test_that("na_vector", {
 })
 
 test_that("delta", {
-  expect_equal(tf_delta(c(3, 5, NA, NA, 3, 4, NA), 1), c(2, NA, NA, NA, 1, NA))
-  expect_equal(tf_delta(c(3, 8, 20), 1), c(5, 12))
-  expect_equal(tf_delta(c(3, 8, 20), 2), c(17))
-  expect_equal(tf_delta(c(3, 8, 20, 50), 2), c(17, 42))
-  expect_equal(tf_delta(c(3, 8, 20, 50), 3), c(47))
-  expect_equal(tf_delta(c(3, 3), 1), 0)
-  expect_error(tf_delta(c(3, 3), 2), "x must have at least 3 elements.", fixed = TRUE)
-  expect_error(tf_delta(c(3, 3), -1), "must be a positive integer", fixed = TRUE)
-  expect_error(tf_delta(double(), 1), "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_delta(double()), "x must have at least 2 elements.", fixed = TRUE)
+  expect_error(tf_delta(c(0)), "x must have at least 2 elements.", fixed = TRUE)
+  expect_equal(tf_delta(c(0, 1)), 1)
+  expect_equal(tf_delta(c(-3, 8, 2)), 2 - (-3))
+  expect_equal(tf_delta(c(NA, 8, 2)), NA_real_)
+  expect_equal(tf_delta(c(NA, 8, NA)), NA_real_)
 })
 
 test_that("rank", {
