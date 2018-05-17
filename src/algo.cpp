@@ -125,7 +125,7 @@ double corr(const Timeseries& x, const Timeseries& y)
 // [[Rcpp::export("tf_sign")]]
 double sign(const double x)
 {
-  if (Rcpp::NumericVector::is_na(x)) return NA_REAL;
+  if (ISNAN(x)) return NA_REAL;
   return (x > 0.0) ? 1.0 : (x < 0.0) ? -1.0 : 0.0;
 }
 
@@ -199,7 +199,7 @@ Timeseries log(const Timeseries& x)
 {
   Timeseries res(x.size());
   std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) {
-    if (Rcpp::NumericVector::is_na(v) || v <= 0.0) return NA_REAL;
+    if (ISNAN(v) || v <= 0.0) return NA_REAL;
     return std::log(v);
   });
   return res;

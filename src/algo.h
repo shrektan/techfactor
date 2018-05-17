@@ -384,7 +384,7 @@ inline Timeseries operator>(const Timeseries& x, const Timeseries& y)
   std::transform(
     x.cbegin(), x.cend(), y.cbegin(),
     res.begin(), [](const double v1, const double v2) {
-      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
       return double(v1 > v2);
     });
   return res;
@@ -398,7 +398,7 @@ inline Timeseries operator<(const Timeseries& x, const Timeseries& y)
   std::transform(
     x.cbegin(), x.cend(), y.cbegin(),
     res.begin(), [](const double v1, const double v2) {
-      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
       return double(v1 < v2);
     });
   return res;
@@ -412,7 +412,7 @@ inline Timeseries operator==(const Timeseries& x, const Timeseries& y)
   std::transform(
     x.cbegin(), x.cend(), y.cbegin(),
     res.begin(), [](const double v1, const double v2) {
-      if (ISNA(v1) || ISNA(v2)) return NA_REAL;
+      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
       return double(v1 == v2);
     });
   return res;
@@ -421,7 +421,7 @@ inline Timeseries operator==(const Timeseries& x, const Timeseries& y)
 
 inline double tf_pow(const double base, const double exp)
 {
-  if (ISNA(base) || ISNA(exp) || base < 0.0 || (base == 0.0 && exp < 0.0)) {
+  if (ISNAN(base) || ISNAN(exp) || base < 0.0 || (base == 0.0 && exp < 0.0)) {
     return NA_REAL;
   }
   return std::pow(base, exp);
