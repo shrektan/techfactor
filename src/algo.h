@@ -78,37 +78,37 @@ void assert_sorted(const std::vector<RDate>& x);
 struct Quote_raw {
   Quote_raw() = default;
   explicit Quote_raw(const Rcpp::DataFrame tbl)
-    : dates_ { col_date(tbl, "DATE") },
-      pclose_ { col(tbl, "PCLOSE") },
-      open_ { col(tbl, "OPEN") },
-      high_ { col(tbl, "HIGH") },
-      low_ { col(tbl, "LOW") },
-      close_ { col(tbl, "CLOSE") },
-      vwap_ { col(tbl, "VWAP") },
-      volume_ { col(tbl, "VOLUME") },
-      amount_ { col(tbl, "AMOUNT") },
-      bmk_close_ { col(tbl, "BMK_CLOSE") },
-      bmk_open_ { col(tbl, "BMK_OPEN") }
+    : dates { col_date(tbl, "DATE") },
+      pclose { col(tbl, "PCLOSE") },
+      open { col(tbl, "OPEN") },
+      high { col(tbl, "HIGH") },
+      low { col(tbl, "LOW") },
+      close { col(tbl, "CLOSE") },
+      vwap { col(tbl, "VWAP") },
+      volume { col(tbl, "VOLUME") },
+      amount { col(tbl, "AMOUNT") },
+      bmk_close { col(tbl, "BMK_CLOSE") },
+      bmk_open { col(tbl, "BMK_OPEN") }
   {
-        assert_sorted(dates_);
+        assert_sorted(dates);
   }
-  std::vector<RDate> dates_;
-  Timeseries pclose_;
-  Timeseries open_;
-  Timeseries high_;
-  Timeseries low_;
-  Timeseries close_;
-  Timeseries vwap_;
-  Timeseries volume_;
-  Timeseries amount_;
-  Timeseries bmk_close_;
-  Timeseries bmk_open_;
+  std::vector<RDate> dates;
+  Timeseries pclose;
+  Timeseries open;
+  Timeseries high;
+  Timeseries low;
+  Timeseries close;
+  Timeseries vwap;
+  Timeseries volume;
+  Timeseries amount;
+  Timeseries bmk_close;
+  Timeseries bmk_open;
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
   {
     assert_valid(from_to);
-    auto begin = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[0]));
-    auto end = std::lower_bound(dates_.cbegin(), dates_.cend(), int(from_to[1]));
-    if (end != dates_.cend() && *end == int(from_to[1])) ++end;
+    auto begin = std::lower_bound(dates.cbegin(), dates.cend(), int(from_to[0]));
+    auto end = std::lower_bound(dates.cbegin(), dates.cend(), int(from_to[1]));
+    if (end != dates.cend() && *end == int(from_to[1])) ++end;
     std::vector<RDate> res;
     std::copy(begin, end, std::back_inserter(res));
     return res;
@@ -136,60 +136,60 @@ public:
   RDate today()
   {
     if (today_index_ < 0) Rcpp::stop("negative today_index_ %d.", today_index_);
-    return raw_.dates_[today_index_];
+    return raw_.dates[today_index_];
   }
   int today_index() const noexcept { return today_index_; }
 
-  double pclose(const int delay = 0) const { return get_(raw_.pclose_, delay); }
-  double open(const int delay = 0) const { return get_(raw_.open_, delay); }
-  double high(const int delay = 0) const { return get_(raw_.high_, delay); }
-  double low(const int delay = 0) const { return get_(raw_.low_, delay); }
-  double close(const int delay = 0) const { return get_(raw_.close_, delay); }
-  double vwap(const int delay = 0) const { return get_(raw_.vwap_, delay); }
-  double volume(const int delay = 0) const { return get_(raw_.volume_, delay); }
-  double amount(const int delay = 0) const { return get_(raw_.amount_, delay); }
-  double bmk_close(const int delay = 0) const { return get_(raw_.bmk_close_, delay); }
-  double bmk_open(const int delay = 0) const { return get_(raw_.bmk_open_, delay); }
+  double pclose(const int delay = 0) const { return get_(raw_.pclose, delay); }
+  double open(const int delay = 0) const { return get_(raw_.open, delay); }
+  double high(const int delay = 0) const { return get_(raw_.high, delay); }
+  double low(const int delay = 0) const { return get_(raw_.low, delay); }
+  double close(const int delay = 0) const { return get_(raw_.close, delay); }
+  double vwap(const int delay = 0) const { return get_(raw_.vwap, delay); }
+  double volume(const int delay = 0) const { return get_(raw_.volume, delay); }
+  double amount(const int delay = 0) const { return get_(raw_.amount, delay); }
+  double bmk_close(const int delay = 0) const { return get_(raw_.bmk_close, delay); }
+  double bmk_open(const int delay = 0) const { return get_(raw_.bmk_open, delay); }
 
   Timeseries ts_pclose(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.pclose_, n, delay);
+    return ts_get_(raw_.pclose, n, delay);
   }
   Timeseries ts_open(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.open_, n, delay);
+    return ts_get_(raw_.open, n, delay);
   }
   Timeseries ts_high(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.high_, n, delay);
+    return ts_get_(raw_.high, n, delay);
   }
   Timeseries ts_low(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.low_, n, delay);
+    return ts_get_(raw_.low, n, delay);
   }
   Timeseries ts_close(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.close_, n, delay);
+    return ts_get_(raw_.close, n, delay);
   }
   Timeseries ts_vwap(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.vwap_, n, delay);
+    return ts_get_(raw_.vwap, n, delay);
   }
   Timeseries ts_volume(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.volume_, n, delay);
+    return ts_get_(raw_.volume, n, delay);
   }
   Timeseries ts_amount(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.amount_, n, delay);
+    return ts_get_(raw_.amount, n, delay);
   }
   Timeseries ts_bmk_close(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.bmk_close_, n, delay);
+    return ts_get_(raw_.bmk_close, n, delay);
   }
   Timeseries ts_bmk_open(const int n, const int delay = 0) const
   {
-    return ts_get_(raw_.bmk_open_, n, delay);
+    return ts_get_(raw_.bmk_open, n, delay);
   }
 
   double hd(const int delay = 0) const { return high(delay) - high(delay + 1); }
@@ -284,11 +284,11 @@ private:
   int today_index_ {0};
   int match_(const RDate today) noexcept
   {
-    auto iter = std::lower_bound(raw_.dates_.cbegin(), raw_.dates_.cend(), today);
-    if (iter == raw_.dates_.cend() || *iter > today) {
+    auto iter = std::lower_bound(raw_.dates.cbegin(), raw_.dates.cend(), today);
+    if (iter == raw_.dates.cend() || *iter > today) {
       return -1;
     } else {
-      return std::distance(raw_.dates_.cbegin(), iter);
+      return std::distance(raw_.dates.cbegin(), iter);
     }
   }
   int delayed_index_(const int delay) const
