@@ -340,151 +340,25 @@ Timeseries operator/(const Timeseries& x, const Timeseries& y);
 Timeseries operator>(const Timeseries& x, const Timeseries& y);
 Timeseries operator<(const Timeseries& x, const Timeseries& y);
 Timeseries operator==(const Timeseries& x, const Timeseries& y);
-double tf_pow(const double base, const double exp);
 Timeseries pow(const Timeseries& base, const Timeseries& exp);
 Timeseries pmin(const Timeseries& x, const double y);
 Timeseries pmax(const Timeseries& x, const double y);
 Timeseries pmin(const Timeseries& x, const Timeseries& y);
 Timeseries pmax(const Timeseries& x, const Timeseries& y);
-
-
-inline Timeseries operator+(const Timeseries& x, const double y)
-{
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(),
-    res.begin(), [y](const double v) { return v + y; }
-  );
-  return res;
-}
-
-
-inline Timeseries operator-(const Timeseries& x, const double y)
-{
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(),
-    res.begin(), [y](const double v) { return v - y; }
-  );
-  return res;
-}
-
-
-inline Timeseries operator*(const Timeseries& x, const double y)
-{
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(),
-    res.begin(), [y](const double v) { return v * y; }
-  );
-  return res;
-}
-
-
-inline Timeseries operator/(const Timeseries& x, const double y)
-{
-  Timeseries res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(),
-    res.begin(), [y](const double v) {
-      if (y == 0.0) return NA_REAL;
-      return v / y;
-    }
-  );
-  return res;
-}
-
-
-inline std::vector<bool> operator>(const Timeseries& x, const double y)
-{
-  std::vector<bool> res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(),
-    res.begin(), [y](const double v) { return v > y; }
-  );
-  return res;
-}
-
-
-inline std::vector<bool> operator<(const Timeseries& x, const double y)
-{
-  std::vector<bool> res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(),
-    res.begin(), [y](const double v) { return v < y; }
-  );
-  return res;
-}
-
-
-inline std::vector<bool> operator==(const Timeseries& x, const double y)
-{
-  std::vector<bool> res(x.size());
-  std::transform(
-    x.cbegin(), x.cend(),
-    res.begin(), [y](const double v) { return v == y; }
-  );
-  return res;
-}
-
-
-inline Timeseries pow(const Timeseries& base, const double exp)
-{
-  Timeseries res(base.size());
-  std::transform(
-    base.cbegin(), base.cend(),
-    res.begin(), [exp](const double v) {
-      double res = std::pow(v, exp);
-      if (R_finite(res)) return res;
-      return NA_REAL;
-    }
-  );
-  return res;
-}
-
-
-inline void assert_valid(const Panel& x)
-{
-  std::set<int> vec_n;
-  for (const auto& elem : x) vec_n.insert(elem.size());
-  if (vec_n.size() >= 2) Rcpp::stop(
-    "panel data should have the same length in each slot."
-  );
-}
-
-
-inline Timeseries apply(const Panel& x, std::function<double(const Timeseries&)> fun)
-{
-  assert_valid(x);
-  Timeseries res;
-  if (x.size() == 0) return res;
-  const int n = x[0].size();
-  for (int i = 0; i < n; ++i) {
-    Timeseries elem;
-    for (const auto& sub_x : x) elem.push_back(sub_x[i]);
-    res.push_back(fun(elem));
-  }
-  return res;
-}
-
-
-inline Timeseries apply(
+Timeseries operator+(const Timeseries& x, const double y);
+Timeseries operator-(const Timeseries& x, const double y);
+Timeseries operator*(const Timeseries& x, const double y);
+Timeseries operator/(const Timeseries& x, const double y);
+std::vector<bool> operator>(const Timeseries& x, const double y);
+std::vector<bool> operator<(const Timeseries& x, const double y);
+std::vector<bool> operator==(const Timeseries& x, const double y);
+Timeseries pow(const Timeseries& base, const double exp);
+void assert_valid(const Panel& x);
+Timeseries apply(const Panel& x, std::function<double(const Timeseries&)> fun);
+Timeseries apply(
     const Panel& x, const Panel& y,
     std::function<double(const Timeseries&, const Timeseries&)> fun
-)
-{
-  assert_valid(x); assert_valid(y); assert_same_size(x, y);
-  Timeseries res;
-  if (x.size() == 0) return res;
-  const int n = x[0].size();
-  for (int i = 0; i < n; ++i) {
-    Timeseries elem_x; Timeseries elem_y;
-    for (const auto& sub_x : x) elem_x.push_back(sub_x[i]);
-    for (const auto& sub_y : y) elem_y.push_back(sub_y[i]);
-    res.push_back(fun(elem_x, elem_y));
-  }
-  return res;
-}
+);
 
 
 inline std::vector<Quote_raw> v_quote(Rcpp::List qt_tbls)
