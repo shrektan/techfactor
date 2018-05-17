@@ -39,9 +39,11 @@ Alpha_mfun alpha001 = [](const Quotes& qts) -> Timeseries {
 
 // (-1* DELTA((((CLOSE -LOW) -(HIGH -CLOSE)) / (HIGH -LOW)), 1))
 Alpha_fun alpha002 = [](const Quote& quote) -> double {
-  const auto rk_price = ((quote.ts_close(2) - quote.ts_low(2)) - (quote.ts_high(2) - quote.ts_close(2))) /
-                        (quote.ts_high(2) - quote.ts_low(2));
-  return delta(rk_price) * -1;
+  const auto left =
+    (quote.ts_close(2) - quote.ts_low(2)) -
+    (quote.ts_high(2) - quote.ts_close(2));
+  const auto right = quote.ts_high(2) - quote.ts_low(2);
+  return delta(left / right) * -1;
 };
 
 
@@ -122,7 +124,9 @@ Alpha_mfun alpha007 = [](const Quotes& quotes) -> Timeseries {
   auto d_volume = [](const Quote& qt) {
     return qt.volume() - qt.volume(3);
   };
-  return (rank(quotes.apply(max_p)) + rank(quotes.apply(min_p))) * quotes.apply(d_volume);
+  const auto left = rank(quotes.apply(max_p)) + rank(quotes.apply(min_p));
+  const auto right = quotes.apply(d_volume);
+  return left * right;
 };
 
 
@@ -163,9 +167,11 @@ Alpha_mfun alpha010 = [](const Quotes& quotes) -> Timeseries {
 
 // SUM(((CLOSE-LOW)-(HIGH-CLOSE))./(HIGH-LOW).*VOLUME,6)
 Alpha_fun alpha011 = [](const Quote& quote) -> double {
-  auto compose_pv = ((quote.ts_close(6) - quote.ts_low(6)) - (quote.ts_high(6) - quote.ts_close(6))) /
-                    (quote.ts_high(6) - quote.ts_low(6)) * quote.ts_volume(6);
-  return sum(compose_pv);
+  const auto left =
+    (quote.ts_close(6) - quote.ts_low(6)) -
+    (quote.ts_high(6) - quote.ts_close(6));
+  const auto right = quote.ts_high(6) - quote.ts_low(6);
+  return sum(left / right * quote.ts_volume(6));
 };
 
 
@@ -299,7 +305,8 @@ Alpha_fun alpha021 = [](const Quote& quote) -> double {
 };
 
 
-// SMA(((CLOSE-MEAN(CLOSE,6))/MEAN(CLOSE,6)-DELAY((CLOSE-MEAN(CLOSE,6))/MEAN(CLOSE,6),3)),12,1)
+// SMA(((CLOSE-MEAN(CLOSE,6))/MEAN(CLOSE,6)-
+// DELAY((CLOSE-MEAN(CLOSE,6))/MEAN(CLOSE,6),3)),12,1)
 Alpha_fun alpha022 = [](const Quote& quote) -> double {
   auto base_fun = [&quote](const int delay) {
     double price = quote.close(delay) - mean(quote.ts_close(6, delay));
@@ -311,7 +318,8 @@ Alpha_fun alpha022 = [](const Quote& quote) -> double {
 
 
 // SMA((CLOSE>DELAY(CLOSE,1)? STD(CLOSE,20):0),20,1)/
-// (SMA((CLOSE>DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1)+SMA((CLOSE<=DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1))*
+// (SMA((CLOSE>DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1)+
+// SMA((CLOSE<=DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1))*
 // 100
 Alpha_fun alpha023 = [](const Quote& quote) -> double {
   auto p_con1 = [&quote](const int delay) {
@@ -344,7 +352,8 @@ Alpha_fun alpha024 = [](const Quote& quote) -> double {
 };
 
 
-// (-1 * RANK((DELTA(CLOSE, 7) * (1 -RANK(DECAYLINEAR((VOLUME / MEAN(VOLUME,20)), 9)))))) *
+// (-1 * RANK((DELTA(CLOSE, 7) *
+// (1 -RANK(DECAYLINEAR((VOLUME / MEAN(VOLUME,20)), 9)))))) *
 // (1 + RANK(SUM(RET, 250)))
 Alpha_mfun alpha025 = [](const Quotes& quotes) -> Timeseries {
   auto d_close = [](const Quote& qt) {
@@ -362,7 +371,8 @@ Alpha_mfun alpha025 = [](const Quotes& quotes) -> Timeseries {
   Timeseries delta_close = quotes.apply(d_close);
   Timeseries rk_sum_ret = rank(quotes.apply(sum_ret));
   Timeseries rk_decay_linear = rank(quotes.apply(decay_linear));
-  return rank(delta_close * (rk_decay_linear * -1.0 + 1.0)) * (rk_sum_ret * -1.0 + 1.0) * -1.0;
+  return rank(delta_close * (rk_decay_linear * -1.0 + 1.0)) *
+    (rk_sum_ret * -1.0 + 1.0) * -1.0;
 };
 
 
@@ -377,8 +387,12 @@ Alpha_fun alpha026 = [](const Quote& quote) -> double {
 // WMA((CLOSE-DELAY(CLOSE,3))/DELAY(CLOSE,3)*100+(CLOSE-DELAY(CLOSE,6))/DELAY(CLOSE,6)*100,12)
 Alpha_fun alpha027 = [](const Quote& quote) -> double {
   auto fun = [&quote](const int delay) {
-    double rk_close_ret_d3 = (quote.close(delay) - quote.close(delay + 3)) / quote.close(delay + 3);
-    double rk_close_ret_d6 = (quote.close(delay) - quote.close(delay + 6)) / quote.close(delay + 6);
+    double rk_close_ret_d3 =
+      (quote.close(delay) - quote.close(delay + 3)) /
+        quote.close(delay + 3);
+    double rk_close_ret_d6 =
+      (quote.close(delay) - quote.close(delay + 6)) /
+      quote.close(delay + 6);
     return rk_close_ret_d3 * 100 + rk_close_ret_d6 * 100;
   };
   return wma(ts<double>(12, fun));
@@ -395,8 +409,12 @@ Alpha_fun alpha028 = [](const Quote& quote) -> double {
   };
   auto ts_p_sma = [&quote](const int delay1) {
     auto p_sma = [&quote, delay1](const int delay2) {
-      double param1 = quote.close(delay1 + delay2) - tsmin(quote.ts_low(9, delay1 + delay2));
-      double param2 = tsmax(quote.ts_high(9, delay1 + delay2)) - tsmin(quote.ts_low(9, delay1 + delay2));
+      double param1 =
+        quote.close(delay1 + delay2) -
+        tsmin(quote.ts_low(9, delay1 + delay2));
+      double param2 =
+        tsmax(quote.ts_high(9, delay1 + delay2)) -
+        tsmin(quote.ts_low(9, delay1 + delay2));
       return param1 / param2 * 100;
     };
     return sma(ts<double>(3, p_sma), 1);
@@ -414,8 +432,10 @@ Alpha_fun alpha029 = [](const Quote& quote) -> double {
 // WMA((REGRESI(CLOSE/DELAY(CLOSE)-1,MKT，60))^2,20)
 Alpha_fun alpha030 = [](const Quote& quote) -> double {
   auto base_fun = [&quote](const int delay) {
-    Timeseries close_ret = quote.ts_close(60, delay) / quote.ts_close(60, 1 + delay) - 1;
-    Timeseries bmk_close_ret = quote.ts_bmk_close(60, delay) / quote.ts_bmk_close(60, 1 + delay) - 1;
+    Timeseries close_ret =
+      quote.ts_close(60, delay) / quote.ts_close(60, 1 + delay) - 1;
+    Timeseries bmk_close_ret =
+      quote.ts_bmk_close(60, delay) / quote.ts_bmk_close(60, 1 + delay) - 1;
     return std::pow(regresi(close_ret, bmk_close_ret), 2.0);
   };
   return wma(ts<double>(20, base_fun));
@@ -424,7 +444,8 @@ Alpha_fun alpha030 = [](const Quote& quote) -> double {
 
 // (CLOSE-MEAN(CLOSE,12))/MEAN(CLOSE,12)*100
 Alpha_fun alpha031 = [](const Quote& quote) -> double {
-  return (quote.close() - mean(quote.ts_close(12))) / mean(quote.ts_close(12)) * 100;
+  return (quote.close() - mean(quote.ts_close(12))) /
+    mean(quote.ts_close(12)) * 100;
 };
 
 
@@ -501,7 +522,8 @@ Alpha_fun alpha034 = [](const Quote& quote) -> double {
 
 
 // (MIN(RANK(DECAYLINEAR(DELTA(OPEN, 1), 15)),
-// RANK(DECAYLINEAR(CORR((VOLUME), ((OPEN * 0.65) + (OPEN *0.35)), 17),7))) * -1)
+// RANK(DECAYLINEAR(CORR((VOLUME),
+// ((OPEN * 0.65) + (OPEN *0.35)), 17),7))) * -1)
 Alpha_mfun alpha035 = [](const Quotes& quotes) -> Timeseries {
   auto base_fun1 = [](const Quote& qt) {
     auto d_open = [&qt](const int delay) {
@@ -571,7 +593,9 @@ Alpha_mfun alpha036 = [](const Quotes& quotes) -> Timeseries {
 Alpha_mfun alpha037 = [](const Quotes& quotes) -> Timeseries {
   auto sum_open_ret = [](const Quote& qt) {
     double open_ret = sum(qt.ts_open(5)) * sum(qt.ts_ret(5));
-    double d_open_ret = sum(qt.ts_open(5)) * sum(qt.ts_ret(5)) - (sum(qt.ts_open(5, 10)) * sum(qt.ts_ret(5, 10)));
+    double d_open_ret =
+      sum(qt.ts_open(5)) * sum(qt.ts_ret(5)) -
+      (sum(qt.ts_open(5, 10)) * sum(qt.ts_ret(5, 10)));
     return open_ret - d_open_ret;
   };
   return rank(quotes.apply(sum_open_ret)) * -1.0;
@@ -601,7 +625,8 @@ Alpha_mfun alpha039 = [](const Quotes& quotes) -> Timeseries {
   auto decay_v = [](const Quote& qt) {
     auto corr_p = [&qt](const int delay) {
       auto vo = [&qt, delay](const int delay2) {
-        return qt.vwap(delay + delay2) * 0.3 + qt.open(delay + delay2) * 0.7;
+        return qt.vwap(delay + delay2) * 0.3 +
+          qt.open(delay + delay2) * 0.7;
       };
       auto sum_v = [&qt, delay](const int delay2) {
         auto volume = [&qt, delay, delay2](const int delay3) {
@@ -621,7 +646,8 @@ Alpha_mfun alpha039 = [](const Quotes& quotes) -> Timeseries {
 };
 
 
-// SUM((CLOSE>DELAY(CLOSE,1)?VOLUME:0),26)/SUM((CLOSE<=DELAY(CLOSE,1)?VOLUME:0),26)*100
+// SUM((CLOSE>DELAY(CLOSE,1)?VOLUME:0),26)/
+// SUM((CLOSE<=DELAY(CLOSE,1)?VOLUME:0),26)*100
 Alpha_fun alpha040 = [](const Quote& quote) -> double {
   auto base_fun1 = [&quote](const int delay) {
     if (quote.close(delay) > quote.close(1 + delay)) {
@@ -739,8 +765,10 @@ Alpha_fun alpha047 = [](const Quote& quote) -> double {
 };
 
 
-// -1*(RANK((SIGN((CLOSE -DELAY(CLOSE,1))) + SIGN((DELAY(CLOSE, 1) -DELAY(CLOSE, 2)))) +
-// SIGN((DELAY(CLOSE, 2) -DELAY(CLOSE, 3))))) * SUM(VOLUME, 5) / SUM(VOLUME, 20)
+// -1*(RANK((SIGN((CLOSE -DELAY(CLOSE,1))) +
+// SIGN((DELAY(CLOSE, 1) -DELAY(CLOSE, 2)))) +
+// SIGN((DELAY(CLOSE, 2) -DELAY(CLOSE, 3))))) *
+// SUM(VOLUME, 5) / SUM(VOLUME, 20)
 Alpha_mfun alpha048 = [](const Quotes& quotes) -> Timeseries {
   auto sum_vol = [](const Quote& qt) {
     return sum(qt.ts_volume(5)) / sum(qt.ts_volume(20));
@@ -763,7 +791,8 @@ Alpha_mfun alpha048 = [](const Quotes& quotes) -> Timeseries {
 // 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))
 Alpha_fun alpha049 = [](const Quote& qt) -> double {
   auto sum1 = [&qt](const int delay) {
-    if ((qt.high(delay) + qt.low(delay)) >= (qt.high(delay + 1) + qt.low(delay + 1))) {
+    if ((qt.high(delay) + qt.low(delay)) >=
+        (qt.high(delay + 1) + qt.low(delay + 1))) {
       return 0.0;
     } else {
       return(std::max(std::abs(qt.high(delay) - qt.high(delay + 1)),
@@ -771,7 +800,8 @@ Alpha_fun alpha049 = [](const Quote& qt) -> double {
     };
   };
   auto sum2 = [&qt](const int delay) {
-    if ((qt.high(delay) + qt.low(delay)) <= (qt.high(delay + 1) + qt.low(delay + 1))) {
+    if ((qt.high(delay) + qt.low(delay)) <=
+        (qt.high(delay + 1) + qt.low(delay + 1))) {
       return 0.0;
     } else {
       return(std::max(std::abs(qt.high(delay) - qt.high(delay + 1)),
