@@ -100,6 +100,30 @@ Alpha_mfun alpha124 = [](const Quotes& qts) -> Timeseries {
 };
 
 
+// (RANK(DECAYLINEAR(CORR((VWAP), MEAN(VOLUME,80),17), 20)) /
+// RANK(DECAYLINEAR(DELTA(((CLOSE * 0.5) + (VWAP * 0.5)), 3), 16)))
+Alpha_mfun alpha125 = [](const Quotes& qts) -> Timeseries {
+  auto mean_vol_80 = [](const Quote& qt) {
+    return mean(qt.ts_volume(80));
+  };
+  auto corr_17 = [mean_vol_80](const Quote& qt) {
+    auto vwap = qt.ts_vwap(17);
+    auto mvol80 = qt.ts<double>(17, mean_vol_80);
+    return corr(vwap, mvol80);
+  };
+  auto decay_20 = [corr_17](const Quote& qt) {
+    return decaylinear(qt.ts<double>(20, corr_17));
+  };
+  auto left = rank(qts.apply(decay_20));
+
+  auto close_vwap = [](const Quote& qt) {
+    return qt.close() * 0.5 + qt.vwap() * 0.5;
+  };
+  auto delta_3 = [close_vwap](const Quote& qt) {
+    return delta(qt.ts<double>(3, close_vwap));
+  };
+};
+
 Alpha_fun alpha149 = [](const Quote& qt) -> double {
   const auto dr = qt.ts_close(252) / qt.ts_close(252, 1) - 1.0;
   const auto bmk_dr = qt.ts_bmk_close(252) / qt.ts_bmk_close(252, 1) - 1.0;
