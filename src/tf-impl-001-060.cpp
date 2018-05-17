@@ -211,47 +211,19 @@ Alpha_fun alpha015 = [](const Quote& quote) -> double {
 
 // (-1 * TSMAX(RANK(CORR(RANK(VOLUME), RANK(VWAP), 5)), 5))
 Alpha_mfun alpha016 = [](const Quotes& quotes) -> Timeseries {
-
-  auto rk_corr = [&quotes](const int delay) {
-    auto rk_volume = [delay, &quotes](const int delay2) {
-      auto volume = [delay, delay2](const Quote& qt) {
-        return qt.volume(delay + delay2);
-      };
-      return rank(quotes.apply(volume));
-    };
-    auto rk_vwap = [delay, &quotes](const int delay2) {
-      auto vwap = [delay, delay2](const Quote& qt) {
-        return qt.vwap(delay + delay2);
-      };
-      return rank(quotes.apply(vwap));
-    };
-    auto rk_v = ts<Timeseries>(5, rk_volume);
-    auto rk_p = ts<Timeseries>(5, rk_vwap);
-    Timeseries corr_res;
-    const int num_secu = quotes.size();
-    for (int i = 0; i < num_secu; ++i) {
-      Timeseries sub_rk_v, sub_rk_p;
-      for (int j = 0; j < 5; ++j) {
-        sub_rk_v.push_back(rk_v[j][i]);
-        sub_rk_p.push_back(rk_p[j][i]);
-      }
-      corr_res.push_back(corr(sub_rk_v, sub_rk_p));
-    }
-    Timeseries rank_corr_res = rank(corr_res);
-    return rank_corr_res;
+  auto rk_volume = [](const Quotes& qts) {
+    return rank(qts.apply([](const Quote& qt) { return qt.volume(); }));
   };
-  auto rank_corr_res = ts<Timeseries>(5, rk_corr);
-
-  Timeseries tsmax_res;
-  const int num_secu = quotes.size();
-  for (int i = 0; i < num_secu; ++i) {
-    Timeseries tsmax_res_t;
-    for (int j = 0; j < 5; ++j) {
-      tsmax_res_t.push_back(rank_corr_res[j][i]);
-    }
-    tsmax_res.push_back(tsmax(tsmax_res_t));
-  }
-  return tsmax_res * -1;
+  auto rk_vwap = [](const Quotes& qts) {
+    return rank(qts.apply([](const Quote& qt) { return qt.vwap(); }));
+  };
+  auto rk_corr = [rk_volume, rk_vwap](const Quotes& qts) {
+    auto rk_volumes = qts.tsapply(5, rk_volume);
+    auto rk_vwaps = qts.tsapply(5, rk_vwap);
+    return apply(rk_volumes, rk_vwaps, corr);
+  };
+  auto rks = quotes.tsapply(5, rk_corr);
+  return apply(rks, tsmax) * -1.0;
 };
 
 

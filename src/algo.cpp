@@ -301,9 +301,7 @@ void assert_valid(const Rcpp::newDateVector from_to)
 // [[Rcpp::export("tf_assert_same_size")]]
 void assert_same_size(const Timeseries& x, const Timeseries& y)
 {
-  if (x.size() != y.size()) Rcpp::stop(
-    "x and y must have the same size."
-  );
+  assert_same_size(x, y);
 }
 
 

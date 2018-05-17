@@ -5,7 +5,17 @@
 #include <map>
 #include "GCAMCTF_types.h"
 
-void assert_same_size(const Timeseries& x, const Timeseries& y);
+template <typename T>
+void assert_same_size(const T& x, const T& y)
+{
+  const int x_size = x.size();
+  const int y_size = y.size();
+  if (x_size != y_size) Rcpp::stop(
+    "The length of x (%d) and y (%d) must be the same.",
+    x_size, y_size
+  );
+}
+
 void assert_valid(const Rcpp::newDateVector from_to);
 bool any_na(const Timeseries& x);
 void assert_no_na(const Timeseries& x);
@@ -549,6 +559,25 @@ inline Timeseries apply(const Panel& x, std::function<double(const Timeseries&)>
     Timeseries elem;
     for (const auto& sub_x : x) elem.push_back(sub_x[i]);
     res.push_back(fun(elem));
+  }
+  return res;
+}
+
+
+inline Timeseries apply(
+    const Panel& x, const Panel& y,
+    std::function<double(const Timeseries&, const Timeseries&)> fun
+)
+{
+  assert_valid(x); assert_valid(y); assert_same_size(x, y);
+  Timeseries res;
+  if (x.size() == 0) return res;
+  const int n = x[0].size();
+  for (int i = 0; i < n; ++i) {
+    Timeseries elem_x; Timeseries elem_y;
+    for (const auto& sub_x : x) elem_x.push_back(sub_x[i]);
+    for (const auto& sub_y : y) elem_y.push_back(sub_y[i]);
+    res.push_back(fun(elem_x, elem_y));
   }
   return res;
 }
