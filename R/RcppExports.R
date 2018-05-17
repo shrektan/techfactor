@@ -5,8 +5,8 @@ tf_na_vector <- function(length) {
     .Call(`_GCAMCTF_na_vector`, length)
 }
 
-tf_delta <- function(x, n) {
-    .Call(`_GCAMCTF_delta`, x, n)
+tf_delta <- function(x) {
+    .Call(`_GCAMCTF_delta`, x)
 }
 
 tf_rank <- function(x) {

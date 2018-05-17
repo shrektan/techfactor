@@ -1,4 +1,4 @@
-# GCAMCTF 0.0.11
+# GCAMCTF 0.0.12
 
 * Added a `NEWS.md` file to track changes to the package.
 * Set up CI and code coverage.
@@ -12,3 +12,8 @@
 * Add `Quotes` and R interface to process panel based indicators.
 * Eliminate the need for numerous delay in alpha definition functions by introduce the proxy class.
 * Add `Quotes.tsapply()`, `Panel`, `assert_valid(Panel)` and `Panel apply()` functions.
+* `delta()` returns a double value = x[k] - x[0].
+
+## TODO
+
+- [ ] Ensure all the timeseries is acsending date order, i.e., `x[0]` is old while `x[x.size()-1]` is new.
