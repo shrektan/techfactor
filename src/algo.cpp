@@ -2,7 +2,7 @@
 #include "algo.h"
 
 
-inline void assert_length(const Timeseries& x, const int n)
+void assert_length(const Timeseries& x, const int n)
 {
   if (int(x.size()) < n) Rcpp::stop("x must have at least %d elements.", n);
 }
@@ -125,7 +125,7 @@ double corr(const Timeseries& x, const Timeseries& y)
 // [[Rcpp::export("tf_sign")]]
 double sign(const double x)
 {
-  if (Rcpp::NumericVector::is_na(x)) return NA_REAL;
+  if (ISNAN(x)) return NA_REAL;
   return (x > 0.0) ? 1.0 : (x < 0.0) ? -1.0 : 0.0;
 }
 
@@ -199,7 +199,7 @@ Timeseries log(const Timeseries& x)
 {
   Timeseries res(x.size());
   std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) {
-    if (Rcpp::NumericVector::is_na(v) || v <= 0.0) return NA_REAL;
+    if (ISNAN(v) || v <= 0.0) return NA_REAL;
     return std::log(v);
   });
   return res;
@@ -282,6 +282,293 @@ double lowday(const Timeseries& x)
   return std::distance(it, x.cend()) - 1.0;
 }
 
+
+Timeseries pmin(const Timeseries& x, const double y) {
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), std::back_inserter(res),
+    [y](const double elem) {
+      return (ISNAN(elem) || ISNAN(y)) ? NA_REAL : std::min(elem, y);
+    }
+  );
+  return res;
+}
+
+
+Timeseries pmax(const Timeseries& x, const double y) {
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), std::back_inserter(res),
+    [y](const double elem) {
+      return (ISNAN(elem) || ISNAN(y)) ? NA_REAL : std::max(elem, y);
+    }
+  );
+  return res;
+}
+
+
+Timeseries pmin(const Timeseries& x, const Timeseries& y) {
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(), std::back_inserter(res),
+    [](const double elem_x, const double elem_y) {
+      return (ISNAN(elem_x) || ISNAN(elem_y)) ? NA_REAL : std::min(elem_x, elem_y);
+    }
+  );
+  return res;
+}
+
+
+Timeseries pmax(const Timeseries& x, const Timeseries& y) {
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(), std::back_inserter(res),
+    [](const double elem_x, const double elem_y) {
+      return (ISNAN(elem_x) || ISNAN(elem_y)) ? NA_REAL : std::max(elem_x, elem_y);
+    }
+  );
+  return res;
+}
+
+Timeseries operator+(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(x.cbegin(), x.cend(), y.cbegin(), res.begin(), std::plus<double>());
+  return res;
+}
+
+
+Timeseries operator-(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(x.cbegin(), x.cend(), y.cbegin(), res.begin(), std::minus<double>());
+  return res;
+}
+
+
+Timeseries operator*(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), std::multiplies<double>()
+  );
+  return res;
+}
+
+
+Timeseries operator/(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (v2 == 0) return NA_REAL;
+      return v1 / v2;
+    });
+  return res;
+}
+
+
+Timeseries operator>(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
+      return double(v1 > v2);
+    });
+  return res;
+}
+
+
+Timeseries operator<(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
+      return double(v1 < v2);
+    });
+  return res;
+}
+
+
+Timeseries operator==(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(),
+    res.begin(), [](const double v1, const double v2) {
+      if (ISNAN(v1) || ISNAN(v2)) return NA_REAL;
+      return double(v1 == v2);
+    });
+  return res;
+}
+
+
+Timeseries pow(const Timeseries& base, const Timeseries& exp)
+{
+  Timeseries res(base.size());
+  std::transform(
+    base.cbegin(), base.cend(),
+    exp.cbegin(), res.begin(),
+    [](const double base_, const double exp_) {
+      double res = std::pow(base_, exp_);
+      if (R_finite(res)) return res;
+      return NA_REAL;
+    }
+  );
+  return res;
+}
+
+
+Timeseries operator+(const Timeseries& x, const double y)
+{
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v + y; }
+  );
+  return res;
+}
+
+
+Timeseries operator-(const Timeseries& x, const double y)
+{
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v - y; }
+  );
+  return res;
+}
+
+
+Timeseries operator*(const Timeseries& x, const double y)
+{
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v * y; }
+  );
+  return res;
+}
+
+
+Timeseries operator/(const Timeseries& x, const double y)
+{
+  Timeseries res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) {
+      if (y == 0.0) return NA_REAL;
+      return v / y;
+    }
+  );
+  return res;
+}
+
+
+std::vector<bool> operator>(const Timeseries& x, const double y)
+{
+  std::vector<bool> res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v > y; }
+  );
+  return res;
+}
+
+
+std::vector<bool> operator<(const Timeseries& x, const double y)
+{
+  std::vector<bool> res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v < y; }
+  );
+  return res;
+}
+
+
+std::vector<bool> operator==(const Timeseries& x, const double y)
+{
+  std::vector<bool> res(x.size());
+  std::transform(
+    x.cbegin(), x.cend(),
+    res.begin(), [y](const double v) { return v == y; }
+  );
+  return res;
+}
+
+
+Timeseries pow(const Timeseries& base, const double exp)
+{
+  Timeseries res(base.size());
+  std::transform(
+    base.cbegin(), base.cend(),
+    res.begin(), [exp](const double v) {
+      double res = std::pow(v, exp);
+      if (R_finite(res)) return res;
+      return NA_REAL;
+    }
+  );
+  return res;
+}
+
+
+void assert_valid(const Panel& x)
+{
+  std::set<int> vec_n;
+  for (const auto& elem : x) vec_n.insert(elem.size());
+  if (vec_n.size() >= 2) Rcpp::stop(
+    "panel data should have the same length in each slot."
+  );
+}
+
+
+Timeseries apply(const Panel& x, std::function<double(const Timeseries&)> fun)
+{
+  assert_valid(x);
+  Timeseries res;
+  if (x.size() == 0) return res;
+  const int n = x[0].size();
+  for (int i = 0; i < n; ++i) {
+    Timeseries elem;
+    for (const auto& sub_x : x) elem.push_back(sub_x[i]);
+    res.push_back(fun(elem));
+  }
+  return res;
+}
+
+
+Timeseries apply(
+    const Panel& x, const Panel& y,
+    std::function<double(const Timeseries&, const Timeseries&)> fun
+)
+{
+  assert_valid(x); assert_valid(y); assert_same_size(x, y);
+  Timeseries res;
+  if (x.size() == 0) return res;
+  const int n = x[0].size();
+  for (int i = 0; i < n; ++i) {
+    Timeseries elem_x; Timeseries elem_y;
+    for (const auto& sub_x : x) elem_x.push_back(sub_x[i]);
+    for (const auto& sub_y : y) elem_y.push_back(sub_y[i]);
+    res.push_back(fun(elem_x, elem_y));
+  }
+  return res;
+}
 
 
 // [[Rcpp::export("tf_assert_valid_from_to")]]
