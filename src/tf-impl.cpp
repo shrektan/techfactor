@@ -37,6 +37,10 @@ extern Alpha_fun alpha047;
 extern Alpha_fun alpha049;
 extern Alpha_fun alpha053;
 extern Alpha_fun alpha122;
+extern Alpha_fun alpha126;
+extern Alpha_fun alpha127;
+extern Alpha_fun alpha128;
+extern Alpha_fun alpha129;
 extern Alpha_fun alpha149;
 }
 
@@ -81,6 +85,10 @@ std::map<std::string, Alpha_fun&> tf_caculators
   {"alpha049", alpha_impl::alpha049},
   {"alpha053", alpha_impl::alpha053},
   {"alpha122", alpha_impl::alpha122},
+  {"alpha126", alpha_impl::alpha126},
+  {"alpha127", alpha_impl::alpha127},
+  {"alpha128", alpha_impl::alpha128},
+  {"alpha128", alpha_impl::alpha129},
   {"alpha149", alpha_impl::alpha149}
 };
 
@@ -110,6 +118,9 @@ extern Alpha_mfun alpha048;
 extern Alpha_mfun alpha121;
 extern Alpha_mfun alpha123;
 extern Alpha_mfun alpha124;
+extern Alpha_mfun alpha125;
+extern Alpha_mfun alpha130;
+extern Alpha_mfun alpha131;
 }
 
 std::map<std::string, Alpha_mfun&> tf_mcaculators
@@ -135,5 +146,8 @@ std::map<std::string, Alpha_mfun&> tf_mcaculators
   {"alpha048", alpha_impl::alpha048},
   {"alpha121", alpha_impl::alpha121},
   {"alpha123", alpha_impl::alpha123},
-  {"alpha124", alpha_impl::alpha124}
+  {"alpha124", alpha_impl::alpha124},
+  {"alpha125", alpha_impl::alpha125},
+  {"alpha130", alpha_impl::alpha130},
+  {"alpha131", alpha_impl::alpha131}
 };

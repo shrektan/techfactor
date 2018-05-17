@@ -3,7 +3,7 @@
 
 namespace alpha_impl
 {
-// ((RANK((VWAP -MIN(VWAP, 12)))^
+// ((RANK((VWAP -TSMIN(VWAP, 12)))^
 // TSRANK(CORR(TSRANK(VWAP, 20), TSRANK(MEAN(VOLUME,60), 2), 18), 3)) * -1)
 Alpha_mfun alpha121 = [](const Quotes& qts) -> Timeseries {
   auto fun_base = [](const Quote& qt) {
@@ -31,7 +31,8 @@ Alpha_mfun alpha121 = [](const Quotes& qts) -> Timeseries {
 };
 
 
-// (SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2)-DELAY(SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2),1))/
+// (SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2)-
+// DELAY(SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2),1))/
 // DELAY(SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2),1)
 Alpha_fun alpha122 = [](const Quote& qt) -> double {
   auto sma_1 = [](const Quote& qt) {
@@ -120,9 +121,117 @@ Alpha_mfun alpha125 = [](const Quotes& qts) -> Timeseries {
     return qt.close() * 0.5 + qt.vwap() * 0.5;
   };
   auto delta_3 = [close_vwap](const Quote& qt) {
-    return delta(qt.ts<double>(3, close_vwap));
+    return delta(qt.ts<double>(4, close_vwap));
   };
+  auto decay_16 = [delta_3](const Quote& qt) {
+    return decaylinear(qt.ts<double>(17, delta_3));
+  };
+  auto right = rank(qts.apply(decay_16));
+  return left / right;
 };
+
+
+// (CLOSE+HIGH+LOW)/3
+Alpha_fun alpha126 = [](const Quote& qt) -> double {
+  return (qt.close() + qt.high() + qt.low()) / 3.0;
+};
+
+
+// (MEAN((100*(CLOSE-TSMAX(CLOSE,12)) /(TSMAX(CLOSE,12)))^2, 12))^(1/2)
+Alpha_fun alpha127 = [](const Quote& qt) -> double {
+  auto max_close_12 = tsmax(qt.ts_close(12));
+  auto close_diff = (qt.ts_close(12) - max_close_12) * 100.0;
+  auto mp = mean(pow(close_diff / max_close_12, 2.0));
+  if (!R_FINITE(mp)) return NA_REAL;
+  return std::pow(mp, 0.5);
+};
+
+
+// 100-(100/(1+ SUM( ((HIGH+LOW+CLOSE)/3>DELAY((HIGH+LOW+CLOSE)/3,1)?
+// (HIGH+LOW+CLOSE)/3*VOLUME:0)  ,14) /SUM(((HIGH+LOW+CLOSE)/3<
+// DELAY((HIGH+LOW+CLOSE)/3,1)?(HIGH+LOW+CLOSE)/3*VOLUME:0),14)))
+Alpha_fun alpha128 = [](const Quote& qt) -> double {
+  auto fun = [](const bool larger) {
+    return [larger](const Quote& qt) {
+      auto avg_hlc = (qt.high() + qt.low() + qt.close()) / 3.0;
+      auto vol = qt.volume();
+      auto avg_hlc_1 = (qt.high(1) + qt.low(1) + qt.close(1)) / 3.0;
+      if (larger) {
+        return (avg_hlc > avg_hlc_1) ? avg_hlc * vol : 0.0;
+      } else {
+        return (avg_hlc < avg_hlc_1) ? avg_hlc * vol : 0.0;
+      }
+    };
+  };
+  auto right = sum(qt.ts<double>(14, fun(false)));
+  auto left = sum(qt.ts<double>(14, fun(true)));
+  if (right == 0.0) return (left == 0.0) ? NA_REAL : 100.0;
+  return 100.0 - 100.0 / (left / right + 1.0);
+};
+
+
+// SUM((CLOSE-DELAY(CLOSE,1)<0?ABS(CLOSE-DELAY(CLOSE,1)):0),12)
+Alpha_fun alpha129 = [](const Quote& qt) -> double {
+  auto fun = [](const Quote& qt) {
+    auto close_diff = qt.close() - qt.close(1);
+    return close_diff < 0 ? std::abs(close_diff) : 0.0;
+  };
+  return sum(qt.ts<double>(12, fun));
+};
+
+
+// (RANK(DECAYLINEAR(CORR(((HIGH + LOW) / 2), MEAN(VOLUME,40), 9), 10)) /
+// RANK(DECAYLINEAR(CORR(RANK(VWAP), RANK(VOLUME), 7),3)))
+Alpha_mfun alpha130 = [](const Quotes& qts) -> Timeseries {
+  auto hl = [](const Quote& qt) {
+    return (qt.high() + qt.low()) / 2.0;
+  };
+  auto mvol = [](const Quote& qt) {
+    return mean(qt.ts_volume(40));
+  };
+  auto cor_hl_mvol = [hl, mvol](const Quote& qt) {
+    return corr(qt.ts<double>(9, hl), qt.ts<double>(9, mvol));
+  };
+  auto dec_cor_hm = [cor_hl_mvol](const Quote& qt) {
+    return decaylinear(qt.ts<double>(10, cor_hl_mvol));
+  };
+  auto left = qts.apply(dec_cor_hm);
+
+  auto rk_vwap = [](const Quotes& qts) {
+    return rank(qts.apply([](const Quote& qt) { return qt.vwap(); }));
+  };
+  auto rk_vol = [](const Quotes& qts) {
+    return rank(qts.apply([](const Quote& qt) { return qt.volume(); }));
+  };
+  auto cor_rk = [rk_vwap, rk_vol](const Quotes& qts) {
+    return apply(qts.tsapply(7, rk_vwap), qts.tsapply(7, rk_vol), corr);
+  };
+  auto right = rank(apply(qts.tsapply(3, cor_rk), decaylinear));
+
+  return left / right;
+};
+
+
+// (RANK(DELAT(VWAP, 1))^TSRANK(CORR(CLOSE,MEAN(VOLUME,50), 18), 18))
+Alpha_mfun alpha131 = [](const Quotes& qts) -> Timeseries {
+  auto d_vwap = [](const Quote& qt) {
+    return delta(qt.ts_vwap(2));
+  };
+  auto rk_d_vwap = qts.apply(d_vwap);
+
+  auto mvol50 = [](const Quote& qt) {
+    return mean(qt.ts_volume(50));
+  };
+  auto cor_18 = [mvol50](const Quote& qt) {
+    return corr(qt.ts_close(18), qt.ts<double>(18, mvol50));
+  };
+  auto tsrk18 = [cor_18](const Quote& qt) {
+    return tsrank(qt.ts<double>(18, cor_18));
+  };
+
+  return pow(rk_d_vwap, qts.apply(tsrk18));
+};
+
 
 Alpha_fun alpha149 = [](const Quote& qt) -> double {
   const auto dr = qt.ts_close(252) / qt.ts_close(252, 1) - 1.0;
