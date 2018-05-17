@@ -386,15 +386,15 @@ inline std::vector<std::string> v_names(Rcpp::List qt_tbls)
 struct Quotes_raw {
   Quotes_raw() = default;
   explicit Quotes_raw(Rcpp::List qt_tbls)
-    : names_ (v_names(qt_tbls)),
-      qts_ (v_quote(qt_tbls))
+    : names (v_names(qt_tbls)),
+      qts (v_quote(qt_tbls))
   { }
-  std::vector<std::string> names_;
-  std::vector<Quote_raw> qts_;
+  std::vector<std::string> names;
+  std::vector<Quote_raw> qts;
   std::vector<RDate> tdates(const Rcpp::newDateVector from_to) const
   {
     std::set<RDate> set;
-    for (const auto& qt : qts_) {
+    for (const auto& qt : qts) {
       auto dates = qt.tdates(from_to);
       for (auto date : dates) set.insert(date);
     }
@@ -402,8 +402,7 @@ struct Quotes_raw {
     std::copy(set.cbegin(), set.cend(), std::back_inserter(res));
     return res;
   }
-  int size() const { return qts_.size(); }
-  const std::vector<std::string>& names() const { return names_; }
+  int size() const { return qts.size(); }
 };
 
 
@@ -446,14 +445,14 @@ public:
     return raw_.tdates(from_to);
   }
   int size() const { return raw_.size(); }
-  const std::vector<std::string>& names() const { return raw_.names(); }
+  const std::vector<std::string>& names() const { return raw_.names; }
 private:
   const Quotes_raw& raw_;
   std::vector<Quote> qts_;
   std::vector<Quote> gen_qts_(const Quotes_raw& raw, const RDate today) const
   {
     std::vector<Quote> res;
-    for (const auto& qt : raw.qts_) res.emplace_back(qt, today);
+    for (const auto& qt : raw.qts) res.emplace_back(qt, today);
     return res;
   }
   std::vector<Quote> gen_qts_(const std::vector<Quote>& qts, const int days) const

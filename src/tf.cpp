@@ -213,6 +213,6 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
   res = Rcpp::transpose(res);
   newDateVector r_dates(dates.size());
   std::copy(dates.cbegin(), dates.cend(), r_dates.begin());
-  res.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::wrap(qts.names()));
+  res.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::wrap(qts.names));
   return create_xts(res, r_dates);
 }
