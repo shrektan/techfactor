@@ -350,33 +350,33 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// test_qt_tdates
-Rcpp::newDateVector test_qt_tdates(SEXP quote_ptr, const Rcpp::newDateVector from_to);
-RcppExport SEXP _GCAMCTF_test_qt_tdates(SEXP quote_ptrSEXP, SEXP from_toSEXP) {
+// tf_qt_tdates
+Rcpp::newDateVector tf_qt_tdates(SEXP quote_ptr, const Rcpp::newDateVector from_to);
+RcppExport SEXP _GCAMCTF_tf_qt_tdates(SEXP quote_ptrSEXP, SEXP from_toSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type quote_ptr(quote_ptrSEXP);
     Rcpp::traits::input_parameter< const Rcpp::newDateVector >::type from_to(from_toSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_qt_tdates(quote_ptr, from_to));
+    rcpp_result_gen = Rcpp::wrap(tf_qt_tdates(quote_ptr, from_to));
     return rcpp_result_gen;
 END_RCPP
 }
-// test_qt_today
-Rcpp::Date test_qt_today(SEXP quote_ptr, const Rcpp::Date today);
-RcppExport SEXP _GCAMCTF_test_qt_today(SEXP quote_ptrSEXP, SEXP todaySEXP) {
+// tf_qt_today
+Rcpp::Date tf_qt_today(SEXP quote_ptr, const Rcpp::Date today);
+RcppExport SEXP _GCAMCTF_tf_qt_today(SEXP quote_ptrSEXP, SEXP todaySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type quote_ptr(quote_ptrSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
-    rcpp_result_gen = Rcpp::wrap(test_qt_today(quote_ptr, today));
+    rcpp_result_gen = Rcpp::wrap(tf_qt_today(quote_ptr, today));
     return rcpp_result_gen;
 END_RCPP
 }
-// test_qt_get
-double test_qt_get(SEXP quote_ptr, const Rcpp::Date today, const std::string tag, const int delay);
-RcppExport SEXP _GCAMCTF_test_qt_get(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP delaySEXP) {
+// tf_qt_get
+double tf_qt_get(SEXP quote_ptr, const Rcpp::Date today, const std::string tag, const int delay);
+RcppExport SEXP _GCAMCTF_tf_qt_get(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP delaySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -384,13 +384,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
     Rcpp::traits::input_parameter< const std::string >::type tag(tagSEXP);
     Rcpp::traits::input_parameter< const int >::type delay(delaySEXP);
-    rcpp_result_gen = Rcpp::wrap(test_qt_get(quote_ptr, today, tag, delay));
+    rcpp_result_gen = Rcpp::wrap(tf_qt_get(quote_ptr, today, tag, delay));
     return rcpp_result_gen;
 END_RCPP
 }
-// test_qt_ts_get
-Timeseries test_qt_ts_get(SEXP quote_ptr, const Rcpp::Date today, const std::string tag, const int n, const int delay);
-RcppExport SEXP _GCAMCTF_test_qt_ts_get(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP nSEXP, SEXP delaySEXP) {
+// tf_qt_ts_get
+Timeseries tf_qt_ts_get(SEXP quote_ptr, const Rcpp::Date today, const std::string tag, const int n, const int delay);
+RcppExport SEXP _GCAMCTF_tf_qt_ts_get(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP tagSEXP, SEXP nSEXP, SEXP delaySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -399,67 +399,67 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::string >::type tag(tagSEXP);
     Rcpp::traits::input_parameter< const int >::type n(nSEXP);
     Rcpp::traits::input_parameter< const int >::type delay(delaySEXP);
-    rcpp_result_gen = Rcpp::wrap(test_qt_ts_get(quote_ptr, today, tag, n, delay));
+    rcpp_result_gen = Rcpp::wrap(tf_qt_ts_get(quote_ptr, today, tag, n, delay));
     return rcpp_result_gen;
 END_RCPP
 }
-// test_ts_op
-Timeseries test_ts_op(const Timeseries& x, const Timeseries& y, const std::string op);
-RcppExport SEXP _GCAMCTF_test_ts_op(SEXP xSEXP, SEXP ySEXP, SEXP opSEXP) {
+// tf_ts_op
+Timeseries tf_ts_op(const Timeseries& x, const Timeseries& y, const std::string op);
+RcppExport SEXP _GCAMCTF_tf_ts_op(SEXP xSEXP, SEXP ySEXP, SEXP opSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const Timeseries& >::type y(ySEXP);
     Rcpp::traits::input_parameter< const std::string >::type op(opSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_ts_op(x, y, op));
+    rcpp_result_gen = Rcpp::wrap(tf_ts_op(x, y, op));
     return rcpp_result_gen;
 END_RCPP
 }
-// test_ts_scalar_op
-Timeseries test_ts_scalar_op(const Timeseries& x, const double y, const std::string op);
-RcppExport SEXP _GCAMCTF_test_ts_scalar_op(SEXP xSEXP, SEXP ySEXP, SEXP opSEXP) {
+// tf_ts_scalar_op
+Timeseries tf_ts_scalar_op(const Timeseries& x, const double y, const std::string op);
+RcppExport SEXP _GCAMCTF_tf_ts_scalar_op(SEXP xSEXP, SEXP ySEXP, SEXP opSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const double >::type y(ySEXP);
     Rcpp::traits::input_parameter< const std::string >::type op(opSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_ts_scalar_op(x, y, op));
+    rcpp_result_gen = Rcpp::wrap(tf_ts_scalar_op(x, y, op));
     return rcpp_result_gen;
 END_RCPP
 }
-// test_ts
-Timeseries test_ts(SEXP quote_ptr, const Rcpp::Date today, const int n);
-RcppExport SEXP _GCAMCTF_test_ts(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP nSEXP) {
+// tf_ts
+Timeseries tf_ts(SEXP quote_ptr, const Rcpp::Date today, const int n);
+RcppExport SEXP _GCAMCTF_tf_ts(SEXP quote_ptrSEXP, SEXP todaySEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type quote_ptr(quote_ptrSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Date >::type today(todaySEXP);
     Rcpp::traits::input_parameter< const int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_ts(quote_ptr, today, n));
+    rcpp_result_gen = Rcpp::wrap(tf_ts(quote_ptr, today, n));
     return rcpp_result_gen;
 END_RCPP
 }
-// test_assert_valid_panel
-void test_assert_valid_panel(const Rcpp::List x);
-RcppExport SEXP _GCAMCTF_test_assert_valid_panel(SEXP xSEXP) {
+// tf_assert_valid_panel
+void tf_assert_valid_panel(const Rcpp::List x);
+RcppExport SEXP _GCAMCTF_tf_assert_valid_panel(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type x(xSEXP);
-    test_assert_valid_panel(x);
+    tf_assert_valid_panel(x);
     return R_NilValue;
 END_RCPP
 }
-// test_panel_sum
-Rcpp::NumericVector test_panel_sum(const Rcpp::List x);
-RcppExport SEXP _GCAMCTF_test_panel_sum(SEXP xSEXP) {
+// tf_panel_sum
+Rcpp::NumericVector tf_panel_sum(const Rcpp::List x);
+RcppExport SEXP _GCAMCTF_tf_panel_sum(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_panel_sum(x));
+    rcpp_result_gen = Rcpp::wrap(tf_panel_sum(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -577,15 +577,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_any_na", (DL_FUNC) &_GCAMCTF_any_na, 1},
     {"_GCAMCTF_assert_no_na", (DL_FUNC) &_GCAMCTF_assert_no_na, 1},
     {"_GCAMCTF_assert_sorted", (DL_FUNC) &_GCAMCTF_assert_sorted, 1},
-    {"_GCAMCTF_test_qt_tdates", (DL_FUNC) &_GCAMCTF_test_qt_tdates, 2},
-    {"_GCAMCTF_test_qt_today", (DL_FUNC) &_GCAMCTF_test_qt_today, 2},
-    {"_GCAMCTF_test_qt_get", (DL_FUNC) &_GCAMCTF_test_qt_get, 4},
-    {"_GCAMCTF_test_qt_ts_get", (DL_FUNC) &_GCAMCTF_test_qt_ts_get, 5},
-    {"_GCAMCTF_test_ts_op", (DL_FUNC) &_GCAMCTF_test_ts_op, 3},
-    {"_GCAMCTF_test_ts_scalar_op", (DL_FUNC) &_GCAMCTF_test_ts_scalar_op, 3},
-    {"_GCAMCTF_test_ts", (DL_FUNC) &_GCAMCTF_test_ts, 3},
-    {"_GCAMCTF_test_assert_valid_panel", (DL_FUNC) &_GCAMCTF_test_assert_valid_panel, 1},
-    {"_GCAMCTF_test_panel_sum", (DL_FUNC) &_GCAMCTF_test_panel_sum, 1},
+    {"_GCAMCTF_tf_qt_tdates", (DL_FUNC) &_GCAMCTF_tf_qt_tdates, 2},
+    {"_GCAMCTF_tf_qt_today", (DL_FUNC) &_GCAMCTF_tf_qt_today, 2},
+    {"_GCAMCTF_tf_qt_get", (DL_FUNC) &_GCAMCTF_tf_qt_get, 4},
+    {"_GCAMCTF_tf_qt_ts_get", (DL_FUNC) &_GCAMCTF_tf_qt_ts_get, 5},
+    {"_GCAMCTF_tf_ts_op", (DL_FUNC) &_GCAMCTF_tf_ts_op, 3},
+    {"_GCAMCTF_tf_ts_scalar_op", (DL_FUNC) &_GCAMCTF_tf_ts_scalar_op, 3},
+    {"_GCAMCTF_tf_ts", (DL_FUNC) &_GCAMCTF_tf_ts, 3},
+    {"_GCAMCTF_tf_assert_valid_panel", (DL_FUNC) &_GCAMCTF_tf_assert_valid_panel, 1},
+    {"_GCAMCTF_tf_panel_sum", (DL_FUNC) &_GCAMCTF_tf_panel_sum, 1},
     {"_GCAMCTF_create_xts", (DL_FUNC) &_GCAMCTF_create_xts, 2},
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},
