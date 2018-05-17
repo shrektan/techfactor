@@ -382,7 +382,7 @@ Alpha_mfun alpha140 = [](const Quotes& qts) -> Timeseries {
     return mean(qt.ts_volume(60));
   };
   auto rk_mean_vol60 = [mean_vol60](const Quote& qt) {
-    return tsrank(qt.ts<double>(mean_vol60));
+    return tsrank(qt.ts<double>(20, mean_vol60));
   };
   auto corr_rk_rk = [rk_close8, rk_mean_vol60](const Quote& qt) {
     return corr(qt.ts<double>(8, rk_close8), qt.ts<double>(8, rk_mean_vol60));
