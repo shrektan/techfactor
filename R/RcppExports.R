@@ -125,40 +125,40 @@ tf_assert_is_sorted <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_sorted`, x))
 }
 
-test_qt_tdates <- function(quote_ptr, from_to) {
-    .Call(`_GCAMCTF_test_qt_tdates`, quote_ptr, from_to)
+tf_qt_tdates <- function(quote_ptr, from_to) {
+    .Call(`_GCAMCTF_tf_qt_tdates`, quote_ptr, from_to)
 }
 
-test_qt_today <- function(quote_ptr, today) {
-    .Call(`_GCAMCTF_test_qt_today`, quote_ptr, today)
+tf_qt_today <- function(quote_ptr, today) {
+    .Call(`_GCAMCTF_tf_qt_today`, quote_ptr, today)
 }
 
-test_qt_get <- function(quote_ptr, today, tag, delay) {
-    .Call(`_GCAMCTF_test_qt_get`, quote_ptr, today, tag, delay)
+tf_qt_get <- function(quote_ptr, today, tag, delay) {
+    .Call(`_GCAMCTF_tf_qt_get`, quote_ptr, today, tag, delay)
 }
 
-test_qt_ts_get <- function(quote_ptr, today, tag, n, delay) {
-    .Call(`_GCAMCTF_test_qt_ts_get`, quote_ptr, today, tag, n, delay)
+tf_qt_ts_get <- function(quote_ptr, today, tag, n, delay) {
+    .Call(`_GCAMCTF_tf_qt_ts_get`, quote_ptr, today, tag, n, delay)
 }
 
-test_ts_op <- function(x, y, op) {
-    .Call(`_GCAMCTF_test_ts_op`, x, y, op)
+tf_ts_op <- function(x, y, op) {
+    .Call(`_GCAMCTF_tf_ts_op`, x, y, op)
 }
 
-test_ts_scalar_op <- function(x, y, op) {
-    .Call(`_GCAMCTF_test_ts_scalar_op`, x, y, op)
+tf_ts_scalar_op <- function(x, y, op) {
+    .Call(`_GCAMCTF_tf_ts_scalar_op`, x, y, op)
 }
 
-test_ts <- function(quote_ptr, today, n) {
-    .Call(`_GCAMCTF_test_ts`, quote_ptr, today, n)
+tf_ts <- function(quote_ptr, today, n) {
+    .Call(`_GCAMCTF_tf_ts`, quote_ptr, today, n)
 }
 
-test_assert_valid_panel <- function(x) {
-    invisible(.Call(`_GCAMCTF_test_assert_valid_panel`, x))
+tf_assert_valid_panel <- function(x) {
+    invisible(.Call(`_GCAMCTF_tf_assert_valid_panel`, x))
 }
 
-test_panel_sum <- function(x) {
-    .Call(`_GCAMCTF_test_panel_sum`, x)
+tf_panel_sum <- function(x) {
+    .Call(`_GCAMCTF_tf_panel_sum`, x)
 }
 
 create_xts <- function(x_mat, x_dates) {
