@@ -751,38 +751,143 @@ Alpha_mfun alpha048 = [](const Quotes& quotes) -> Timeseries {
 // SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?
 // 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))
 Alpha_fun alpha049 = [](const Quote& qt) -> double {
-  auto sum1 = [&qt](const int delay) {
-    if ((qt.high(delay) + qt.low(delay)) >= (qt.high(delay + 1) + qt.low(delay + 1))) {
+  auto sum1 = [](const Quote& qt) {
+    if ((qt.high() + qt.low()) <= (qt.high(1) + qt.low(1))) {
       return 0.0;
     } else {
-      return(std::max(std::abs(qt.high(delay) - qt.high(delay + 1)),
-                      std::abs(qt.low(delay) - qt.low(delay + 1))));
+      double hd1 = std::abs(qt.high() - qt.high(1));
+      double hd2 = std::abs(qt.low() - qt.low(1));
+      return std::max(hd1, hd2);
     };
   };
-  auto sum2 = [&qt](const int delay) {
-    if ((qt.high(delay) + qt.low(delay)) <= (qt.high(delay + 1) + qt.low(delay + 1))) {
+  auto sum2 = [](const Quote& qt) {
+    if ((qt.high() + qt.low()) >= (qt.high(1) + qt.low(1))) {
       return 0.0;
     } else {
-      return(std::max(std::abs(qt.high(delay) - qt.high(delay + 1)),
-                      std::abs(qt.low(delay) - qt.low(delay + 1))));
+      double hd1 = std::abs(qt.high() - qt.high(1));
+      double hd2 = std::abs(qt.low() - qt.low(1));
+      return std::max(hd1, hd2);
     };
   };
-  auto sum_ts1 = sum(ts<double>(12, sum1));
-  auto sum_ts2 = sum(ts<double>(12, sum2));
+  auto sum_ts1 = sum(qt.ts<double>(12, sum1));
+  auto sum_ts2 = sum(qt.ts<double>(12, sum2));
+  return sum_ts2 / (sum_ts1 + sum_ts2);
+};
+
+
+// SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12) /
+// (SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)+
+// SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))-
+// SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)/
+// (SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)+
+// SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))
+Alpha_fun alpha050 = [](const Quote& qt) -> double {
+  auto sum1 = [](const Quote& qt) {
+    if ((qt.high() + qt.low()) <= (qt.high(1) + qt.low(1))) {
+      return 0.0;
+    } else {
+      double hd1 = std::abs(qt.high() - qt.high(1));
+      double hd2 = std::abs(qt.low() - qt.low(1));
+      return std::max(hd1, hd2);
+    };
+  };
+  auto sum2 = [](const Quote& qt) {
+    if ((qt.high() + qt.low()) >= (qt.high(1) + qt.low(1))) {
+      return 0.0;
+    } else {
+      double hd1 = std::abs(qt.high() - qt.high(1));
+      double hd2 = std::abs(qt.low() - qt.low(1));
+      return std::max(hd1, hd2);
+    };
+  };
+  auto sum_ts1 = sum(qt.ts<double>(12, sum1));
+  auto sum_ts2 = sum(qt.ts<double>(12, sum2));
+  return (sum_ts1 - sum_ts2) / (sum_ts1 + sum_ts2);
+};
+
+
+// SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12) /
+// (SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)+
+// SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?
+// 0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))
+Alpha_fun alpha051 = [](const Quote& qt) -> double {
+  auto sum1 = [](const Quote& qt) {
+    if ((qt.high() + qt.low()) <= (qt.high(1) + qt.low(1))) {
+      return 0.0;
+    } else {
+      double hd1 = std::abs(qt.high() - qt.high(1));
+      double hd2 = std::abs(qt.low() - qt.low(1));
+      return std::max(hd1, hd2);
+    };
+  };
+  auto sum2 = [](const Quote& qt) {
+    if ((qt.high() + qt.low()) >= (qt.high(1) + qt.low(1))) {
+      return 0.0;
+    } else {
+      double hd1 = std::abs(qt.high() - qt.high(1));
+      double hd2 = std::abs(qt.low() - qt.low(1));
+      return std::max(hd1, hd2);
+    };
+  };
+  auto sum_ts1 = sum(qt.ts<double>(12, sum1));
+  auto sum_ts2 = sum(qt.ts<double>(12, sum2));
   return sum_ts1 / (sum_ts1 + sum_ts2);
 };
 
 
-// COUNT(CLOSE>DELAY(CLOSE,1),12)/12*100
-Alpha_fun alpha053 = [](const Quote& quote) -> double {
-  auto fun = [&quote] (const int delay) {
-    return quote.close(delay + 0) > quote.close(delay + 1);
+// SUM(MAX(0,HIGH-DELAY((HIGH+LOW+CLOSE)/3,1)),26)/
+// SUM(MAX(0,DELAY((HIGH+LOW+CLOSE)/3,1)-LOW),26)*100
+Alpha_fun alpha052 = [](const Quote& qt) -> double {
+  auto sum1 = [](const Quote& qt) {
+    return std::max(0.0, qt.high() - (qt.high(1) + qt.low(1) + qt.close(1)) / 3);
   };
-  return count(ts<bool>(12, fun)) / 12.0 * 100.0;
+  auto sum2 = [](const Quote& qt) {
+    return std::max(0.0, (qt.high(1) + qt.low(1) + qt.close(1)) / 3 - qt.low());
+  };
+  auto sum_ts1 = sum(qt.ts<double>(26, sum1));
+  auto sum_ts2 = sum(qt.ts<double>(26, sum2));
+  return sum_ts1 / sum_ts2 * 100;
 };
 
 
 
+// COUNT(CLOSE>DELAY(CLOSE,1),12)/12*100
+Alpha_fun alpha053 = [](const Quote& qt) -> double {
+  auto bool_fun = [] (const Quote& qt) {
+    return qt.close() > qt.close(1);
+  };
+  return count(qt.ts<bool>(12, bool_fun)) / 12.0 * 100.0;
+};
+
+
+
+// -1 * RANK((STD(ABS(CLOSE -OPEN), 10) + (CLOSE -OPEN)) + CORR(CLOSE, OPEN,10))
+Alpha_mfun alpha054 = [](const Quotes& qts) -> Timeseries {
+  auto muti_stat = [](const Quote& qt) {
+    double stat1 = stdev(abs(qt.ts_close(10) - qt.ts_open(10)));
+    double stat2 = qt.close() - qt.open();
+    double stat3 = corr(qt.ts_close(10), qt.ts_open(10));
+    return stat1 + stat2 + stat3;
+  };
+  return rank(qts.apply(muti_stat)) * -1.0;
+};
+
+
+// SUM(16*(CLOSE-DELAY(CLOSE,1)+(CLOSE-OPEN)/2+DELAY(CLOSE,1)-DELAY(OPEN,1))/
+// ((ABS(HIGH-DELAY(CLOSE,1))>ABS(LOW-DELAY(CLOSE,1)) &
+// ABS(HIGH-DELAY(CLOSE,1))>ABS(HIGH-DELAY(LOW,1))?
+// ABS(HIGH-DELAY(CLOSE,1))+ABS(LOW-DELAY(CLOSE,1))/2+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4:
+// (ABS(LOW-DELAY(CLOSE,1))>ABS(HIGH-DELAY(LOW,1)) & ABS(LOW-DELAY(CLOSE,1))>ABS(HIGH-DELAY(CLOSE,1))?
+// ABS(LOW-DELAY(CLOSE,1))+ABS(HIGH-DELAY(CLOSE,1))/2+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4:
+// ABS(HIGH-DELAY(LOW,1))+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4)))*MAX(ABS(HIGH-DELAY(CLOSE,1)),ABS(LOW-DELAY(CLOSE,1))),20)
 
 
 }
