@@ -41,7 +41,7 @@ Alpha_mfun alpha001 = [](const Quotes& qts) -> Timeseries {
 Alpha_fun alpha002 = [](const Quote& quote) -> double {
   const auto rk_price = ((quote.ts_close(2) - quote.ts_low(2)) - (quote.ts_high(2) - quote.ts_close(2))) /
                         (quote.ts_high(2) - quote.ts_low(2));
-  return sum(delta(rk_price, 1)) * -1;
+  return delta(rk_price) * -1;
 };
 
 
@@ -101,11 +101,13 @@ Alpha_fun alpha005 = [](const Quote& quote) -> double {
 
 // (RANK(SIGN(DELTA((((OPEN * 0.85) + (HIGH * 0.15))), 4)))* -1)
 Alpha_mfun alpha006 = [](const Quotes& quotes) -> Timeseries {
-  auto base_fun = [](const Quote& qt) {
-    double d_price = sum(delta(qt.ts_open(5) * 0.85 + qt.ts_high(5) * 0.15, 4));
-    return sign(d_price);
+  auto open_high = [](const Quote& qt) {
+    return qt.open() * 0.85 + qt.high() * 0.15;
   };
-  return rank(quotes.apply(base_fun)) * -1;
+  auto sign_delta = [open_high](const Quote& qt) {
+    return sign(delta(qt.ts<double>(5, open_high)));
+  };
+  return rank(quotes.apply(sign_delta)) * -1.0;
 };
 
 
@@ -128,7 +130,7 @@ Alpha_mfun alpha007 = [](const Quotes& quotes) -> Timeseries {
 Alpha_mfun alpha008 = [](const Quotes& quotes) -> Timeseries {
   auto delta_p = [](const Quote& qt) {
     const auto price = (qt.ts_high(5) + qt.ts_low(5)) / 2 * 0.2 + qt.ts_vwap(5) * 0.8;
-    const auto delta_price = sum(delta(price, 4));
+    const auto delta_price = delta(price);
     return -delta_price;
   };
   return rank(quotes.apply(delta_p));
@@ -579,7 +581,7 @@ Alpha_mfun alpha037 = [](const Quotes& quotes) -> Timeseries {
 // (((SUM(HIGH, 20) / 20) < HIGH) ? (-1 * DELTA(HIGH, 2)) : 0)
 Alpha_fun alpha038 = [](const Quote& quote) -> double {
   if (mean(quote.ts_high(20)) < quote.high()) {
-    return -sum(delta(quote.ts_high(3), 2));
+    return -delta(quote.ts_high(3));
   } else {
     return 0.0;
   }
@@ -646,7 +648,7 @@ Alpha_fun alpha040 = [](const Quote& quote) -> double {
 // RANK(MAX(DELTA((VWAP), 3), 5))* -1
 Alpha_mfun alpha041 = [](const Quotes& quotes) -> Timeseries {
   auto max_d_vwap = [](const Quote& qt) {
-    return std::max(sum(delta(qt.ts_vwap(4), 3)), 5.0);
+    return std::max(delta(qt.ts_vwap(4)), 5.0);
   };
   return rank(quotes.apply(max_d_vwap)) * -1.0;
 };
