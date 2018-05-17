@@ -6,8 +6,6 @@ namespace alpha_impl
 
 // (-1 * CORR(RANK(DELTA(LOG(VOLUME), 1)), RANK(((CLOSE -OPEN) / OPEN)), 6))
 Alpha_mfun alpha001 = [](const Quotes& qts) -> Timeseries {
-
-  const int num_day = 6;
   auto d_log_vol = [](const Quote& qt) {
     return log(qt.volume()) - log(qt.volume(1));
   };
@@ -20,20 +18,10 @@ Alpha_mfun alpha001 = [](const Quotes& qts) -> Timeseries {
   auto rk_c_p = [c_p](const Quotes& qts) {
     return rank(qts.apply(c_p));
   };
-  auto rk1 = qts.tsapply(num_day, rk_d_log_vol);
-  auto rk2 = qts.tsapply(num_day, rk_c_p);
-
-  Timeseries res;
-  const int num_secu = qts.size();
-  for (int i = 0; i < num_secu; ++i) {
-    Timeseries sub_rk1, sub_rk2;
-    for (int j = 0; j < num_day; ++j) {
-      sub_rk1.push_back(rk1[j][i]);
-      sub_rk2.push_back(rk2[j][i]);
-    }
-    res.push_back(corr(sub_rk1, sub_rk2) * -1);
-  }
-  return res;
+  auto rk1 = qts.tsapply(6, rk_d_log_vol);
+  auto rk2 = qts.tsapply(6, rk_c_p);
+  auto corr_rk = apply(rk1, rk2, corr);
+  return corr_rk * -1.0;
 };
 
 
