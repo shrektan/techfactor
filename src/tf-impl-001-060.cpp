@@ -927,4 +927,77 @@ Alpha_fun alpha055 = [](const Quote& qt) -> double {
 };
 
 
+// RANK(OPEN -TSMIN(OPEN, 12)) < RANK(RANK(CORR(SUM((HIGH+ LOW) / 2, 19), SUM(MEAN(VOLUME,40), 19), 13))^5)
+Alpha_mfun alpha056 = [](const Quotes& qts) -> Timeseries {
+  auto fun_left = [](const Quote& qt) {
+    return qt.open() - tsmin(qt.ts_open(12));
+  };
+  auto hl_sum = [](const Quote& qt) {
+    return sum((qt.ts_high(19) + qt.ts_low(19)) / 2);
+  };
+  auto vol = [](const Quote& qt) {
+    return mean(qt.ts_volume(40));
+  };
+  auto vol_sum = [vol](const Quote& qt) {
+    return sum(qt.ts<double>(19, vol));
+  };
+  auto fun_right = [hl_sum, vol_sum](const Quote& qt) {
+    auto corr1 = qt.ts<double>(13, hl_sum);
+    auto corr2 = qt.ts<double>(13, vol_sum);
+    return corr(corr1, corr2);
+  };
+  auto rk_left = rank(qts.apply(fun_left));
+  auto rk_right = rank(pow(rank(qts.apply(fun_right)), 5.0));
+  return rk_left < rk_right;
+};
+
+
+// SMA((CLOSE-TSMIN(LOW,9))/(TSMAX(HIGH,9)-TSMIN(LOW,9))*100,3,1)
+Alpha_fun alpha057 = [](const Quote& qt) -> double {
+  auto muti_p = [](const Quote& qt) {
+    double left = qt.close() - tsmin(qt.ts_low(9));
+    double right = tsmax(qt.ts_high(9)) - tsmin(qt.ts_low(9));
+    return left / right * 100;
+  };
+  return sma(qt.ts<double>(3, muti_p), 1);
+};
+
+
+
+// COUNT(CLOSE>DELAY(CLOSE,1),20)/20*100
+Alpha_fun alpha058 = [](const Quote& qt) -> double {
+  auto bool_fun = [](const Quote& qt) {
+    return qt.close() > qt.close(1);
+  };
+  return count(qt.ts<bool>(20.0, bool_fun)) / 20.0 * 100.0;
+};
+
+
+// SUM((CLOSE=DELAY(CLOSE,1)?
+// 0:CLOSE-(CLOSE>DELAY(CLOSE,1)?
+// MIN(LOW,DELAY(CLOSE,1)):MAX(HIGH,DELAY(CLOSE,1)))),20)
+Alpha_fun alpha059 = [](const Quote& qt) -> double {
+  auto base_fun = [](const Quote& qt) {
+    if (qt.close() == qt.close(1)) {
+      return 0.0;
+    } else if (qt.close() > qt.close(1)) {
+      return qt.close() - std::min(qt.low(), qt.close(1));
+    } else {
+      return qt.close() - std::max(qt.high(), qt.close(1));
+    }
+  };
+  return sum(qt.ts<double>(20, base_fun));
+};
+
+
+// SUM(((CLOSE-LOW)-(HIGH-CLOSE))./(HIGH-LOW).*VOLUME,20)
+Alpha_fun alpha060 = [](const Quote& qt) -> double {
+  auto base_fun = [](const Quote& qt) {
+    double left = (qt.close() - qt.low()) - (qt.high() - qt.close());
+    double right = (qt.high() - qt.low()) / qt.volume();
+    return left / right;
+  };
+  return sum(qt.ts<double>(20, base_fun));
+};
+
 }
