@@ -181,7 +181,11 @@ Alpha_mfun alpha012 = [](const Quotes& quotes) -> Timeseries {
 
 // (((HIGH * LOW)^0.5) -VWAP)
 Alpha_fun alpha013 = [](const Quote& quote) -> double {
-  return std::pow((quote.high() * quote.low()), 0.5) - quote.vwap();
+  if (ISNA(quote.high()) || ISNA(quote.low()) || ISNA(quote.vwap()) ||
+      quote.high() * quote.low() <= 0.0) {
+    return NA_REAL;
+  }
+  return std::pow(quote.high() * quote.low(), 0.5) - quote.vwap();
 };
 
 
@@ -324,6 +328,7 @@ Alpha_fun alpha023 = [](const Quote& quote) -> double {
   };
   double sma1 = sma(ts<double>(20, p_con1), 1);
   double sma2 = sma(ts<double>(20, p_con2), 1);
+  if (sma1 + sma2 == 0.0) return NA_REAL;
   return sma1 / (sma1 + sma2) * 100;
 };
 
@@ -630,7 +635,11 @@ Alpha_fun alpha040 = [](const Quote& quote) -> double {
       return 0.0;
     }
   };
-  return sum(ts<double>(26, base_fun1)) / sum(ts<double>(26, base_fun2)) * 100;
+
+  auto right = sum(ts<double>(26, base_fun2));
+  if (right == 0.0) return NA_REAL;
+  auto left = sum(ts<double>(26, base_fun1));
+  return left / right * 100;
 };
 
 
