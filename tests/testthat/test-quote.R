@@ -295,6 +295,14 @@ test_that("ts_op_ts", {
     test_ts_op(x, y, "<"),
     as.double(x < y)
   )
+  expect_equal(
+    test_ts_op(x, y, "pmax"),
+    pmax(x, y)
+  )
+  expect_equal(
+    test_ts_op(x, y, "pmin"),
+    pmin(x, y)
+  )
 })
 
 
@@ -353,6 +361,14 @@ test_that("ts_op_scalar", {
       res[is.na(res)] <- 0.0
       res
     })
+  )
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "pmin")),
+    purrr::map(y, ~pmin(x, .))
+  )
+  expect_equal(
+    purrr::map(y, ~test_ts_scalar_op(x, ., "pmax")),
+    purrr::map(y, ~pmax(x, .))
   )
 })
 

@@ -444,6 +444,12 @@ inline Timeseries pow(const Timeseries& base, const Timeseries& exp)
 }
 
 
+Timeseries pmin(const Timeseries& x, const double y);
+Timeseries pmax(const Timeseries& x, const double y);
+Timeseries pmin(const Timeseries& x, const Timeseries& y);
+Timeseries pmax(const Timeseries& x, const Timeseries& y);
+
+
 inline Timeseries operator+(const Timeseries& x, const double y)
 {
   Timeseries res(x.size());

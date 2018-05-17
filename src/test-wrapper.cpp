@@ -100,7 +100,9 @@ const std::map<
   {"^", [](const Timeseries& x, const Timeseries& y) { return pow(x, y); }},
   {">", [](const Timeseries& x, const Timeseries& y) { return x > y; }},
   {"<", [](const Timeseries& x, const Timeseries& y) { return x < y; }},
-  {"==", [](const Timeseries& x, const Timeseries& y) { return x == y; }}
+  {"==", [](const Timeseries& x, const Timeseries& y) { return x == y; }},
+  {"pmin", [](const Timeseries& x, const Timeseries& y) { return pmin(x, y); }},
+  {"pmax", [](const Timeseries& x, const Timeseries& y) { return pmax(x, y); }}
 };
 
 
@@ -145,7 +147,9 @@ const std::map<
      for (auto x : bool_res) res.push_back(x);
      return res;
    }
-  }
+  },
+  {"pmin", [](const Timeseries& x, const double y) { return pmin(x, y); }},
+  {"pmax", [](const Timeseries& x, const double y) { return pmax(x, y); }}
 };
 
 

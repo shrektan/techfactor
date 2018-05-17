@@ -283,6 +283,53 @@ double lowday(const Timeseries& x)
 }
 
 
+Timeseries pmin(const Timeseries& x, const double y) {
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), std::back_inserter(res),
+    [y](const double elem) {
+      return (ISNAN(elem) || ISNAN(y)) ? NA_REAL : std::min(elem, y);
+    }
+  );
+  return res;
+}
+
+
+Timeseries pmax(const Timeseries& x, const double y) {
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), std::back_inserter(res),
+    [y](const double elem) {
+      return (ISNAN(elem) || ISNAN(y)) ? NA_REAL : std::max(elem, y);
+    }
+  );
+  return res;
+}
+
+
+Timeseries pmin(const Timeseries& x, const Timeseries& y) {
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(), std::back_inserter(res),
+    [](const double elem_x, const double elem_y) {
+      return (ISNAN(elem_x) || ISNAN(elem_y)) ? NA_REAL : std::min(elem_x, elem_y);
+    }
+  );
+  return res;
+}
+
+
+Timeseries pmax(const Timeseries& x, const Timeseries& y) {
+  Timeseries res;
+  std::transform(
+    x.cbegin(), x.cend(), y.cbegin(), std::back_inserter(res),
+    [](const double elem_x, const double elem_y) {
+      return (ISNAN(elem_x) || ISNAN(elem_y)) ? NA_REAL : std::max(elem_x, elem_y);
+    }
+  );
+  return res;
+}
+
 
 // [[Rcpp::export("tf_assert_valid_from_to")]]
 void assert_valid(const Rcpp::newDateVector from_to)
