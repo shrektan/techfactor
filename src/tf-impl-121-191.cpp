@@ -926,7 +926,7 @@ Alpha_mfun alpha170 = [](const Quotes& qts) -> Timeseries {
 Alpha_fun alpha171 = [](const Quote& qt) -> double {
   auto num = (qt.low() - qt.close()) * std::pow(qt.open(), 5.0);
   auto deno = (qt.close() - qt.high()) * std::pow(qt.close(), 5.0);
-  if (deno == 0.0) return NA_REAL;
+  if (deno == 0.0 || ISNAN(num) || ISNAN(deno)) return NA_REAL;
   return -1.0 * num / deno;
 };
 
