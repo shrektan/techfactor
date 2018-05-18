@@ -13,7 +13,7 @@ Alpha_mfun alpha001 = [](const Quotes& qts) -> Timeseries {
     return rank(qts.apply(d_log_vol));
   };
   auto c_p = [](const Quote& qt) {
-    return (qt.close() - qt.close()) / qt.open();
+    return (qt.close() - qt.open()) / qt.open();
   };
   auto rk_c_p = [c_p](const Quotes& qts) {
     return rank(qts.apply(c_p));
