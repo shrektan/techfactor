@@ -576,4 +576,423 @@ Alpha_fun alpha151 = [](const Quote& qt) -> double {
   return sma(qt.ts<double>(20, c20), 1);
 };
 
+
+// SMA(MEAN(DELAY(SMA(DELAY(CLOSE/DELAY(CLOSE,9),1),9,1),1),12)-
+// MEAN(DELAY(SMA(DELAY(CLOSE/DELAY(CLOSE,9),1),9,1),1),26),9,1)
+Alpha_fun alpha152 = [](const Quote& qt) -> double {
+  auto dcc9 = [](const Quote& qt) {
+    return qt.clock_back(1).close() / qt.clock_back(1).close(9);
+  };
+  auto dsma_dcc9 = [dcc9](const Quote& qt) {
+    return sma(qt.clock_back(1).ts<double>(9, dcc9), 1);
+  };
+  auto mds12 = [dsma_dcc9](const Quote& qt) {
+    return mean(qt.ts<double>(12, dsma_dcc9));
+  };
+  auto mds26 = [dsma_dcc9](const Quote& qt) {
+    return mean(qt.ts<double>(26, dsma_dcc9));
+  };
+  return sma(qt.ts<double>(9, mds12) - qt.ts<double>(9, mds26), 1);
+};
+
+
+// (MEAN(CLOSE,3)+MEAN(CLOSE,6)+MEAN(CLOSE,12)+MEAN(CLOSE,24))/4
+Alpha_fun alpha153 = [](const Quote& qt) -> double {
+  return (mean(qt.ts_close(3)) +
+          mean(qt.ts_close(6)) +
+          mean(qt.ts_close(12)) +
+          mean(qt.ts_close(24))) / 4.0;
+};
+
+
+// (((VWAP -MIN(VWAP, 16))) < (CORR(VWAP, MEAN(VOLUME,180), 18)))
+Alpha_fun alpha154 = [](const Quote& qt) -> double {
+  auto vmv16 = qt.vwap() - tsmin(qt.ts_vwap(16));
+  auto mv180 = [](const Quote& qt) {
+    return mean(qt.ts_volume(180));
+  };
+  auto cvmv180 = corr(
+    qt.ts_vwap(18),
+    qt.ts<double>(18, mv180)
+  );
+  return double(vmv16 < cvmv180);
+};
+
+
+// SMA(VOLUME,13,2)-SMA(VOLUME,27,2)-SMA(SMA(VOLUME,13,2)-SMA(VOLUME,27,2),10,2)
+Alpha_fun alpha155 = [](const Quote& qt) -> double {
+  auto sv13_fun = [](const Quote& qt) {
+    return sma(qt.ts_volume(13), 2);
+  };
+  auto sv27_fun = [](const Quote& qt) {
+    return sma(qt.ts_volume(27), 2);
+  };
+  auto sv13 = sv13_fun(qt);
+  auto sv27 = sv27_fun(qt);
+  auto ssv10 = sma(qt.ts<double>(10, sv13_fun) - qt.ts<double>(10, sv27_fun), 2);
+  return sv13 - sv27 - ssv10;
+};
+
+
+// (MAX(RANK(DECAYLINEAR(DELTA(VWAP, 5), 3)),
+// RANK(DECAYLINEAR(((DELTA(((OPEN * 0.15) + (LOW *0.85)), 2) /
+// ((OPEN * 0.15) + (LOW * 0.85))) * -1), 3))) * -1)
+Alpha_mfun alpha156 = [](const Quotes& qts) -> Timeseries {
+  auto dv5 = [](const Quote& qt) {
+    return delta(qt.ts_vwap(5));
+  };
+  auto decay_dv5 = [dv5](const Quote& qt) {
+    return decaylinear(qt.ts<double>(3, dv5));
+  };
+  auto rk_decay_dv5 = rank(qts.apply(decay_dv5));
+  auto open_low = [](const Quote& qt) {
+    return qt.open() * 0.15 + qt.low() * 0.85;
+  };
+  auto d_ol_ol = [open_low](const Quote& qt) {
+    auto ol = open_low(qt);
+    if (ol == 0.0) return NA_REAL;
+    return delta(qt.ts<double>(2, open_low)) / ol * -1.0;
+  };
+  auto decay_dolol = [d_ol_ol](const Quote& qt) {
+    return decaylinear(qt.ts<double>(3, d_ol_ol));
+  };
+  auto rk_decay_dolol = rank(qts.apply(decay_dolol));
+  return pmax(rk_decay_dv5, rk_decay_dolol) * -1.0;
+};
+
+
+// (MIN(PROD(RANK(RANK(LOG(SUM(TSMIN(RANK((-1 * RANK(DELTA((CLOSE -1), 5))))), 2), 1)))), 1), 5) +
+// TSRANK(DELAY((-1 * RET), 6), 5)) ==> modified...
+// MIN(RANK(LOG(TSMIN(RANK(-1*RANK(DELTA(CLOSE,5))),2))),5)+
+// TSRANK(DELAY(-1*RET,6),5)
+Alpha_mfun alpha157 = [](const Quotes& qts) -> Timeseries {
+  auto dc5 = [](const Quote& qt) {
+    return delta(qt.ts_close(5));
+  };
+  auto rk_dc5 = [dc5](const Quotes& qts) {
+    return rank(qts.apply(dc5)) * -1.0;
+  };
+  auto rk_log_min_rk = [rk_dc5](const Quotes& qts) {
+    return rank(log(apply(qts.tsapply(2, rk_dc5), tsmin)));
+  };
+  auto left = apply(qts.tsapply(5, rk_log_min_rk), tsmin);
+
+  auto delay_rtn = [](const Quote& qt) {
+    return qt.ret(6) * -1.0;
+  };
+  auto rk_rtn = [delay_rtn](const Quote& qt) {
+    return tsrank(qt.ts<double>(5, delay_rtn));
+  };
+  auto right = qts.apply(rk_rtn);
+  return left + right;
+};
+
+
+// ((HIGH-SMA(CLOSE,15,2))-(LOW-SMA(CLOSE,15,2)))/CLOSE
+Alpha_fun alpha158 = [](const Quote& qt) -> double {
+  auto close = qt.close();
+  if (ISNAN(close) || close == 0.0) return NA_REAL;
+  return ((qt.high() - sma(qt.ts_close(15), 2)) -
+    (qt.low() - sma(qt.ts_close(15), 2))) / close;
+};
+
+
+// ((CLOSE-SUM(MIN(LOW,DELAY(CLOSE,1)),6))/
+// SUM(MAX(HGIH,DELAY(CLOSE,1))-MIN(LOW,DELAY(CLOSE,1)),6)*12*24+
+// (CLOSE-SUM(MIN(LOW,DELAY(CLOSE,1)),12))/SUM(MAX(HGIH,DELAY(CLOSE,1))-
+// MIN(LOW,DELAY(CLOSE,1)),12)*6*24+
+// (CLOSE-SUM(MIN(LOW,DELAY(CLOSE,1)),24))/SUM(MAX(HGIH,DELAY(CLOSE,1))-
+// MIN(LOW,DELAY(CLOSE,1)),24)*6*24)*100/(6*12+6*24+12*24)
+// ==>
+// let close1 = DELAY(CLOSE,1)
+// let min_lc1 = MIN(LOW,close1)
+// let max_hc1 = MAX(HGIH,close1)
+// part1 = (CLOSE-SUM(min_lc1,6))
+// part2 = SUM(max_hc1-min_lc1,6)
+// part3 = (CLOSE-SUM(min_lc1,12))
+// part4 = SUM(max_hc1-min_lc1,12)
+// part5 = (CLOSE-SUM(min_lc1,24))
+// part6 = SUM(max_hc1-min_lc1,24)
+// (part1/part2*12*24+part3/part4*6*24+part5/part6*6*24)*100/(6*12+6*24+12*24)
+Alpha_fun alpha159 = [](const Quote& qt) -> double {
+  auto min_lc1 = [](const Quote& qt) {
+    return std::min(qt.low(), qt.close(1));
+  };
+  auto max_hc1 = [](const Quote& qt) {
+    return std::max(qt.high(), qt.close(1));
+  };
+  auto max_min = [min_lc1, max_hc1](const Quote& qt) {
+    return max_hc1(qt) - min_lc1(qt);
+  };
+  auto part1 = qt.close() - sum(qt.ts<double>(6, min_lc1));
+  auto part2 = sum(qt.ts<double>(6, max_min));
+  auto part3 = qt.close() - sum(qt.ts<double>(12, min_lc1));
+  auto part4 = sum(qt.ts<double>(12, max_min));
+  auto part5 = qt.close() - sum(qt.ts<double>(24, min_lc1));
+  auto part6 = sum(qt.ts<double>(24, max_min));
+  if (part2 == 0.0 || part4 == 0.0 || part6 == 0.0) return NA_REAL;
+  return (part1 / part2 * 12 * 24 +
+          part3 / part4 * 6 * 24 +
+          part5 / part6 * 6 * 24) *
+          100 / (6 * 12 + 6 * 24 + 12 * 24);
+};
+
+
+// SMA((CLOSE<=DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1)
+Alpha_fun alpha160 = [](const Quote& qt) -> double {
+  auto fun = [](const Quote& qt) {
+    return (qt.close() <= qt.close(1)) ? stdev(qt.ts_close(20)) : 0.0;
+  };
+  return sma(qt.ts<double>(20, fun), 1);
+};
+
+
+// MEAN(MAX(MAX((HIGH-LOW),ABS(DELAY(CLOSE,1)-HIGH)),ABS(DELAY(CLOSE,1)-LOW)),12)
+Alpha_fun alpha161 = [](const Quote& qt) -> double {
+  auto fun = [](const Quote& qt) {
+    auto hl = qt.high() - qt.low();
+    auto abs_c1_h = std::abs(qt.close(1) - qt.high());
+    auto max1 = std::max(hl, abs_c1_h);
+    auto abs_c1_l = std::abs(qt.close(1) - qt.low());
+    return std::max(max1, abs_c1_l);
+  };
+  return mean(qt.ts<double>(12, fun));
+};
+
+
+// (SMA(MAX(CLOSE-DELAY(CLOSE,1),0),12,1)/
+// SMA(ABS(CLOSE-DELAY(CLOSE,1)),12,1)*100-
+// MIN(SMA(MAX(CLOSE-DELAY(CLOSE,1),0),12,1)/
+// SMA(ABS(CLOSE-DELAY(CLOSE,1)),12,1)*100,12))/
+// (MAX(SMA(MAX(CLOSE-DELAY(CLOSE,1),0),12,1)/
+// SMA(ABS(CLOSE-DELAY(CLOSE,1)),12,1)*100,12)-
+// MIN(SMA(MAX(CLOSE-DELAY(CLOSE,1),0),12,1)/
+// SMA(ABS(CLOSE-DELAY(CLOSE,1)),12,1)*100,12))
+// let dc1 = CLOSE-DELAY(CLOSE,1) maxdc1 = MAX(dc1,0) absdc1 = ABS(dc1)
+// let sma_max = SMA(maxdc1,12,1) sma_abs = SMA(absdc1,12,1)
+// (sma_max/sma_abs*100-MIN(sma_max/sma_abs*100,12))/
+// (MAX(sma_max/sma_abs*100,12)-MIN(sma_max/sma_abs*100,12))
+Alpha_fun alpha162 = [](const Quote& qt) -> double {
+  auto max_dc1 = [](const Quote& qt) {
+    return std::max(qt.close() - qt.close(1), 0.0);
+  };
+  auto abs_dc1 = [](const Quote& qt) {
+    return std::abs(qt.close() - qt.close(1));
+  };
+  auto sma_max = [max_dc1](const Quote& qt) {
+    return sma(qt.ts<double>(12, max_dc1), 1);
+  };
+  auto sma_abs = [abs_dc1](const Quote& qt) {
+    return sma(qt.ts<double>(12, abs_dc1), 1);
+  };
+  auto max_abs = [sma_max, sma_abs](const Quote& qt) {
+    auto abs_qt = sma_abs(qt);
+    if (abs_qt == 0.0) return NA_REAL;
+    return sma_max(qt) / abs_qt * 100.0;
+  };
+  return (max_abs(qt) - tsmin(qt.ts<double>(12, max_abs))) /
+    (tsmax(qt.ts<double>(12, max_abs)) - tsmin(qt.ts<double>(12, max_abs)));
+};
+
+
+// RANK(((((-1 * RET) * MEAN(VOLUME,20)) * VWAP) * (HIGH -CLOSE)))
+Alpha_mfun alpha163 = [](const Quotes& qts) -> Timeseries {
+  auto fun = [](const Quote& qt) {
+    return qt.ret() * -1.0 *
+      mean(qt.ts_volume(20)) *
+      qt.vwap() *
+      (qt.high() - qt.close());
+  };
+  return rank(qts.apply(fun));
+};
+
+// let cdc1 = (CLOSE>DELAY(CLOSE,1))?1/(CLOSE-DELAY(CLOSE,1)):1;
+// SMA((cdc1-MIN(cdc1,12))/(HIGH-LOW)*100,13,2)
+Alpha_fun alpha164 = [](const Quote& qt) -> double {
+  auto cdc1 = [](const Quote& qt) {
+    auto dc1 = qt.close() - qt.close(1);
+    return (dc1 > 0.0) ? 1.0 / dc1 : 1.0;
+  };
+  auto fun = [cdc1](const Quote& qt) {
+    auto hl = qt.high() - qt.low();;
+    if (hl == 0.0 || ISNAN(hl)) return NA_REAL;
+    return (cdc1(qt) - tsmin(qt.ts<double>(12, cdc1))) / hl * 100.0;
+  };
+  return sma(qt.ts<double>(13, fun), 2);
+};
+
+
+// MAX(SUMAC(CLOSE(48)-MEAN(CLOSE,48)))-MIN(SUMAC(CLOSE(48)-MEAN(CLOSE,48)))/STD(CLOSE,48)
+Alpha_fun alpha165 = [](const Quote& qt) -> double {
+  auto tsclose = qt.ts_close(48);
+  auto c48 = tsclose - mean(tsclose);
+  auto stdclose48 = stdev(qt.ts_close(48));
+  if (stdclose48 == 0.0 || ISNAN(stdclose48)) return NA_REAL;
+  return (tsmax(sumac(c48)) - tsmin(sumac(c48))) / stdclose48;
+};
+
+
+// let dr = CLOSE/DELAY(CLOSE,1)-1
+// -20*（20-1）^1.5*SUM(dr-MEAN(dr,20),20)/
+// ((20-1)*(20-2)*(SUM((dr,20)^2,20))^1.5)
+Alpha_fun alpha166 = [](const Quote& qt) -> double {
+  auto dr = [](const Quote& qt) {
+    auto c1 = qt.close(1);
+    if (c1 == 0.0 || ISNAN(c1)) return NA_REAL;
+    return qt.close() / c1 - 1.0;
+  };
+  auto dr20 = qt.ts<double>(20, dr);
+  auto sum_dr20 = sum(dr20 - mean(dr20));
+  auto sum_drsqr20 = sum(pow(dr20, 2.0));
+  if (ISNAN(sum_drsqr20) || sum_drsqr20 == 0.0) return NA_REAL;
+  return sum_dr20 * (-20.0) * std::pow(19, 1.5) /
+    (19.0 * 18.0 * std::pow(sum_drsqr20, 1.5));
+
+};
+
+
+// SUM((CLOSE-DELAY(CLOSE,1)>0?CLOSE-DELAY(CLOSE,1):0),12)
+Alpha_fun alpha167 = [](const Quote& qt) -> double {
+  auto dc1 = [](const Quote& qt) {
+    auto res = qt.close() - qt.close(1);
+    return (res > 0.0) ? res : 0.0;
+  };
+  return sum(qt.ts<double>(12, dc1));
+};
+
+
+// (-1*VOLUME/MEAN(VOLUME,20))
+Alpha_fun alpha168 = [](const Quote& qt) -> double {
+  return qt.volume() / mean(qt.ts_volume(20)) * -1.0;
+};
+
+
+// SMA(MEAN(DELAY(SMA(CLOSE-DELAY(CLOSE,1),9,1),1),12)-
+// MEAN(DELAY(SMA(CLOSE-DELAY(CLOSE,1),9,1),1),26),10,1)
+Alpha_fun alpha169 = [](const Quote& qt) -> double {
+  auto dc1 = [](const Quote& qt) {
+    return qt.close() - qt.close(1);
+  };
+  auto delay_sma_dc9 = [dc1](const Quote& qt) {
+    return sma(qt.clock_back(1).ts<double>(9, dc1), 1);
+  };
+  auto m_delay_12 = [delay_sma_dc9](const Quote& qt) {
+    return mean(qt.ts<double>(12, delay_sma_dc9));
+  };
+  auto m_delay_26 = [delay_sma_dc9](const Quote& qt) {
+    return mean(qt.ts<double>(26, delay_sma_dc9));
+  };
+  return sma(
+    qt.ts<double>(10, m_delay_12) - qt.ts<double>(10, m_delay_26),
+    1
+  );
+};
+
+
+// ((((RANK((1 / CLOSE)) * VOLUME) / MEAN(VOLUME,20)) *
+// ((HIGH * RANK((HIGH -CLOSE))) / (SUM(HIGH, 5) / 5))) -
+// RANK((VWAP -DELAY(VWAP, 5)))) ==>
+//
+// RANK(1 / CLOSE) * RANK(HIGH -CLOSE) *
+//  (VOLUME / MEAN(VOLUME,20) * HIGH / SUM(HIGH, 5) * 5) - ==> middle_number
+// RANK(VWAP -DELAY(VWAP, 5))
+Alpha_mfun alpha170 = [](const Quotes& qts) -> Timeseries {
+  auto inv_close = [](const Quote& qt) {
+    return (qt.close() == 0.0) ? NA_REAL : 1.0 / qt.close();
+  };
+  auto rk_inv_close = rank(qts.apply(inv_close));
+  auto h_c = [](const Quote& qt) {
+    return qt.high() - qt.close();
+  };
+  auto rk_h_c = rank(qts.apply(h_c));
+  auto d_vwap_5 = [](const Quote& qt) {
+    return qt.vwap() - qt.vwap(5);
+  };
+  auto rk_d_vwap_5 = rank(qts.apply(d_vwap_5));
+
+  auto fun = [](const Quote& qt) {
+    auto mvol = mean(qt.ts_volume(20));
+    auto sumh = sum(qt.ts_high(5));
+    if (mvol == 0.0 || sumh == 0.0) return NA_REAL;
+    return qt.volume() / mvol * qt.high() / sumh * 5.0;
+  };
+  auto middle_number = qts.apply(fun);
+
+  return rk_inv_close * rk_h_c * middle_number - rk_d_vwap_5;
+};
+
+
+// ((-1 * ((LOW -CLOSE) * (OPEN^5))) / ((CLOSE -HIGH) * (CLOSE^5)))
+Alpha_fun alpha171 = [](const Quote& qt) -> double {
+  auto num = (qt.low() - qt.close()) * std::pow(qt.open(), 5.0);
+  auto deno = (qt.close() - qt.high()) * std::pow(qt.close(), 5.0);
+  if (deno == 0.0) return NA_REAL;
+  return -1.0 * num / deno;
+};
+
+
+// let ldhd = (LD>0 & LD>HD)?LD:0
+// let hdld = (HD>0 & HD>LD)?HD:0
+// let ldhd14 = SUM(ldhd,14)
+// let hdld14 = SUM(hdld,14)
+// let tr14 = SUM(TR,14)
+// MEAN(ABS(ldhd14-hdld14)/
+// (ldhd14+hdld14)*100,6)
+Alpha_fun alpha172 = [](const Quote& qt) -> double {
+  auto ldhd = [](const Quote& qt) {
+    return (qt.ld() > 0 && qt.ld() > qt.hd()) ? qt.ld() : 0.0;
+  };
+  auto hdld = [](const Quote& qt) {
+    return (qt.hd() > 0 && qt.hd() > qt.ld()) ? qt.hd() : 0.0;
+  };
+  auto ldhd14 = [ldhd](const Quote& qt) {
+    return sum(qt.ts<double>(14, ldhd));
+  };
+  auto hdld14 = [hdld](const Quote& qt) {
+    return sum(qt.ts<double>(14, hdld));
+  };
+  auto tr14 = [](const Quote& qt) {
+    return sum(qt.ts_tr(14));
+  };
+  auto fun = [ldhd14, hdld14, tr14](const Quote& qt) {
+    auto vtr14 = tr14(qt);
+    if (ISNAN(vtr14) || vtr14 == 0.0) return NA_REAL;
+    auto vldhd14 = ldhd14(qt);
+    auto vhdld14 = hdld14(qt);
+    auto deno = vldhd14 + vhdld14;
+    if (deno == 0.0) return NA_REAL;
+    auto num = std::abs(vldhd14 - vhdld14);
+    return num / deno * 100.0;
+  };
+  return mean(qt.ts<double>(6, fun));
+};
+
+
+// 3*SMA(CLOSE,13,2)-
+// 2*SMA(SMA(CLOSE,13,2),13,2)+
+// SMA(SMA(SMA(LOG(CLOSE),13,2),13,2),13,2);
+Alpha_fun alpha173 = [](const Quote& qt) -> double {
+  auto sma_close_fun = [](const Quote& qt) {
+    return sma(qt.ts_close(13), 2);
+  };
+  auto sma_close_13_2 = sma_close_fun(qt);
+  auto smasma = sma(qt.ts<double>(13, sma_close_fun), 2);
+  auto sma_log_close_fun = [](const Quote& qt) {
+    return sma(log(qt.ts_close(13)), 2);
+  };
+  auto smasma_fun = [sma_log_close_fun](const Quote& qt) {
+    return sma(qt.ts<double>(13, sma_log_close_fun), 2);
+  };
+  auto smasmasma = sma(qt.ts<double>(13, smasma_fun), 2);
+  return 3.0 * sma_close_13_2 - 2.0 * smasma + smasmasma;
+};
+
+// SMA((CLOSE>DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1)
+Alpha_fun alpha174 = [](const Quote& qt) -> double {
+  auto fun = [](const Quote& qt) {
+    return (qt.close() > qt.close(1)) ? stdev(qt.ts_close(20)) : 0.0;
+  };
+  return sma(qt.ts<double>(20, fun), 1);
+};
+
 }

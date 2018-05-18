@@ -55,6 +55,25 @@ extern Alpha_fun alpha147;
 extern Alpha_fun alpha149;
 extern Alpha_fun alpha150;
 extern Alpha_fun alpha151;
+extern Alpha_fun alpha152;
+extern Alpha_fun alpha153;
+extern Alpha_fun alpha154;
+extern Alpha_fun alpha155;
+extern Alpha_fun alpha158;
+extern Alpha_fun alpha159;
+extern Alpha_fun alpha160;
+extern Alpha_fun alpha161;
+extern Alpha_fun alpha162;
+extern Alpha_fun alpha164;
+extern Alpha_fun alpha165;
+extern Alpha_fun alpha166;
+extern Alpha_fun alpha167;
+extern Alpha_fun alpha168;
+extern Alpha_fun alpha169;
+extern Alpha_fun alpha171;
+extern Alpha_fun alpha172;
+extern Alpha_fun alpha173;
+extern Alpha_fun alpha174;
 }
 
 
@@ -115,7 +134,26 @@ std::map<std::string, Alpha_fun&> tf_caculators
   {"alpha147", alpha_impl::alpha147},
   {"alpha149", alpha_impl::alpha149},
   {"alpha150", alpha_impl::alpha150},
-  {"alpha151", alpha_impl::alpha151}
+  {"alpha151", alpha_impl::alpha151},
+  {"alpha152", alpha_impl::alpha152},
+  {"alpha153", alpha_impl::alpha153},
+  {"alpha154", alpha_impl::alpha154},
+  {"alpha155", alpha_impl::alpha155},
+  {"alpha158", alpha_impl::alpha158},
+  {"alpha159", alpha_impl::alpha159},
+  {"alpha160", alpha_impl::alpha160},
+  {"alpha161", alpha_impl::alpha161},
+  {"alpha162", alpha_impl::alpha162},
+  {"alpha164", alpha_impl::alpha164},
+  {"alpha165", alpha_impl::alpha165},
+  {"alpha166", alpha_impl::alpha166},
+  {"alpha167", alpha_impl::alpha167},
+  {"alpha168", alpha_impl::alpha168},
+  {"alpha169", alpha_impl::alpha169},
+  {"alpha171", alpha_impl::alpha171},
+  {"alpha172", alpha_impl::alpha172},
+  {"alpha173", alpha_impl::alpha173},
+  {"alpha174", alpha_impl::alpha174}
 };
 
 
@@ -153,6 +191,10 @@ extern Alpha_mfun alpha140;
 extern Alpha_mfun alpha141;
 extern Alpha_mfun alpha142;
 extern Alpha_mfun alpha148;
+extern Alpha_mfun alpha156;
+extern Alpha_mfun alpha157;
+extern Alpha_mfun alpha163;
+extern Alpha_mfun alpha170;
 }
 
 std::map<std::string, Alpha_mfun&> tf_mcaculators
@@ -187,5 +229,9 @@ std::map<std::string, Alpha_mfun&> tf_mcaculators
   {"alpha140", alpha_impl::alpha140},
   {"alpha141", alpha_impl::alpha141},
   {"alpha142", alpha_impl::alpha142},
-  {"alpha148", alpha_impl::alpha148}
+  {"alpha148", alpha_impl::alpha148},
+  {"alpha156", alpha_impl::alpha156},
+  {"alpha157", alpha_impl::alpha157},
+  {"alpha163", alpha_impl::alpha163},
+  {"alpha170", alpha_impl::alpha170}
 };
