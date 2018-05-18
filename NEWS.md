@@ -5,17 +5,17 @@
 * Implemented basic algo and quote classes.
 * Ready to to implement the factor definitions.
 * Added the documentation for exported functions.
-* Rename `tf_factor()` to `tf_cal()` to be not confusing with `tf_registered_factors()`.
-* Refactor the cpp file structure.
+* Renamed `tf_factor()` to `tf_cal()` to be not confusing with `tf_registered_factors()`.
+* Refactored the cpp file structure.
 * `delta()` gains an additional param n.
-* Rename `Quotes` to `Quote` because we are going to introduce a new type => a vector of `Quote` which will be named as `Quotes`.
-* Add `Quotes` and R interface to process panel based indicators.
-* Eliminate the need for numerous delay in alpha definition functions by introduce the proxy class.
-* Add `Quotes.tsapply()`, `Panel`, `assert_valid(Panel)` and `Panel apply()` functions.
-* `delta()` returns a double value = x[k] - x[0].
-* Reimplement `rank()` to allow `NA` (rather than return a `NA` vector even when there's only one `NA`) because the function is mainly used for cross-sectional data, where `NA` is common. In other words, the implementation equals to `frank(x, ties.method = "min", na.last = "keep")`.
-* `Quote_raw()` constructor now checks the validaty of price, volume and dates so that we can be sure that there's no zero of negative price, negative volume or NA date in the dataset.
+* Renamed `Quotes` to `Quote` because we are going to introduce a new type => a vector of `Quote` which will be named as `Quotes`.
+* Added `Quotes` and an R interface to process panel based indicators.
+* Eliminated the need for numerous `delay` in alpha definition functions by introducing the proxy class.
+* Added the `Quotes.tsapply()`, `Panel`, `assert_valid(Panel)` and `Panel apply()` functions.
+* `delta()` returns a double value that equals to `x[k] - x[0]`.
+* Reimplemented `rank()` to allow `NA` (rather than return a `NA` vector even when there's only one `NA`) because the function is mainly used for cross-sectional data, where `NA` is common. In other words, the implementation now equals to `data.table::frank(x, ties.method = "min", na.last = "keep")`.
+* `Quote_raw()` constructor now checks the validity of price, volume and dates so that we can be sure that there's no zero or negative price, negative volume or NA date in the dataset.
 
 ## TODO
 
-- [ ] Ensure all the timeseries is acsending date order, i.e., `x[0]` is old while `x[x.size()-1]` is new.
+- [ ] Ensure all the timeseries is in acsending date order, i.e., `x[0]` is oldest while `x[x.size()-1]` is newest.
