@@ -117,6 +117,18 @@ tf_assert_no_na <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_no_na`, x))
 }
 
+tf_assert_valid_dates <- function(x, field) {
+    invisible(.Call(`_GCAMCTF_assert_valid_dates`, x, field))
+}
+
+tf_assert_valid_price <- function(x, field) {
+    invisible(.Call(`_GCAMCTF_assert_valid_price`, x, field))
+}
+
+tf_assert_valid_volume <- function(x, field) {
+    invisible(.Call(`_GCAMCTF_assert_valid_volume`, x, field))
+}
+
 tf_assert_is_sorted <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_sorted`, x))
 }

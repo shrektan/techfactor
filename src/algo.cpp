@@ -601,6 +601,36 @@ void assert_no_na(const Timeseries& x)
 }
 
 
+// [[Rcpp::export("tf_assert_valid_dates")]]
+void assert_valid_dates(const std::vector<RDate>& x, const std::string& field)
+{
+  auto any = std::any_of(x.cbegin(), x.cend(), [](const RDate v) {
+    return v == NA_INTEGER;
+  });
+  if (any) Rcpp::stop("%s mustn't contain NA.", field);
+}
+
+
+// [[Rcpp::export("tf_assert_valid_price")]]
+void assert_valid_price(const Timeseries& x, const std::string& field)
+{
+  auto any = std::any_of(x.cbegin(), x.cend(), [](const double v) {
+    return !(R_FINITE(v) && v > 0.0) && !ISNA(v);
+  });
+  if (any) Rcpp::stop("%s must be finite positive value or NA.", field);
+}
+
+
+// [[Rcpp::export("tf_assert_valid_volume")]]
+void assert_valid_volume(const Timeseries& x, const std::string& field)
+{
+  auto any = std::any_of(x.cbegin(), x.cend(), [](const double v) {
+    return !(R_FINITE(v) && v >= 0.0) && !ISNA(v);
+  });
+  if (any) Rcpp::stop("%s must be finite non-negative value or NA.", field);
+}
+
+
 // [[Rcpp::export("tf_assert_is_sorted")]]
 void assert_sorted(const std::vector<RDate>& x)
 {
