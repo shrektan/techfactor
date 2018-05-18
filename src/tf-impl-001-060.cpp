@@ -193,7 +193,7 @@ Alpha_fun alpha014 = [](const Quote& qt) -> double {
 
 // OPEN/DELAY(CLOSE,1)-1
 Alpha_fun alpha015 = [](const Quote& qt) -> double {
-  if ISNA(qt.close(1) || qt.close(1) == 0.0) {
+  if (ISNA(qt.close(1)) || qt.close(1) == 0.0) {
     return NA_REAL;
   }
   return qt.open() / qt.close(1) - 1.0;
@@ -234,7 +234,7 @@ Alpha_mfun alpha017 = [](const Quotes& qts) -> Timeseries {
 
 // CLOSE/DELAY(CLOSE,5)
 Alpha_fun alpha018 = [](const Quote& qt) -> double {
-  if ISNA(qt.close(5) || qt.close(5) == 0.0) {
+  if (ISNA(qt.close(5)) || qt.close(5) == 0.0) {
     return NA_REAL;
   }
   return qt.close() / qt.close(5);
