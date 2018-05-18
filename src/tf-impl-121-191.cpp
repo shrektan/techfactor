@@ -398,6 +398,158 @@ Alpha_mfun alpha140 = [](const Quotes& qts) -> Timeseries {
 };
 
 
+// (RANK(CORR(RANK(HIGH), RANK(MEAN(VOLUME,15)), 9))* -1
+Alpha_mfun alpha141 = [](const Quotes& qts) -> Timeseries {
+  auto rk_high = [](const Quotes& qts) {
+    return rank(qts.apply([](const Quote& qt) { return qt.high(); }));
+  };
+  auto m_vol15 = [](const Quote& qt) {
+    return mean(qt.ts_volume(15));
+  };
+  auto rk_m_vol = [m_vol15](const Quotes& qts) {
+    return rank(qts.apply(m_vol15));
+  };
+  auto highs = qts.tsapply(9, rk_high);
+  auto vols = qts.tsapply(9, rk_m_vol);
+  return rank(apply(highs, vols, corr)) * -1.0;
+};
+
+
+// (((-1 * RANK(TSRANK(CLOSE, 10))) * RANK(DELTA(DELTA(CLOSE, 1), 1))) *
+// RANK(TSRANK((VOLUME /MEAN(VOLUME,20)), 5)))
+Alpha_mfun alpha142 = [](const Quotes& qts) -> Timeseries {
+  auto rk_c_10 = [](const Quote& qt) {
+    return tsrank(qt.ts_close(10));
+  };
+  auto part1 = qts.apply(rk_c_10) * -1.0;
+  auto d_c_1 = [](const Quote& qt) {
+    return delta(qt.ts_close(2));
+  };
+  auto dd_c_1 = [d_c_1](const Quote& qt) {
+    return delta(qt.ts<double>(2, d_c_1));
+  };
+  auto part2 = qts.apply(dd_c_1);
+  auto v_m_v_20 = [](const Quote& qt) {
+    auto deno = mean(qt.ts_volume(20));
+    return (deno == 0.0) ? NA_REAL : qt.volume() / deno;
+  };
+  auto rk_5 = [v_m_v_20](const Quote& qt) {
+    return tsrank(qt.ts<double>(5, v_m_v_20));
+  };
+  auto part3 = qts.apply(rk_5);
+  return part1 * part2 * part3;
+};
+
+
+// CLOSE>DELAY(CLOSE,1)?(CLOSE-DELAY(CLOSE,1))/DELAY(CLOSE,1)*SELF:SELF
+// ==> equal to multiple all the positive dr
+Alpha_fun alpha143 = [](const Quote& qt) -> double {
+  const int index = qt.today_index();
+  if (index <= 0) return NA_REAL;
+  if (index == 1) return 1.0;
+  auto tsclose = qt.ts_close(index + 1);
+  double res {1.0};
+  for (int i = 1; i < (index + 1); ++i) {
+    double dr = (tsclose[i - 1] <= 0.0) ? NA_REAL : tsclose[i] / tsclose[i - 1] - 1.0;
+    res *= (dr > 0.0) ? dr : 1.0;
+  }
+  return res;
+};
+
+
+// SUMIF(ABS(CLOSE/DELAY(CLOSE,1)-1)/AMOUNT,20,CLOSE<DELAY(CLOSE,1))/
+// COUNT(CLOSE<DELAY(CLOSE,1),20)
+Alpha_fun alpha144 = [](const Quote& qt) -> double {
+  auto abs_dr_amt = [](const Quote& qt) {
+    return
+    (qt.close(1) == 0.0 ? NA_REAL : qt.close() / qt.close(1) - 1.0) /
+    qt.amount();
+  };
+  auto cond = [](const Quote& qt) {
+    return qt.close() < qt.close(1);
+  };
+  auto v_abs = qt.ts<double>(20, abs_dr_amt);
+  auto v_cond = qt.ts<bool>(20, cond);
+  auto left = std::accumulate(
+    v_abs.cbegin(), v_abs.cend(), 0.0, [](const double v) {
+    return (v < 0.0) ? v : 0.0;
+  });
+  auto right = count(v_cond);
+  return left / right;
+};
+
+
+// (MEAN(VOLUME,9)-MEAN(VOLUME,26))/MEAN(VOLUME,12)*100
+Alpha_fun alpha145 = [](const Quote& qt) -> double {
+  auto mvol12 = mean(qt.ts_volume(12));
+  if (ISNAN(mvol12) || mvol12 == 0.0) return NA_REAL;
+  auto mvol9 = mean(qt.ts_volume(9));
+  auto mvol26 = mean(qt.ts_volume(26));
+  return (mvol9 - mvol26) / mvol12 * 100.0;
+};
+
+
+// let dr = (CLOSE-DELAY(CLOSE,1))/DELAY(CLOSE,1)
+// MEAN(dr-SMA(dr,61,2),20)*
+// (dr- SMA(dr,61,2))/
+// SMA(SMA(dr,61,2)^2,60);
+Alpha_fun alpha146 = [](const Quote& qt) -> double {
+  auto dr = [](const Quote& qt) {
+    return (qt.close(1) == 0.0) ? NA_REAL : qt.close() / qt.close(1) - 1.0;
+  };
+  auto sma_dr61 = [dr](const Quote& qt) {
+    return sma(qt.ts<double>(61, dr), 2);
+  };
+  auto dr_sma_dr61 = [dr, sma_dr61](const Quote& qt) {
+    return dr(qt) - sma_dr61(qt);
+  };
+  auto mean_dr_sma_dr = mean(qt.ts<double>(20, dr_sma_dr61));
+  auto dr_sma = dr_sma_dr61(qt);
+  auto sma_sqr = [sma_dr61](const Quote& qt) {
+    return std::pow(sma_dr61(qt), 2.0);
+  };
+  auto sma_sma = sma(qt.ts<double>(60, sma_sqr), 2);
+  if (sma_sma == 0.0) return NA_REAL;
+  return mean_dr_sma_dr * dr_sma / sma_sma;
+};
+
+
+// REGBETA(MEAN(CLOSE,12),SEQUENCE(12))
+// modified to ==>
+// REGBETA(CLOSE(12) - MEAN(CLOSE,12),SEQUENCE(12))
+Alpha_fun alpha147 = [](const Quote& qt) -> double {
+  return regbeta(qt.ts_close(12) - mean(qt.ts_close(12)), sequence(12));
+};
+
+
+// ((RANK(CORR((OPEN), SUM(MEAN(VOLUME,60), 9), 6)) <
+// RANK((OPEN -TSMIN(OPEN, 14)))) * -1
+Alpha_mfun alpha148 = [](const Quotes& qts) -> Timeseries {
+  auto mvol60 = [](const Quote& qt) {
+    return mean(qt.ts_volume(60));
+  };
+  auto sum9 = [mvol60](const Quote& qt) {
+    return sum(qt.ts<double>(9, mvol60));
+  };
+  auto corr6 = [sum9](const Quote& qt) {
+    return corr(
+      qt.ts_open(6),
+      qt.ts<double>(6, sum9)
+    );
+  };
+  auto left = rank(qts.apply(corr6));
+  auto open_tsmin14 = [](const Quote& qt) {
+    return qt.open() - tsmin(qt.ts_open(14));
+  };
+  auto right = rank(qts.apply(open_tsmin14));
+  return (left < right) * -1;
+};
+
+
+// REGBETA(FILTER(CLOSE/DELAY(CLOSE,1)-1,
+// BANCHMARKINDEXCLOSE<DELAY(BANCHMARKINDEXCLOSE,1)),
+// FILTER(BANCHMARKINDEXCLOSE/DELAY(BANCHMARKINDEXCLOSE,1)-1,
+// BANCHMARKINDEXCLOSE<DELAY(BANCHMARKINDEXCLOSE,1)),252)
 Alpha_fun alpha149 = [](const Quote& qt) -> double {
   const auto dr = qt.ts_close(252) / qt.ts_close(252, 1) - 1.0;
   const auto bmk_dr = qt.ts_bmk_close(252) / qt.ts_bmk_close(252, 1) - 1.0;
@@ -405,6 +557,21 @@ Alpha_fun alpha149 = [](const Quote& qt) -> double {
   const auto y = filter(bmk_dr, bmk_dr < 0.0);
   if (x.size() < 2) return NA_REAL;
   return regbeta(x, y);
+};
+
+
+// (CLOSE+HIGH+LOW)/3*VOLUME
+Alpha_fun alpha150 = [](const Quote& qt) -> double {
+  return (qt.close() + qt.high() + qt.low()) / 3.0 * qt.volume();
+};
+
+
+// SMA(CLOSE-DELAY(CLOSE,20),20,1)
+Alpha_fun alpha151 = [](const Quote& qt) -> double {
+  auto c20 = [](const Quote& qt) {
+    return qt.close() - qt.close(20);
+  };
+  return sma(qt.ts<double>(20, c20), 1);
 };
 
 }

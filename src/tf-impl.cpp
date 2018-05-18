@@ -41,7 +41,20 @@ extern Alpha_fun alpha126;
 extern Alpha_fun alpha127;
 extern Alpha_fun alpha128;
 extern Alpha_fun alpha129;
+extern Alpha_fun alpha132;
+extern Alpha_fun alpha133;
+extern Alpha_fun alpha134;
+extern Alpha_fun alpha135;
+extern Alpha_fun alpha137;
+extern Alpha_fun alpha139;
+extern Alpha_fun alpha143;
+extern Alpha_fun alpha144;
+extern Alpha_fun alpha145;
+extern Alpha_fun alpha146;
+extern Alpha_fun alpha147;
 extern Alpha_fun alpha149;
+extern Alpha_fun alpha150;
+extern Alpha_fun alpha151;
 }
 
 
@@ -88,8 +101,21 @@ std::map<std::string, Alpha_fun&> tf_caculators
   {"alpha126", alpha_impl::alpha126},
   {"alpha127", alpha_impl::alpha127},
   {"alpha128", alpha_impl::alpha128},
-  {"alpha128", alpha_impl::alpha129},
-  {"alpha149", alpha_impl::alpha149}
+  {"alpha129", alpha_impl::alpha129},
+  {"alpha132", alpha_impl::alpha132},
+  {"alpha133", alpha_impl::alpha133},
+  {"alpha134", alpha_impl::alpha134},
+  {"alpha135", alpha_impl::alpha135},
+  {"alpha137", alpha_impl::alpha137},
+  {"alpha139", alpha_impl::alpha139},
+  {"alpha143", alpha_impl::alpha143},
+  {"alpha144", alpha_impl::alpha144},
+  {"alpha145", alpha_impl::alpha145},
+  {"alpha146", alpha_impl::alpha146},
+  {"alpha147", alpha_impl::alpha147},
+  {"alpha149", alpha_impl::alpha149},
+  {"alpha150", alpha_impl::alpha150},
+  {"alpha151", alpha_impl::alpha151}
 };
 
 
@@ -121,6 +147,12 @@ extern Alpha_mfun alpha124;
 extern Alpha_mfun alpha125;
 extern Alpha_mfun alpha130;
 extern Alpha_mfun alpha131;
+extern Alpha_mfun alpha136;
+extern Alpha_mfun alpha138;
+extern Alpha_mfun alpha140;
+extern Alpha_mfun alpha141;
+extern Alpha_mfun alpha142;
+extern Alpha_mfun alpha148;
 }
 
 std::map<std::string, Alpha_mfun&> tf_mcaculators
@@ -149,5 +181,11 @@ std::map<std::string, Alpha_mfun&> tf_mcaculators
   {"alpha124", alpha_impl::alpha124},
   {"alpha125", alpha_impl::alpha125},
   {"alpha130", alpha_impl::alpha130},
-  {"alpha131", alpha_impl::alpha131}
+  {"alpha131", alpha_impl::alpha131},
+  {"alpha136", alpha_impl::alpha136},
+  {"alpha138", alpha_impl::alpha138},
+  {"alpha140", alpha_impl::alpha140},
+  {"alpha141", alpha_impl::alpha141},
+  {"alpha142", alpha_impl::alpha142},
+  {"alpha148", alpha_impl::alpha148}
 };
