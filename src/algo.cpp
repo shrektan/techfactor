@@ -587,13 +587,6 @@ void assert_valid(const Rcpp::newDateVector from_to)
 }
 
 
-// [[Rcpp::export("tf_assert_same_size")]]
-void assert_same_size(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-}
-
-
 // [[Rcpp::export("tf_any_na")]]
 bool any_na(const Timeseries& x)
 {

@@ -308,17 +308,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// assert_same_size
-void assert_same_size(const Timeseries& x, const Timeseries& y);
-RcppExport SEXP _GCAMCTF_assert_same_size(SEXP xSEXP, SEXP ySEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const Timeseries& >::type y(ySEXP);
-    assert_same_size(x, y);
-    return R_NilValue;
-END_RCPP
-}
 // any_na
 bool any_na(const Timeseries& x);
 RcppExport SEXP _GCAMCTF_any_na(SEXP xSEXP) {
@@ -461,6 +450,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::List >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(tf_panel_sum(x));
     return rcpp_result_gen;
+END_RCPP
+}
+// tf_assert_same_size
+void tf_assert_same_size(const Timeseries& x, const Timeseries& y);
+RcppExport SEXP _GCAMCTF_tf_assert_same_size(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Timeseries& >::type y(ySEXP);
+    tf_assert_same_size(x, y);
+    return R_NilValue;
 END_RCPP
 }
 // create_xts
