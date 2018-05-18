@@ -308,17 +308,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// assert_same_size
-void assert_same_size(const Timeseries& x, const Timeseries& y);
-RcppExport SEXP _GCAMCTF_assert_same_size(SEXP xSEXP, SEXP ySEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const Timeseries& >::type y(ySEXP);
-    assert_same_size(x, y);
-    return R_NilValue;
-END_RCPP
-}
 // any_na
 bool any_na(const Timeseries& x);
 RcppExport SEXP _GCAMCTF_any_na(SEXP xSEXP) {
@@ -337,6 +326,39 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
     assert_no_na(x);
+    return R_NilValue;
+END_RCPP
+}
+// assert_valid_dates
+void assert_valid_dates(const std::vector<RDate>& x, const std::string& field);
+RcppExport SEXP _GCAMCTF_assert_valid_dates(SEXP xSEXP, SEXP fieldSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<RDate>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type field(fieldSEXP);
+    assert_valid_dates(x, field);
+    return R_NilValue;
+END_RCPP
+}
+// assert_valid_price
+void assert_valid_price(const Timeseries& x, const std::string& field);
+RcppExport SEXP _GCAMCTF_assert_valid_price(SEXP xSEXP, SEXP fieldSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type field(fieldSEXP);
+    assert_valid_price(x, field);
+    return R_NilValue;
+END_RCPP
+}
+// assert_valid_volume
+void assert_valid_volume(const Timeseries& x, const std::string& field);
+RcppExport SEXP _GCAMCTF_assert_valid_volume(SEXP xSEXP, SEXP fieldSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type field(fieldSEXP);
+    assert_valid_volume(x, field);
     return R_NilValue;
 END_RCPP
 }
@@ -463,6 +485,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tf_assert_same_size
+void tf_assert_same_size(const Timeseries& x, const Timeseries& y);
+RcppExport SEXP _GCAMCTF_tf_assert_same_size(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Timeseries& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Timeseries& >::type y(ySEXP);
+    tf_assert_same_size(x, y);
+    return R_NilValue;
+END_RCPP
+}
 // create_xts
 Rcpp::NumericMatrix create_xts(Rcpp::NumericMatrix x_mat, Rcpp::newDateVector x_dates);
 RcppExport SEXP _GCAMCTF_create_xts(SEXP x_matSEXP, SEXP x_datesSEXP) {
@@ -573,9 +606,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_highday", (DL_FUNC) &_GCAMCTF_highday, 1},
     {"_GCAMCTF_lowday", (DL_FUNC) &_GCAMCTF_lowday, 1},
     {"_GCAMCTF_assert_valid", (DL_FUNC) &_GCAMCTF_assert_valid, 1},
-    {"_GCAMCTF_assert_same_size", (DL_FUNC) &_GCAMCTF_assert_same_size, 2},
     {"_GCAMCTF_any_na", (DL_FUNC) &_GCAMCTF_any_na, 1},
     {"_GCAMCTF_assert_no_na", (DL_FUNC) &_GCAMCTF_assert_no_na, 1},
+    {"_GCAMCTF_assert_valid_dates", (DL_FUNC) &_GCAMCTF_assert_valid_dates, 2},
+    {"_GCAMCTF_assert_valid_price", (DL_FUNC) &_GCAMCTF_assert_valid_price, 2},
+    {"_GCAMCTF_assert_valid_volume", (DL_FUNC) &_GCAMCTF_assert_valid_volume, 2},
     {"_GCAMCTF_assert_sorted", (DL_FUNC) &_GCAMCTF_assert_sorted, 1},
     {"_GCAMCTF_tf_qt_tdates", (DL_FUNC) &_GCAMCTF_tf_qt_tdates, 2},
     {"_GCAMCTF_tf_qt_today", (DL_FUNC) &_GCAMCTF_tf_qt_today, 2},
@@ -586,6 +621,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_tf_ts", (DL_FUNC) &_GCAMCTF_tf_ts, 3},
     {"_GCAMCTF_tf_assert_valid_panel", (DL_FUNC) &_GCAMCTF_tf_assert_valid_panel, 1},
     {"_GCAMCTF_tf_panel_sum", (DL_FUNC) &_GCAMCTF_tf_panel_sum, 1},
+    {"_GCAMCTF_tf_assert_same_size", (DL_FUNC) &_GCAMCTF_tf_assert_same_size, 2},
     {"_GCAMCTF_create_xts", (DL_FUNC) &_GCAMCTF_create_xts, 2},
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},

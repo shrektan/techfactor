@@ -74,6 +74,9 @@ inline std::vector<RDate> col_date(const Rcpp::DataFrame tbl, const std::string 
 }
 
 void assert_sorted(const std::vector<RDate>& x);
+void assert_valid_dates(const std::vector<RDate>& x, const std::string& field);
+void assert_valid_price(const Timeseries& x, const std::string& field);
+void assert_valid_volume(const Timeseries& x, const std::string& field);
 
 struct Quote_raw {
   Quote_raw() = default;
@@ -91,6 +94,17 @@ struct Quote_raw {
       bmk_open { col(tbl, "BMK_OPEN") }
   {
         assert_sorted(dates);
+        assert_valid_dates(dates, "dates");
+        assert_valid_price(pclose, "pclose");
+        assert_valid_price(open, "open");
+        assert_valid_price(high, "high");
+        assert_valid_price(low, "low");
+        assert_valid_price(close, "close");
+        assert_valid_price(vwap, "vwap");
+        assert_valid_price(bmk_close, "bmk_close");
+        assert_valid_price(bmk_open, "bmk_open");
+        assert_valid_volume(volume, "volume");
+        assert_valid_volume(amount, "amount");
   }
   std::vector<RDate> dates;
   Timeseries pclose;

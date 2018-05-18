@@ -203,3 +203,10 @@ Rcpp::NumericVector tf_panel_sum(const Rcpp::List x)
   auto panel = tf_create_panel(x);
   return Rcpp::wrap(apply(panel, fun));
 }
+
+
+// [[Rcpp::export]]
+void tf_assert_same_size(const Timeseries& x, const Timeseries& y)
+{
+  assert_same_size(x, y);
+}

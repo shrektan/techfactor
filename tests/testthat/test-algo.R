@@ -23,11 +23,13 @@ test_that("delta", {
 })
 
 test_that("rank", {
-  x <- c(10, 1, 2, 8, 1.3, 1.34, 1)
-  expect_equal(tf_rank(x), frank(x, ties.method = "min"))
   expect_equal(tf_rank(double()), double())
   expect_equal(tf_rank(20), 1)
-  expect_equal(tf_rank(c(1, 3, 5, NA, 7, 9)), rep(NA_real_, 6))
+  expect_equal(tf_rank(NA_real_), NA_real_)
+  x <- c(10, 1, 2, 8, 1.3, 1.34, 1, 1.3)
+  expect_equal(tf_rank(x), frank(x, ties.method = "min"))
+  x <- c(10, 1, 2, NA_real_, 8, 1.3, 1.34, NA_real_, 1, 1.3)
+  expect_equal(tf_rank(x), frank(x, ties.method = "min", na.last = "keep"))
 })
 
 test_that("sum", {
@@ -306,6 +308,79 @@ test_that("assert valid panel", {
   )
 })
 
+
+test_that("assert valid dates", {
+  x <- c(anydate(20180101), NA)
+  expect_error(
+    tf_assert_valid_dates(x, "abc"),
+    "abc mustn't contain NA",
+    fixed = TRUE
+  )
+  expect_silent(
+    tf_assert_valid_dates(anydate(20180101)[0], "dates")
+  )
+  expect_silent(
+    tf_assert_valid_dates(anydate(20180101), "dates")
+  )
+})
+
+
+test_that("assert valid price/volume", {
+  x1 <- double()
+  expect_silent(
+    tf_assert_valid_price(x1, "x1")
+  )
+  expect_silent(
+    tf_assert_valid_volume(x1, "x1")
+  )
+  x2 <- 1.3
+  expect_silent(
+    tf_assert_valid_price(x2, "x2")
+  )
+  expect_silent(
+    tf_assert_valid_volume(x2, "x2")
+  )
+  x3 <- NA_real_
+  expect_silent(
+    tf_assert_valid_price(x3, "x3")
+  )
+  expect_silent(
+    tf_assert_valid_volume(x3, "x3")
+  )
+  x4 <- c(1.2, 3.1, NA_real_, 0.1)
+  expect_silent(
+    tf_assert_valid_price(x4, "x4")
+  )
+  expect_silent(
+    tf_assert_valid_volume(x4, "x4")
+  )
+  x5 <- c(0, 1.0)
+  expect_error(
+    tf_assert_valid_price(x5, "x5"),
+    "x5 must be finite positive value or NA"
+  )
+  expect_silent(
+    tf_assert_valid_volume(x5, "x5")
+  )
+  x6 <- c(-0.1, 1.0)
+  expect_error(
+    tf_assert_valid_price(x6, "x6"),
+    "x6 must be finite positive value or NA"
+  )
+  expect_error(
+    tf_assert_valid_volume(x6, "x6"),
+    "x6 must be finite non-negative value or NA"
+  )
+  x7 <- c(Inf, 1.0)
+  expect_error(
+    tf_assert_valid_price(x7, "x7"),
+    "x7 must be finite positive value or NA"
+  )
+  expect_error(
+    tf_assert_valid_volume(x7, "x7"),
+    "x7 must be finite non-negative value or NA"
+  )
+})
 
 test_that("panel apply", {
   expect_equal(

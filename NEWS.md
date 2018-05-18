@@ -1,4 +1,4 @@
-# GCAMCTF 0.0.12
+# GCAMCTF 0.0.14
 
 * Added a `NEWS.md` file to track changes to the package.
 * Set up CI and code coverage.
@@ -13,6 +13,8 @@
 * Eliminate the need for numerous delay in alpha definition functions by introduce the proxy class.
 * Add `Quotes.tsapply()`, `Panel`, `assert_valid(Panel)` and `Panel apply()` functions.
 * `delta()` returns a double value = x[k] - x[0].
+* Reimplement `rank()` to allow `NA` (rather than return a `NA` vector even when there's only one `NA`) because the function is mainly used for cross-sectional data, where `NA` is common. In other words, the implementation equals to `frank(x, ties.method = "min", na.last = "keep")`.
+* `Quote_raw()` constructor now checks the validaty of price, volume and dates so that we can be sure that there's no zero of negative price, negative volume or NA date in the dataset.
 
 ## TODO
 
