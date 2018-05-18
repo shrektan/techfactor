@@ -587,13 +587,6 @@ void assert_valid(const Rcpp::newDateVector from_to)
 }
 
 
-// [[Rcpp::export("tf_assert_same_size")]]
-void assert_same_size(const Timeseries& x, const Timeseries& y)
-{
-  assert_same_size(x, y);
-}
-
-
 // [[Rcpp::export("tf_any_na")]]
 bool any_na(const Timeseries& x)
 {
@@ -605,6 +598,36 @@ bool any_na(const Timeseries& x)
 void assert_no_na(const Timeseries& x)
 {
   if (any_na(x)) Rcpp::stop("x mustn't contain NA.");
+}
+
+
+// [[Rcpp::export("tf_assert_valid_dates")]]
+void assert_valid_dates(const std::vector<RDate>& x, const std::string& field)
+{
+  auto any = std::any_of(x.cbegin(), x.cend(), [](const RDate v) {
+    return v == NA_INTEGER;
+  });
+  if (any) Rcpp::stop("%s mustn't contain NA.", field);
+}
+
+
+// [[Rcpp::export("tf_assert_valid_price")]]
+void assert_valid_price(const Timeseries& x, const std::string& field)
+{
+  auto any = std::any_of(x.cbegin(), x.cend(), [](const double v) {
+    return !(R_FINITE(v) && v > 0.0) && !ISNA(v);
+  });
+  if (any) Rcpp::stop("%s must be finite positive value or NA.", field);
+}
+
+
+// [[Rcpp::export("tf_assert_valid_volume")]]
+void assert_valid_volume(const Timeseries& x, const std::string& field)
+{
+  auto any = std::any_of(x.cbegin(), x.cend(), [](const double v) {
+    return !(R_FINITE(v) && v >= 0.0) && !ISNA(v);
+  });
+  if (any) Rcpp::stop("%s must be finite non-negative value or NA.", field);
 }
 
 

@@ -7,7 +7,33 @@ data("tf_quote")
 dt <- data.table::copy(tf_quote)
 qt <- tf_quote_xptr(dt)
 
-test_that("quote' input must be a sorted tbl", {
+test_that("quote input will check valid price, date and volume", {
+  dt_copy <- data.table::copy(dt)[1, DATE := NA_real_]
+  expect_error(
+    tf_quote_xptr(dt_copy),
+    "dates mustn't contain NA"
+  )
+  dt_copy <- data.table::copy(dt)[1, OPEN := 0.0]
+  expect_error(
+    tf_quote_xptr(dt_copy),
+    "open must be finite positive value or NA"
+  )
+  dt_copy <- data.table::copy(dt)[1, OPEN := NA_real_]
+  expect_silent(
+    tf_quote_xptr(dt_copy)
+  )
+  dt_copy <- data.table::copy(dt)[1, AMOUNT := 0.0]
+  expect_silent(
+    tf_quote_xptr(dt_copy)
+  )
+  dt_copy <- data.table::copy(dt)[1, AMOUNT := -1.0]
+  expect_error(
+    tf_quote_xptr(dt_copy),
+    "amount must be finite non-negative value or NA"
+  )
+})
+
+test_that("quote input must be a sorted tbl", {
   dt_copy <- data.table::copy(dt)
   setorder(dt_copy, -DATE)
   expect_error(
