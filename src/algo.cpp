@@ -28,13 +28,15 @@ double delta(const Timeseries& x)
 // [[Rcpp::export("tf_rank")]]
 Timeseries rank(const Timeseries& x)
 {
-  if (any_na(x)) return na_vector(x.size());
-  Timeseries sorted = x;
+  Timeseries sorted;
+  std::copy_if(x.cbegin(), x.cend(), std::back_inserter(sorted),
+               [](const double v) { return R_FINITE(v); });
   std::sort(sorted.begin(), sorted.end());
   Timeseries res;
   std::transform(
     x.cbegin(), x.cend(), std::back_inserter(res),
     [&sorted](const double v) {
+      if (!R_FINITE(v)) return NA_REAL;
       auto iter = std::lower_bound(sorted.cbegin(), sorted.cend(), v);
       return std::distance(sorted.cbegin(), iter) + 1.0;
     }

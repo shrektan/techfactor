@@ -23,11 +23,13 @@ test_that("delta", {
 })
 
 test_that("rank", {
-  x <- c(10, 1, 2, 8, 1.3, 1.34, 1)
-  expect_equal(tf_rank(x), frank(x, ties.method = "min"))
   expect_equal(tf_rank(double()), double())
   expect_equal(tf_rank(20), 1)
-  expect_equal(tf_rank(c(1, 3, 5, NA, 7, 9)), rep(NA_real_, 6))
+  expect_equal(tf_rank(NA_real_), NA_real_)
+  x <- c(10, 1, 2, 8, 1.3, 1.34, 1, 1.3)
+  expect_equal(tf_rank(x), frank(x, ties.method = "min"))
+  x <- c(10, 1, 2, NA_real_, 8, 1.3, 1.34, NA_real_, 1, 1.3)
+  expect_equal(tf_rank(x), frank(x, ties.method = "min", na.last = "keep"))
 })
 
 test_that("sum", {
