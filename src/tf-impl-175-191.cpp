@@ -305,6 +305,9 @@ Alpha_fun alpha190 = [](const Quote& qt) -> double {
   double param3 = count(qt.ts<bool>(20, count_fun2));
   double param4 = sum(filter(qt.ts<double>(20, double_muti_p), qt.ts<bool>(20, bool_muti_p2)));
 
+  if (ISNA(param1 * param2) || ISNA(param3 * param4) || (param1 * param2 == 0.0) || (param3 * param4 == 0.0)) {
+    return NA_REAL;
+  }
   return std::log(param1 * param2 / (param3 * param4));
 };
 
