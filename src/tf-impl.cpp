@@ -74,6 +74,19 @@ extern Alpha_fun alpha171;
 extern Alpha_fun alpha172;
 extern Alpha_fun alpha173;
 extern Alpha_fun alpha174;
+extern Alpha_fun alpha175;
+extern Alpha_fun alpha177;
+extern Alpha_fun alpha178;
+extern Alpha_fun alpha180;
+extern Alpha_fun alpha181;
+extern Alpha_fun alpha182;
+extern Alpha_fun alpha183;
+extern Alpha_fun alpha186;
+extern Alpha_fun alpha187;
+extern Alpha_fun alpha188;
+extern Alpha_fun alpha189;
+extern Alpha_fun alpha190;
+extern Alpha_fun alpha191;
 }
 
 
@@ -153,7 +166,20 @@ std::map<std::string, Alpha_fun&> tf_caculators
   {"alpha171", alpha_impl::alpha171},
   {"alpha172", alpha_impl::alpha172},
   {"alpha173", alpha_impl::alpha173},
-  {"alpha174", alpha_impl::alpha174}
+  {"alpha174", alpha_impl::alpha174},
+  {"alpha175", alpha_impl::alpha175},
+  {"alpha177", alpha_impl::alpha177},
+  {"alpha178", alpha_impl::alpha178},
+  {"alpha180", alpha_impl::alpha180},
+  {"alpha181", alpha_impl::alpha181},
+  {"alpha182", alpha_impl::alpha182},
+  {"alpha183", alpha_impl::alpha183},
+  {"alpha186", alpha_impl::alpha186},
+  {"alpha187", alpha_impl::alpha187},
+  {"alpha188", alpha_impl::alpha188},
+  {"alpha189", alpha_impl::alpha189},
+  {"alpha190", alpha_impl::alpha190},
+  {"alpha191", alpha_impl::alpha191}
 };
 
 
@@ -195,6 +221,10 @@ extern Alpha_mfun alpha156;
 extern Alpha_mfun alpha157;
 extern Alpha_mfun alpha163;
 extern Alpha_mfun alpha170;
+extern Alpha_mfun alpha176;
+extern Alpha_mfun alpha179;
+extern Alpha_mfun alpha184;
+extern Alpha_mfun alpha185;
 }
 
 std::map<std::string, Alpha_mfun&> tf_mcaculators
@@ -233,5 +263,9 @@ std::map<std::string, Alpha_mfun&> tf_mcaculators
   {"alpha156", alpha_impl::alpha156},
   {"alpha157", alpha_impl::alpha157},
   {"alpha163", alpha_impl::alpha163},
-  {"alpha170", alpha_impl::alpha170}
+  {"alpha170", alpha_impl::alpha170},
+  {"alpha176", alpha_impl::alpha176},
+  {"alpha179", alpha_impl::alpha179},
+  {"alpha184", alpha_impl::alpha184},
+  {"alpha185", alpha_impl::alpha185}
 };
