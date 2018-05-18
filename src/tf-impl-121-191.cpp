@@ -461,20 +461,22 @@ Alpha_fun alpha143 = [](const Quote& qt) -> double {
 // COUNT(CLOSE<DELAY(CLOSE,1),20)
 Alpha_fun alpha144 = [](const Quote& qt) -> double {
   auto abs_dr_amt = [](const Quote& qt) {
-    return
-    (qt.close(1) == 0.0 ? NA_REAL : qt.close() / qt.close(1) - 1.0) /
-    qt.amount();
+    auto amt = qt.amount();
+    auto c1 = qt.close(1);
+    if (amt == 0.0 || c1 == 0.0) return NA_REAL;
+    return (qt.close() / c1 - 1.0) / amt;
   };
   auto cond = [](const Quote& qt) {
     return qt.close() < qt.close(1);
   };
-  auto v_abs = qt.ts<double>(20, abs_dr_amt);
   auto v_cond = qt.ts<bool>(20, cond);
-  auto left = std::accumulate(
-    v_abs.cbegin(), v_abs.cend(), 0.0, [](const double v) {
-    return (v < 0.0) ? v : 0.0;
-  });
   auto right = count(v_cond);
+  if (right == 0.0) return NA_REAL;
+  auto v_abs = qt.ts<double>(20, abs_dr_amt);
+  auto left = std::accumulate(
+    v_abs.cbegin(), v_abs.cend(), 0.0, [](const double old, const double v) {
+    return old + ((v < 0.0) ? v : 0.0);
+  });
   return left / right;
 };
 
