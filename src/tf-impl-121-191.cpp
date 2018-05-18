@@ -39,4 +39,104 @@ Alpha_fun alpha149 = [](const Quote& quote) -> double {
   return regbeta(x, y);
 };
 
+
+// MEAN(MAX(MAX((HIGH-LOW),ABS(DELAY(CLOSE,1)-HIGH)),ABS(DELAY(CLOSE,1)-LOW)),6)
+Alpha_fun alpha175 = [](const Quote& qt) -> double {
+
+  auto max_fun = [](const Quote& qt) {
+    auto left = std::max(qt.high() - qt.low(), std::abs(qt.close(1) - qt.high()));
+    auto right = std::abs(qt.close(1) - qt.low());
+    return std::max(left, right);
+  };
+
+  auto ts = qt.ts<double>(6, max_fun);
+  return mean(ts);
+};
+
+
+// CORR(RANK(((CLOSE -TSMIN(LOW, 12)) / (TSMAX(HIGH, 12) -TSMIN(LOW,12)))), RANK(VOLUME), 6)
+Alpha_mfun alpha176 = [](const Quotes& qts) -> Timeseries {
+
+  auto muti_p = [](const Quote& qt) {
+    double left = qt.close() - tsmin(qt.ts_low(12));
+    double right = tsmax(qt.ts_high(12)) - tsmin(qt.ts_low(12));
+    return left / right;
+  };
+
+  auto rk_left = [muti_p](const Quotes& qts) {
+    return rank(qts.apply(muti_p));
+  };
+
+  auto rk_right = [](const Quotes& qts) {
+    return rank(qts.apply([](const Quote& qt) {return qt.volume();}));
+  };
+
+  auto rk1 = qts.tsapply(6, rk_left);
+  auto rk2 = qts.tsapply(6, rk_right);
+  return apply(rk1, rk2, corr);
+};
+
+
+// ((20-HIGHDAY(HIGH,20))/20)*100
+Alpha_fun alpha177 = [](const Quote& qt) -> double {
+  return (20.0 - highday(qt.ts_high(20))) / 20.0 * 100.0;
+};
+
+
+// (CLOSE-DELAY(CLOSE,1))/DELAY(CLOSE,1)*VOLUME
+Alpha_fun alpha178 = [](const Quote& qt) -> double {
+  if (ISNA(qt.close(1))) {
+    return NA_REAL;
+  }
+  return (qt.close() - qt.close(1)) / qt.close(1) * qt.volume();
+};
+
+
+// RANK(CORR(VWAP, VOLUME, 4)) *
+// RANK(CORR(RANK(LOW), RANK(MEAN(VOLUME,50)), 12))
+Alpha_mfun alpha179 = [](const Quotes& qts) -> Timeseries {
+  auto left_fun = [](const Quote& qt) {
+    return corr(qt.ts_volume(4), qt.ts_vwap(4));
+  };
+  auto left = rank(qts.apply(left_fun));
+
+  auto rk_left = [](const Quotes& qts) {
+    return rank(qts.apply([](const Quote& qt) {return qt.low();}));
+  };
+  auto m_vol = [](const Quote& qt) {
+    return mean(qt.ts_volume(50));
+  };
+  auto rk_right = [m_vol](const Quotes& qts) {
+    return rank(qts.apply(m_vol));
+  };
+  auto rk1 = qts.tsapply(12, rk_left);
+  auto rk2 = qts.tsapply(12, rk_right);
+  auto right = rank(apply(rk1, rk2, corr));
+
+  return left * right;
+};
+
+
+// (MEAN(VOLUME,20) < VOLUME) ?
+// ((-1 * TSRANK(ABS(DELTA(CLOSE, 7)), 60)) * SIGN(DELTA(CLOSE, 7)) : (-1 *  VOLUME))
+Alpha_fun Alpha180 = [](const Quote& qt) -> double {
+  auto abs_fun = [](const Quote& qt) {
+    return std::abs(qt.close() - qt.close(7));
+  };
+
+  if (mean(qt.ts_volume(20)) < qt.volume()) {
+    return tsrank(qt.ts<double>(60, abs_fun)) * sign(qt.close() - qt.close(7)) * -1.0;
+  } else {
+    return qt.volume() * -1.0;
+  }
+};
+
+
+//
+
+
+
+
+
+
 }
