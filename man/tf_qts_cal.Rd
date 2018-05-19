@@ -13,6 +13,8 @@ tf_qts_cal(qts_ptr, name, from_to, threads_no = 1L)
 
 \item{from_to}{A length two \code{Date} vector whose first element must be
 smaller than or equal to the first.}
+
+\item{threads_no}{the number of threads to use, by default is 1.}
 }
 \value{
 An \code{xts} object in which the columns are the factor value for
