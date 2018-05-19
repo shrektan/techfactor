@@ -211,7 +211,7 @@ tf_quotes_xptr <- function(qt_tbls) {
 }
 
 tf_assert_class <- function(x, classname) {
-    invisible(.Call(`_GCAMCTF_asset_valid`, x, classname))
+    invisible(.Call(`_GCAMCTF_assert_valid_class`, x, classname))
 }
 
 #' Calculate the TF for single security

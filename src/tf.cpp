@@ -121,7 +121,7 @@ SEXP tf_quotes_xptr(Rcpp::List qt_tbls)
 
 
 // [[Rcpp::export("tf_assert_class")]]
-void asset_valid(SEXP x, const std::string& classname)
+void assert_valid_class(SEXP x, const std::string& classname)
 {
   const std::string msg = "The class of x must be " + classname;
   if (Rf_isNull(Rf_getAttrib(x, Rf_mkString("class")))) {
@@ -149,7 +149,7 @@ void asset_valid(SEXP x, const std::string& classname)
 Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDateVector from_to)
 {
   using namespace Rcpp;
-  asset_valid(qt_ptr, "tf_quote_xptr");
+  assert_valid_class(qt_ptr, "tf_quote_xptr");
   assert_valid(from_to);
   XPtr<Quote_raw> qt_xptr {qt_ptr};
   auto& qt = *qt_xptr;
@@ -235,7 +235,7 @@ Rcpp::NumericMatrix tf_qts_cal(
     Rcpp::newDateVector from_to, const int threads_no = 1)
 {
   using namespace Rcpp;
-  asset_valid(qts_ptr, "tf_quotes_xptr");
+  assert_valid_class(qts_ptr, "tf_quotes_xptr");
   assert_valid(from_to);
   assert_valid_threads_no(threads_no);
   XPtr<Quotes_raw> qts_xptr {qts_ptr};
