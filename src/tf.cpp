@@ -208,6 +208,17 @@ void assert_valid_threads_no(const int n)
   );
 }
 
+Alpha_mfun get_mcalculator(const std::string& name) {
+  if (tf_mcaculators.count(name)) {
+    return tf_mcaculators.at(name);
+  }
+  if (tf_caculators.count(name)) {
+    auto fun = tf_caculators.at(name);
+    return [fun](const Quotes& qts) { return qts.apply(fun); };
+  }
+  Rcpp::stop("factor %s must be defined before using.", name);
+}
+
 
 //' Calculate the TF for a security pool
 //'
@@ -231,29 +242,14 @@ Rcpp::NumericMatrix tf_qts_cal(
   const auto& qts = *qts_xptr;
   const auto dates = qts.tdates(from_to);
 
+  Alpha_mfun cal = get_mcalculator(name);
+
   std::vector<double> res(qts.size() * dates.size());
   auto res_iter = res.begin();
-  if (tf_mcaculators.count(name)) {
-    auto mcalculator = tf_mcaculators.at(name);
-    for (const auto date : dates) {
-      const auto fv = mcalculator(Quotes(qts, date));
-      std::copy(fv.cbegin(), fv.cend(), res_iter);
-      std::advance(res_iter, fv.size());
-    }
-  }
-  else if (tf_caculators.count(name)) {
-    auto calculator = tf_caculators.at(name);
-    auto fun = [calculator] (const Quote& qt) {
-      return calculator(qt);
-    };
-    for (const auto date : dates) {
-      const auto fv = Quotes(qts, date).apply(fun);
-      std::copy(fv.cbegin(), fv.cend(), res_iter);
-      std::advance(res_iter, fv.size());
-    }
-  }
-  else {
-    stop("factor %s must be defined before using.", name);
+  for (const auto date : dates) {
+    const auto fv = cal(Quotes(qts, date));
+    std::copy(fv.cbegin(), fv.cend(), res_iter);
+    std::advance(res_iter, fv.size());
   }
 
   Rcpp::NumericMatrix mat(qts.size(), dates.size());
