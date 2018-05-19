@@ -144,3 +144,13 @@ test_that("tf_qts_cal support nonASCII inputs", {
   expect_equal(Encoding(names(res)), rep("UTF-8", 5))
 })
 
+
+test_that("tf_qts_cal concurrecy returns the same as one core", {
+  skip_if(tf_hardware_cores() <= 1, "only one core available")
+  from_to <- range(tail(dt$DATE, 10))
+  factor <- tf_reg_factors()[1]
+  res1 <- tf_qts_cal(qts, factor, from_to, threads_no = 1)
+  res2 <- tf_qts_cal(qts, factor, from_to, threads_no = 2)
+  expect_equal(res1, res2)
+})
+

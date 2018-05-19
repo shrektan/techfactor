@@ -552,14 +552,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// asset_valid
-void asset_valid(SEXP x, const std::string& classname);
-RcppExport SEXP _GCAMCTF_asset_valid(SEXP xSEXP, SEXP classnameSEXP) {
+// assert_valid_class
+void assert_valid_class(SEXP x, const std::string& classname);
+RcppExport SEXP _GCAMCTF_assert_valid_class(SEXP xSEXP, SEXP classnameSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type classname(classnameSEXP);
-    asset_valid(x, classname);
+    assert_valid_class(x, classname);
     return R_NilValue;
 END_RCPP
 }
@@ -576,16 +576,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// hardware_cores
+int hardware_cores();
+RcppExport SEXP _GCAMCTF_hardware_cores() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(hardware_cores());
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_qts_cal
-Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVector from_to);
-RcppExport SEXP _GCAMCTF_tf_qts_cal(SEXP qts_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP) {
+Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVector from_to, const int threads_no);
+RcppExport SEXP _GCAMCTF_tf_qts_cal(SEXP qts_ptrSEXP, SEXP nameSEXP, SEXP from_toSEXP, SEXP threads_noSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type qts_ptr(qts_ptrSEXP);
     Rcpp::traits::input_parameter< std::string >::type name(nameSEXP);
     Rcpp::traits::input_parameter< Rcpp::newDateVector >::type from_to(from_toSEXP);
-    rcpp_result_gen = Rcpp::wrap(tf_qts_cal(qts_ptr, name, from_to));
+    Rcpp::traits::input_parameter< const int >::type threads_no(threads_noSEXP);
+    rcpp_result_gen = Rcpp::wrap(tf_qts_cal(qts_ptr, name, from_to, threads_no));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -639,9 +650,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},
     {"_GCAMCTF_enc2utf8", (DL_FUNC) &_GCAMCTF_enc2utf8, 2},
     {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
-    {"_GCAMCTF_asset_valid", (DL_FUNC) &_GCAMCTF_asset_valid, 2},
+    {"_GCAMCTF_assert_valid_class", (DL_FUNC) &_GCAMCTF_assert_valid_class, 2},
     {"_GCAMCTF_tf_qt_cal", (DL_FUNC) &_GCAMCTF_tf_qt_cal, 3},
-    {"_GCAMCTF_tf_qts_cal", (DL_FUNC) &_GCAMCTF_tf_qts_cal, 3},
+    {"_GCAMCTF_hardware_cores", (DL_FUNC) &_GCAMCTF_hardware_cores, 0},
+    {"_GCAMCTF_tf_qts_cal", (DL_FUNC) &_GCAMCTF_tf_qts_cal, 4},
     {NULL, NULL, 0}
 };
 
