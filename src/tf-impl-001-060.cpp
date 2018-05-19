@@ -39,13 +39,11 @@ Alpha_fun alpha002 = [](const Quote& qt) -> double {
 // MIN(LOW,DELAY(CLOSE,1)):MAX(HIGH,DELAY(CLOSE,1)))),6)
 Alpha_fun alpha003 = [](const Quote& qt) -> double {
   auto base_fun = [](const Quote& qt) {
-    if (qt.close() == qt.pclose()) {
-      return 0.0;
-    } else if (qt.close() > qt.pclose()) {
-      return qt.close() - std::min(qt.low(), qt.pclose());
-    } else {
-      return qt.close() - std::min(qt.high(), qt.pclose());
-    }
+    auto close = qt.close();
+    auto pclose = qt.pclose();
+    if (close == pclose) return 0.0;
+    if (close > pclose) return close - std::min(qt.low(), pclose);
+    return close - std::min(qt.high(), pclose);
   };
   return sum(qt.ts<double>(6, base_fun));
 };
@@ -58,19 +56,13 @@ Alpha_fun alpha004 = [](const Quote& qt) -> double {
   const auto sum_close_8 = sum(qt.ts_close(8));
   const auto std_close_8 = stdev(qt.ts_close(8));
   const auto sum_close_2 = sum(qt.ts_close(2));
-  if (sum_close_8 / 8 + std_close_8 < sum_close_2 / 2) {
-    return -1.0;
-  } else if (sum_close_2 / 2 < sum_close_8 / 8 - std_close_8) {
-    return 1.0;
-  } else {
-    const auto vol = qt.volume();
-    const auto mean_vol_20 = mean(qt.ts_volume(20));
-    if (vol / mean_vol_20 >= 1) {
-      return 1.0;
-    } else {
-      return -1.0;
-    }
-  }
+  if (sum_close_8 / 8 + std_close_8 < sum_close_2 / 2) return -1.0;
+  if (sum_close_2 / 2 < sum_close_8 / 8 - std_close_8) return 1.0;
+
+  const auto vol = qt.volume();
+  const auto mean_vol_20 = mean(qt.ts_volume(20));
+  if (ISNAN(mean_vol_20)) return NA_REAL;
+  return (vol / mean_vol_20 >= 1) ? 1.0 : -1.0;
 };
 
 
@@ -121,7 +113,8 @@ Alpha_mfun alpha007 = [](const Quotes& qts) -> Timeseries {
 // RANK(DELTA(((((HIGH + LOW) / 2) * 0.2) + (VWAP * 0.8)), 4) * -1)
 Alpha_mfun alpha008 = [](const Quotes& qts) -> Timeseries {
   auto delta_p = [](const Quote& qt) {
-    const auto price = (qt.ts_high(5) + qt.ts_low(5)) / 2 * 0.2 + qt.ts_vwap(5) * 0.8;
+    const auto price =
+      (qt.ts_high(5) + qt.ts_low(5)) / 2 * 0.2 + qt.ts_vwap(5) * 0.8;
     const auto delta_price = delta(price);
     return -delta_price;
   };
@@ -131,9 +124,12 @@ Alpha_mfun alpha008 = [](const Quotes& qts) -> Timeseries {
 
 // SMA(((HIGH+LOW)/2-(DELAY(HIGH,1)+DELAY(LOW,1))/2)*(HIGH-LOW)/VOLUME,7,2)
 Alpha_fun alpha009 = [](const Quote& qt) -> double {
-  const auto muti_p1 = (qt.ts_high(7) + qt.ts_low(7)) / 2 -
-                       (qt.ts_high(7, 1) + qt.ts_low(7, 1)) / 2;
-  const auto muti_p2 = (qt.ts_high(7) - qt.ts_low(7)) / qt.ts_volume(7);
+  auto h7 = qt.ts_high(7);
+  auto l7 = qt.ts_low(7);
+  auto v7 = qt.ts_volume(7);
+  const auto muti_p1 =
+    (h7 + l7) / 2 - (qt.ts_high(7, 1) + qt.ts_low(7, 1)) / 2;
+  const auto muti_p2 = (h7 - l7) / v7;
   return sma((muti_p1 * muti_p2), 2);
 };
 
@@ -141,13 +137,14 @@ Alpha_fun alpha009 = [](const Quote& qt) -> double {
 // RANK(MAX(((RET < 0) ? STD(RET, 20) : CLOSE)^2, 5))
 Alpha_mfun alpha010 = [](const Quotes& qts) -> Timeseries {
   auto base_fun = [](const Quote& qt) {
-    double comp;
     if (qt.ret() < 0) {
-      comp = std::pow(stdev(qt.ts_ret(20)), 2.0);
-    } else {
-      comp =  std::pow(qt.close(), 2.0);
+      double comp1 = std::pow(stdev(qt.ts_ret(20)), 2.0);
+      return std::max(comp1, 5.0);
     }
-    return std::max(comp, 5.0);
+    else {
+      double comp2 =  std::pow(qt.close(), 2.0);
+      return std::max(comp2, 5.0);
+    }
   };
   return rank(qts.apply(base_fun));
 };
@@ -177,7 +174,7 @@ Alpha_mfun alpha012 = [](const Quotes& qts) -> Timeseries {
 
 // (((HIGH * LOW)^0.5) -VWAP)
 Alpha_fun alpha013 = [](const Quote& qt) -> double {
-  if (ISNA(qt.high()) || ISNA(qt.low()) || ISNA(qt.vwap()) ||
+  if (ISNAN(qt.high()) || ISNAN(qt.low()) || ISNAN(qt.vwap()) ||
       qt.high() * qt.low() <= 0.0) {
     return NA_REAL;
   }
@@ -193,7 +190,7 @@ Alpha_fun alpha014 = [](const Quote& qt) -> double {
 
 // OPEN/DELAY(CLOSE,1)-1
 Alpha_fun alpha015 = [](const Quote& qt) -> double {
-  if (ISNA(qt.close(1)) || qt.close(1) == 0.0) {
+  if (ISNAN(qt.close(1)) || qt.close(1) == 0.0) {
     return NA_REAL;
   }
   return qt.open() / qt.close(1) - 1.0;
@@ -234,7 +231,7 @@ Alpha_mfun alpha017 = [](const Quotes& qts) -> Timeseries {
 
 // CLOSE/DELAY(CLOSE,5)
 Alpha_fun alpha018 = [](const Quote& qt) -> double {
-  if (ISNA(qt.close(5)) || qt.close(5) == 0.0) {
+  if (ISNAN(qt.close(5)) || qt.close(5) == 0.0) {
     return NA_REAL;
   }
   return qt.close() / qt.close(5);
@@ -245,14 +242,17 @@ Alpha_fun alpha018 = [](const Quote& qt) -> double {
 // (CLOSE-DELAY(CLOSE,5))/DELAY(CLOSE,5):(CLOSE=DELAY(CLOSE,5)?
 // 0:(CLOSE-DELAY(CLOSE,5))/CLOSE))
 Alpha_fun alpha019 = [](const Quote& qt) -> double {
-  if (ISNA(qt.close()) || ISNA(qt.close(5)) || qt.close() == 0.0 || qt.close(5) == 0.0) {
+  if (ISNAN(qt.close()) || ISNAN(qt.close(5)) ||
+      qt.close() == 0.0 || qt.close(5) == 0.0) {
     return NA_REAL;
   }
   if (qt.close() < qt.close(5)) {
     return (qt.close() - qt.close(5)) / qt.close(5);
-  } else if (qt.close() == qt.close(5)) {
+  }
+  else if (qt.close() == qt.close(5)) {
     return 0.0;
-  } else {
+  }
+  else {
     return (qt.close() - qt.close(5)) / qt.close();
   }
 };
@@ -260,7 +260,7 @@ Alpha_fun alpha019 = [](const Quote& qt) -> double {
 
 // (CLOSE-DELAY(CLOSE,6))/DELAY(CLOSE,6)*100
 Alpha_fun alpha020 = [](const Quote& qt) -> double {
-  if (ISNA(qt.close(6)) || qt.close(6) == 0.0) {
+  if (ISNAN(qt.close(6)) || qt.close(6) == 0.0) {
     return NA_REAL;
   }
   return (qt.close() - qt.close(6)) / qt.close(6) * 100;
@@ -310,9 +310,7 @@ Alpha_fun alpha023 = [](const Quote& qt) -> double {
   };
   double sma1 = sma(qt.ts<double>(20, p_con1), 1);
   double sma2 = sma(qt.ts<double>(20, p_con2), 1);
-  if ((sma1 + sma2 == 0.0) || (ISNA(sma1 + sma2))) {
-    return NA_REAL;
-  }
+  if (sma1 + sma2 == 0.0) return NA_REAL;
   return sma1 / (sma1 + sma2) * 100;
 };
 
@@ -358,15 +356,14 @@ Alpha_fun alpha026 = [](const Quote& qt) -> double {
 };
 
 
-// WMA((CLOSE-DELAY(CLOSE,3))/DELAY(CLOSE,3)*100+(CLOSE-DELAY(CLOSE,6))/DELAY(CLOSE,6)*100,12)
+// WMA((CLOSE-DELAY(CLOSE,3))/DELAY(CLOSE,3)*100+(CLOSE-DELAY(CLOSE,6))/
+// DELAY(CLOSE,6)*100,12)
 Alpha_fun alpha027 = [](const Quote& qt) -> double {
   auto fun = [](const Quote& qt) {
     double rk_close_ret_d3 =
-      (qt.close() - qt.close(3)) /
-        qt.close(3);
+      (qt.close() - qt.close(3)) / qt.close(3);
     double rk_close_ret_d6 =
-      (qt.close() - qt.close(6)) /
-        qt.close(6);
+      (qt.close() - qt.close(6)) / qt.close(6);
     return rk_close_ret_d3 * 100 + rk_close_ret_d6 * 100;
   };
   return wma(qt.ts<double>(12, fun));
@@ -389,13 +386,14 @@ Alpha_fun alpha028 = [](const Quote& qt) -> double {
   auto ts_p_sma = [p_sma](const Quote& qt) {
     return sma(qt.ts<double>(3, p_sma), 1);
   };
-  return sma(qt.ts<double>(3, ts_p), 1) * 3 - sma(qt.ts<double>(3, ts_p_sma), 1) * 2;
+  return sma(qt.ts<double>(3, ts_p), 1) * 3 -
+    sma(qt.ts<double>(3, ts_p_sma), 1) * 2;
 };
 
 
 // (CLOSE-DELAY(CLOSE,6))/DELAY(CLOSE,6)*VOLUME
 Alpha_fun alpha029 = [](const Quote& qt) -> double {
-  if (ISNA(qt.close(6)) || qt.close(6) == 0.0) {
+  if (ISNAN(qt.close(6)) || qt.close(6) == 0.0) {
     return NA_REAL;
   }
   return (qt.close() - qt.close(6)) / qt.close(6) * qt.volume();
@@ -417,11 +415,9 @@ Alpha_fun alpha030 = [](const Quote& qt) -> double {
 
 // (CLOSE-MEAN(CLOSE,12))/MEAN(CLOSE,12)*100
 Alpha_fun alpha031 = [](const Quote& qt) -> double {
-  if (ISNA(mean(qt.ts_close(12))) || mean(qt.ts_close(12)) == 0.0) {
-    return NA_REAL;
-  }
-  return (qt.close() - mean(qt.ts_close(12))) /
-    mean(qt.ts_close(12)) * 100;
+  const auto mc12 = mean(qt.ts_close(12));
+  if (ISNAN(mc12) || mc12 == 0.0) return NA_REAL;
+  return (qt.close() - mc12) / mc12 * 100;
 };
 
 
@@ -468,9 +464,7 @@ Alpha_mfun alpha033 = [](const Quotes& qts) -> Timeseries {
 
 // MEAN(CLOSE,12)/CLOSE
 Alpha_fun alpha034 = [](const Quote& qt) -> double {
-  if (ISNA(qt.close()) || qt.close() == 0.0) {
-    return NA_REAL;
-  }
+  if (ISNAN(qt.close()) || qt.close() == 0.0) return NA_REAL;
   return mean(qt.ts_close(12)) / qt.close();
 };
 
@@ -594,7 +588,7 @@ Alpha_fun alpha040 = [](const Quote& qt) -> double {
   };
 
   auto right = sum(qt.ts<double>(26, base_fun2));
-  if (right == 0.0 || ISNA(right)) return NA_REAL;
+  if (right == 0.0 || ISNAN(right)) return NA_REAL;
   auto left = sum(qt.ts<double>(26, base_fun1));
   return left / right * 100;
 };
@@ -657,14 +651,17 @@ Alpha_fun alpha044 = [](const Quote& qt) -> double {
     return decaylinear(qt.ts<double>(10, vwap));
   };
 
-  return tsrank(qt.ts<double>(4, decay_corr)) + tsrank(qt.ts<double>(15, decay_delta));
+  return tsrank(qt.ts<double>(4, decay_corr)) +
+    tsrank(qt.ts<double>(15, decay_delta));
 };
 
 
-// RANK(DELTA((CLOSE * 0.6) + (OPEN*0.4), 1)) * RANK(CORR(VWAP, MEAN(VOLUME,150), 15))
+// RANK(DELTA((CLOSE * 0.6) + (OPEN*0.4), 1)) *
+// RANK(CORR(VWAP, MEAN(VOLUME,150), 15))
 Alpha_mfun alpha045 = [](const Quotes& qts) -> Timeseries {
   auto d_close_open = [](const Quote& qt) {
-    return qt.close() * 0.6 + qt.open() * 0.4 - (qt.close(1) * 0.6 + qt.open(1) * 0.4);
+    return qt.close() * 0.6 + qt.open() * 0.4 -
+      (qt.close(1) * 0.6 + qt.open(1) * 0.4);
   };
   auto volume = [](const Quote& qt) {
     return mean(qt.ts_volume(150));
@@ -680,9 +677,7 @@ Alpha_mfun alpha045 = [](const Quotes& qts) -> Timeseries {
 Alpha_fun alpha046 = [](const Quote& qt) -> double {
   double mean_p = mean(qt.ts_close(3)) + mean(qt.ts_close(6)) +
                   mean(qt.ts_close(12)) + mean(qt.ts_close(24));
-  if (ISNA(qt.close()) || qt.close() == 0.0) {
-    return NA_REAL;
-  }
+  if (ISNAN(qt.close()) || qt.close() == 0.0) return NA_REAL;
   return mean_p / (4 * qt.close());
 };
 
@@ -725,7 +720,8 @@ Alpha_fun alpha049 = [](const Quote& qt) -> double {
   auto sum1 = [](const Quote& qt) {
     if ((qt.high() + qt.low()) <= (qt.high(1) + qt.low(1))) {
       return 0.0;
-    } else {
+    }
+    else {
       double hd1 = std::abs(qt.high() - qt.high(1));
       double hd2 = std::abs(qt.low() - qt.low(1));
       return std::max(hd1, hd2);
@@ -734,7 +730,8 @@ Alpha_fun alpha049 = [](const Quote& qt) -> double {
   auto sum2 = [](const Quote& qt) {
     if ((qt.high() + qt.low()) >= (qt.high(1) + qt.low(1))) {
       return 0.0;
-    } else {
+    }
+    else {
       double hd1 = std::abs(qt.high() - qt.high(1));
       double hd2 = std::abs(qt.low() - qt.low(1));
       return std::max(hd1, hd2);
@@ -742,9 +739,7 @@ Alpha_fun alpha049 = [](const Quote& qt) -> double {
   };
   auto sum_ts1 = sum(qt.ts<double>(12, sum1));
   auto sum_ts2 = sum(qt.ts<double>(12, sum2));
-  if (ISNA(sum_ts1 + sum_ts2) || (sum_ts1 + sum_ts2) == 0.0) {
-    return NA_REAL;
-  }
+  if ((sum_ts1 + sum_ts2) == 0.0) return NA_REAL;
   return sum_ts2 / (sum_ts1 + sum_ts2);
 };
 
@@ -765,7 +760,8 @@ Alpha_fun alpha050 = [](const Quote& qt) -> double {
   auto sum1 = [](const Quote& qt) {
     if ((qt.high() + qt.low()) <= (qt.high(1) + qt.low(1))) {
       return 0.0;
-    } else {
+    }
+    else {
       double hd1 = std::abs(qt.high() - qt.high(1));
       double hd2 = std::abs(qt.low() - qt.low(1));
       return std::max(hd1, hd2);
@@ -774,7 +770,8 @@ Alpha_fun alpha050 = [](const Quote& qt) -> double {
   auto sum2 = [](const Quote& qt) {
     if ((qt.high() + qt.low()) >= (qt.high(1) + qt.low(1))) {
       return 0.0;
-    } else {
+    }
+    else {
       double hd1 = std::abs(qt.high() - qt.high(1));
       double hd2 = std::abs(qt.low() - qt.low(1));
       return std::max(hd1, hd2);
@@ -782,9 +779,7 @@ Alpha_fun alpha050 = [](const Quote& qt) -> double {
   };
   auto sum_ts1 = sum(qt.ts<double>(12, sum1));
   auto sum_ts2 = sum(qt.ts<double>(12, sum2));
-  if (ISNA(sum_ts1 + sum_ts2) || (sum_ts1 + sum_ts2) == 0.0) {
-    return NA_REAL;
-  }
+  if ((sum_ts1 + sum_ts2) == 0.0) return NA_REAL;
   return (sum_ts1 - sum_ts2) / (sum_ts1 + sum_ts2);
 };
 
@@ -799,7 +794,8 @@ Alpha_fun alpha051 = [](const Quote& qt) -> double {
   auto sum1 = [](const Quote& qt) {
     if ((qt.high() + qt.low()) <= (qt.high(1) + qt.low(1))) {
       return 0.0;
-    } else {
+    }
+    else {
       double hd1 = std::abs(qt.high() - qt.high(1));
       double hd2 = std::abs(qt.low() - qt.low(1));
       return std::max(hd1, hd2);
@@ -808,7 +804,8 @@ Alpha_fun alpha051 = [](const Quote& qt) -> double {
   auto sum2 = [](const Quote& qt) {
     if ((qt.high() + qt.low()) >= (qt.high(1) + qt.low(1))) {
       return 0.0;
-    } else {
+    }
+    else {
       double hd1 = std::abs(qt.high() - qt.high(1));
       double hd2 = std::abs(qt.low() - qt.low(1));
       return std::max(hd1, hd2);
@@ -816,9 +813,7 @@ Alpha_fun alpha051 = [](const Quote& qt) -> double {
   };
   auto sum_ts1 = sum(qt.ts<double>(12, sum1));
   auto sum_ts2 = sum(qt.ts<double>(12, sum2));
-  if (ISNA(sum_ts1 + sum_ts2) || (sum_ts1 + sum_ts2) == 0.0) {
-    return NA_REAL;
-  }
+  if ((sum_ts1 + sum_ts2) == 0.0) return NA_REAL;
   return sum_ts1 / (sum_ts1 + sum_ts2);
 };
 
@@ -834,9 +829,7 @@ Alpha_fun alpha052 = [](const Quote& qt) -> double {
   };
   auto sum_ts1 = sum(qt.ts<double>(26, sum1));
   auto sum_ts2 = sum(qt.ts<double>(26, sum2));
-  if (ISNA(sum_ts2) || sum_ts2 == 0.0) {
-    return NA_REAL;
-  }
+  if (ISNAN(sum_ts2) || sum_ts2 == 0.0) return NA_REAL;
   return sum_ts1 / sum_ts2 * 100;
 };
 
@@ -867,39 +860,46 @@ Alpha_mfun alpha054 = [](const Quotes& qts) -> Timeseries {
 // SUM(16*(CLOSE-DELAY(CLOSE,1)+(CLOSE-OPEN)/2+DELAY(CLOSE,1)-DELAY(OPEN,1))/
 // (ABS(HIGH-DELAY(CLOSE,1))>ABS(LOW-DELAY(CLOSE,1)) &
 // ABS(HIGH-DELAY(CLOSE,1))>ABS(HIGH-DELAY(LOW,1))?
-// ABS(HIGH-DELAY(CLOSE,1))+ABS(LOW-DELAY(CLOSE,1))/2+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4:
+// ABS(HIGH-DELAY(CLOSE,1))+ABS(LOW-DELAY(CLOSE,1))/2+
+// ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4:
 // (ABS(LOW-DELAY(CLOSE,1))>ABS(HIGH-DELAY(LOW,1)) &
 // ABS(LOW-DELAY(CLOSE,1))>ABS(HIGH-DELAY(CLOSE,1))?
-// ABS(LOW-DELAY(CLOSE,1))+ABS(HIGH-DELAY(CLOSE,1))/2+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4:
+// ABS(LOW-DELAY(CLOSE,1))+ABS(HIGH-DELAY(CLOSE,1))/2+
+// ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4:
 // ABS(HIGH-DELAY(LOW,1))+ABS(DELAY(CLOSE,1)-DELAY(OPEN,1))/4))*
 // MAX(ABS(HIGH-DELAY(CLOSE,1)),ABS(LOW-DELAY(CLOSE,1))),20)
 Alpha_fun alpha055 = [](const Quote& qt) -> double {
   auto base_fun = [](const Quote& qt) {
-    double param1;
-    double param2;
-    double param3;
-    param1 = qt.close() - qt.close(1) + (qt.close() - qt.open()) / 2 +
-             qt.close(1) - qt.open(1);
-    param3 = std::max(std::abs(qt.high() - qt.close(1)),
-                      std::abs(qt.low() - qt.close(1)));
-    if ((std::abs(qt.high() - qt.close(1)) > std::abs(qt.low() - qt.close(1))) &&
-        (std::abs(qt.high() - qt.close(1)) > std::abs(qt.high() - qt.low(1)))) {
-      param2 = std::abs(qt.high() - qt.close(1)) + std::abs(qt.low() - qt.close(1)) / 2 +
-               std::abs(qt.close(1) - qt.open(1)) / 4;
-    } else if ((std::abs(qt.low() - qt.close(1)) > std::abs(qt.high() - qt.low(1))) &&
-               (std::abs(qt.low() - qt.close(1)) > std::abs(qt.high() - qt.close(1)))) {
-      param2 = std::abs(qt.low() - qt.close(1)) + std::abs(qt.high() - qt.close(1)) / 2 +
-               std::abs(qt.close(1) - qt.open(1)) / 4;
-    } else {
-      param2 = std::abs(qt.high() - qt.low(1)) + std::abs(qt.close(1) - qt.open(1)) / 4;
+    const double c = qt.close();
+    const double c1 = qt.close(1);
+    const double o = qt.open();
+    const double o1 = qt.open(1);
+    const double h = qt.high();
+    const double l = qt.low();
+    const double l1 = qt.low(1);
+    double param2 = NA_REAL;
+    const double param1 = c - c1 + (c - qt.open()) / 2 + c1 - o1;
+    const double param3 = std::max(std::abs(h - c1), std::abs(l - c1));
+    if ((std::abs(h - c1) > std::abs(l - c1)) &&
+        (std::abs(h - c1) > std::abs(h - l1))) {
+      param2 = std::abs(h - c1) + std::abs(l - c1) / 2 + std::abs(c1 - o1) / 4;
     }
+    else if ((std::abs(l - c1) > std::abs(h - l1)) &&
+             (std::abs(l - c1) > std::abs(h - c1))) {
+      param2 = std::abs(l - c1) + std::abs(h - c1) / 2 + std::abs(c1 - o1) / 4;
+    }
+    else {
+      param2 = std::abs(h - l1) + std::abs(c1 - o1) / 4;
+    }
+    if (param2 == 0.0) return NA_REAL;
     return 16.0 * param1 / param2 * param3;
   };
   return sum(qt.ts<double>(20, base_fun));
 };
 
 
-// RANK(OPEN -TSMIN(OPEN, 12)) < RANK(RANK(CORR(SUM((HIGH+ LOW) / 2, 19), SUM(MEAN(VOLUME,40), 19), 13))^5)
+// RANK(OPEN -TSMIN(OPEN, 12)) < RANK(RANK(CORR(SUM((HIGH+ LOW) / 2, 19),
+// SUM(MEAN(VOLUME,40), 19), 13))^5)
 Alpha_mfun alpha056 = [](const Quotes& qts) -> Timeseries {
   auto fun_left = [](const Quote& qt) {
     return qt.open() - tsmin(qt.ts_open(12));
@@ -929,6 +929,7 @@ Alpha_fun alpha057 = [](const Quote& qt) -> double {
   auto muti_p = [](const Quote& qt) {
     double left = qt.close() - tsmin(qt.ts_low(9));
     double right = tsmax(qt.ts_high(9)) - tsmin(qt.ts_low(9));
+    if (right == 0.0) return NA_REAL;
     return left / right * 100;
   };
   return sma(qt.ts<double>(3, muti_p), 1);
@@ -952,9 +953,11 @@ Alpha_fun alpha059 = [](const Quote& qt) -> double {
   auto base_fun = [](const Quote& qt) {
     if (qt.close() == qt.close(1)) {
       return 0.0;
-    } else if (qt.close() > qt.close(1)) {
+    }
+    else if (qt.close() > qt.close(1)) {
       return qt.close() - std::min(qt.low(), qt.close(1));
-    } else {
+    }
+    else {
       return qt.close() - std::max(qt.high(), qt.close(1));
     }
   };
@@ -967,6 +970,7 @@ Alpha_fun alpha060 = [](const Quote& qt) -> double {
   auto base_fun = [](const Quote& qt) {
     double left = (qt.close() - qt.low()) - (qt.high() - qt.close());
     double right = (qt.high() - qt.low()) / qt.volume();
+    if (right == 0.0) return NA_REAL;
     return left / right;
   };
   return sum(qt.ts<double>(20, base_fun));
