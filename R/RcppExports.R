@@ -200,6 +200,10 @@ tf_quote_xptr <- function(qt_tbl) {
     .Call(`_GCAMCTF_tf_quote_xptr`, qt_tbl)
 }
 
+tf_enc2utf8 <- function(x, only_mark = FALSE) {
+    .Call(`_GCAMCTF_enc2utf8`, x, only_mark)
+}
+
 #' @rdname tf_quote_xptr
 #' @export
 tf_quotes_xptr <- function(qt_tbls) {

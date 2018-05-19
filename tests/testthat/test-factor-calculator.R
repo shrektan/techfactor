@@ -5,6 +5,27 @@ dt <- data.table::copy(tf_quote)
 qt <- tf_quote_xptr(dt)
 qts <- tf_quotes_xptr(list(bb = dt[-(1:5)], aa = dt[1:(.N - 5)]))
 
+test_that("rcpp enc2utf8 works", {
+  x <- c("El. pa\u00c5\u00a1tas", "fa\u00e7ile", "\u00a1tas", "\u00de", "\u00e7ile")
+  latin1 <- iconv(x, from = "UTF-8", to = "latin1")
+  res <- tf_enc2utf8(latin1)
+  expect_equal(
+    Encoding(res),
+    rep("UTF-8", 5)
+  )
+  expect_identical(res, x)
+  Encoding(res) <- "unknown"
+  expect_equal(
+    Encoding(res),
+    rep("unknown", 5)
+  )
+  res <- tf_enc2utf8(res, TRUE)
+  expect_equal(
+    Encoding(res),
+    rep("UTF-8", 5)
+  )
+  expect_identical(res, x)
+})
 
 test_that("assert_class works", {
   x <- structure(list(a = 1), class = c("abc", "bcd"))
@@ -101,5 +122,25 @@ test_that("all factors can be run by tf_qts_cal()", {
     expect_true(all(is.finite(res) | is.na(res)))
     expect_true(!any(is.nan(res)))
   }
+})
+
+test_that("tf_qts_cal support nonASCII inputs", {
+  from_to <- range(tail(dt$DATE, 10))
+  factor <- tf_reg_factors()[1]
+
+  utf8_names <- c("El. pa\u00c5\u00a1tas", "fa\u00e7ile", "\u00a1tas", "\u00de", "\u00e7ile")
+  latin1_names <- iconv(utf8_names, from = "UTF-8", to = "latin1")
+
+  x <- setNames(list(dt, dt, dt, dt, dt), utf8_names)
+  qts <- tf_quotes_xptr(x)
+  res <- tf_qts_cal(qts, factor, from_to)
+  expect_identical(names(res), utf8_names)
+  expect_equal(Encoding(names(res)), rep("UTF-8", 5))
+
+  x <- setNames(list(dt, dt, dt, dt, dt), latin1_names)
+  qts <- tf_quotes_xptr(x)
+  res <- tf_qts_cal(qts, factor, from_to)
+  expect_identical(names(res), utf8_names)
+  expect_equal(Encoding(names(res)), rep("UTF-8", 5))
 })
 

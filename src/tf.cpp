@@ -90,11 +90,27 @@ SEXP tf_quote_xptr(Rcpp::DataFrame qt_tbl)
 }
 
 
+// [[Rcpp::export("tf_enc2utf8")]]
+Rcpp::StringVector enc2utf8(Rcpp::StringVector x, bool only_mark = false) {
+  x = Rcpp::clone(x);
+  const int n = x.size();
+  for (int i = 0; i < n; ++i) {
+    x[i] = Rf_mkCharCE(only_mark ? x[i] : Rf_translateCharUTF8(x[i]), CE_UTF8);
+  }
+  return x;
+}
+
+
 //' @rdname tf_quote_xptr
 //' @export
 // [[Rcpp::export]]
 SEXP tf_quotes_xptr(Rcpp::List qt_tbls)
 {
+  if (Rf_isNull(qt_tbls.attr("names"))) {
+    Rcpp::stop("qt_tbls must have names attributes.");
+  }
+  Rcpp::StringVector names = qt_tbls.attr("names");
+  qt_tbls.attr("names") = enc2utf8(names);
   Quotes_raw* ptr = new Quotes_raw {qt_tbls};
   auto res = Rcpp::XPtr<Quotes_raw>(ptr, true);
   res.attr("class") = Rcpp::StringVector::create("tf_quotes_xptr");
@@ -185,6 +201,7 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
   XPtr<Quotes_raw> qts_xptr {qts_ptr};
   auto& qts = *qts_xptr;
   const auto dates = qts.tdates(from_to);
+
   NumericMatrix res(qts.size(), dates.size());
   auto res_iter = res.begin();
   if (tf_mcaculators.count(name)) {
@@ -213,6 +230,7 @@ Rcpp::NumericMatrix tf_qts_cal(SEXP qts_ptr, std::string name, Rcpp::newDateVect
   res = Rcpp::transpose(res);
   newDateVector r_dates(dates.size());
   std::copy(dates.cbegin(), dates.cend(), r_dates.begin());
-  res.attr("dimnames") = Rcpp::List::create(R_NilValue, Rcpp::wrap(qts.names));
+  StringVector names = Rcpp::wrap(qts.names); names = enc2utf8(names, true);
+  res.attr("dimnames") = Rcpp::List::create(R_NilValue, names);
   return create_xts(res, r_dates);
 }

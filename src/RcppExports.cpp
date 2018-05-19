@@ -529,6 +529,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// enc2utf8
+Rcpp::StringVector enc2utf8(Rcpp::StringVector x, bool only_mark);
+RcppExport SEXP _GCAMCTF_enc2utf8(SEXP xSEXP, SEXP only_markSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< bool >::type only_mark(only_markSEXP);
+    rcpp_result_gen = Rcpp::wrap(enc2utf8(x, only_mark));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_quotes_xptr
 SEXP tf_quotes_xptr(Rcpp::List qt_tbls);
 RcppExport SEXP _GCAMCTF_tf_quotes_xptr(SEXP qt_tblsSEXP) {
@@ -625,6 +637,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_create_xts", (DL_FUNC) &_GCAMCTF_create_xts, 2},
     {"_GCAMCTF_tf_reg_factors", (DL_FUNC) &_GCAMCTF_tf_reg_factors, 0},
     {"_GCAMCTF_tf_quote_xptr", (DL_FUNC) &_GCAMCTF_tf_quote_xptr, 1},
+    {"_GCAMCTF_enc2utf8", (DL_FUNC) &_GCAMCTF_enc2utf8, 2},
     {"_GCAMCTF_tf_quotes_xptr", (DL_FUNC) &_GCAMCTF_tf_quotes_xptr, 1},
     {"_GCAMCTF_asset_valid", (DL_FUNC) &_GCAMCTF_asset_valid, 2},
     {"_GCAMCTF_tf_qt_cal", (DL_FUNC) &_GCAMCTF_tf_qt_cal, 3},

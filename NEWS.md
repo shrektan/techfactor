@@ -1,4 +1,4 @@
-# GCAMCTF 0.0.14
+# GCAMCTF 0.0.15
 
 * Added a `NEWS.md` file to track changes to the package.
 * Set up CI and code coverage.
@@ -15,6 +15,7 @@
 * `delta()` returns a double value that equals to `x[k] - x[0]`.
 * Reimplemented `rank()` to allow `NA` (rather than return a `NA` vector even when there's only one `NA`) because the function is mainly used for cross-sectional data, where `NA` is common. In other words, the implementation now equals to `data.table::frank(x, ties.method = "min", na.last = "keep")`.
 * `Quote_raw()` constructor now checks the validity of price, volume and dates so that we can be sure that there's no zero or negative price, negative volume or NA date in the dataset.
+* `tf_qts_cal()` now supports non-ASCII names => all the non-UTF8 names will be converted to UTF-8 in the cpp level and return with UTF-8 marked strings.
 
 ## TODO
 
