@@ -192,7 +192,7 @@ Rcpp::NumericMatrix tf_qt_cal(SEXP qt_ptr, Rcpp::StringVector names, Rcpp::newDa
 //' your compture.
 //'
 //' @export
-// [[Rcpp::export]]
+// [[Rcpp::export("tf_hardware_cores")]]
 int hardware_cores()
 {
   return std::thread::hardware_concurrency();
@@ -275,14 +275,39 @@ Rcpp::NumericMatrix tf_qts_cal(
   const auto dates = qts.tdates(from_to);
 
   Alpha_mfun cal = get_mcalculator(name);
-
+  const int days = dates.size();
   std::map<RDate, Timeseries> res;
-  for (const auto date : dates) {
-    res.emplace(date, cal(Quotes(qts, date)));
+
+  if (threads_no > 1) {
+    std::mutex mutex;
+    auto run = [&mutex, &res, &qts, &cal](const RDate date) {
+      auto value = cal(Quotes(qts, date));
+      std::lock_guard<std::mutex> guard(mutex);
+      res.emplace(date, std::move(value));
+    };
+
+    for (int i = 0; i < days; ) {
+      if (i % 100 == 0) checkUserInterrupt();
+      std::vector<std::thread> threads;
+      for (int k = 0; k < threads_no; ++k) {
+        if (i < days) {
+          threads.push_back(std::thread(run, dates[i]));
+        } else {
+          // do nothing
+        }
+        ++i;
+      }
+      for (auto& thread : threads) thread.join();
+    }
+  }
+  else {
+    for (const auto date : dates) {
+      res.emplace(date, cal(Quotes(qts, date)));
+    }
   }
 
   Rcpp::NumericMatrix mat = convert_to_mat(res, qts.size());
-  newDateVector r_dates(dates.size());
+  newDateVector r_dates(days);
   std::copy(dates.cbegin(), dates.cend(), r_dates.begin());
   StringVector names = Rcpp::wrap(qts.names); names = enc2utf8(names, true);
   mat.attr("dimnames") = Rcpp::List::create(R_NilValue, names);

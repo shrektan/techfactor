@@ -233,7 +233,7 @@ tf_qt_cal <- function(qt_ptr, names, from_to) {
 #' your compture.
 #'
 #' @export
-hardware_cores <- function() {
+tf_hardware_cores <- function() {
     .Call(`_GCAMCTF_hardware_cores`)
 }
 
