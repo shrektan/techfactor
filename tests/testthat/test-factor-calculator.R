@@ -88,6 +88,20 @@ test_that("fails for undefined factor names", {
     tf_qt_cal(qt, "#garbname#", anydate(c(20180101, 20180109))),
     "factor #garbname# must be defined before using"
   )
+  expect_error(
+    tf_qts_cal(qts, "#garbname#", anydate(c(20180101, 20180109))),
+    "factor #garbname# must be defined before using"
+  )
+})
+
+test_that("tf_qt_cal throws errors if the factor is supporsed to be cal by qts", {
+  factors <- attr(tf_reg_factors(), "panel", exact = TRUE)
+  skip_if(length(factors) == 0)
+  expect_error(
+    tf_qt_cal(qt, factors[1], anydate(c(20180101, 20180109))),
+    "can only be used in tf_mcal()",
+    fixed = TRUE
+  )
 })
 
 test_that("all normal factors can be run by tf_qt_cal()", {
