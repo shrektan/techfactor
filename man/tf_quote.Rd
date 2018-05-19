@@ -3,18 +3,37 @@
 \docType{data}
 \name{tf_quote}
 \alias{tf_quote}
-\title{The sample quote data used in GCAMCTF}
+\alias{tf_quotes}
+\title{The sample quote data}
+\format{An object of class \code{list} of length 20.}
 \source{
 The Gildata database
 }
 \usage{
 data(tf_quote)
+
+data(tf_quotes)
 }
 \description{
-The data is a realistic China-A security quote of 81 days
-in total, from 2018-01-02 ~ 2018-05-07. The column \code{VWAP}
+We include some small chunck of sample data \code{tf_quote} and
+\code{tf_quotes} to illustrate what kind of data the package functions
+are expected and they are used in the tests as well.
+}
+\details{
+\itemize{
+\item \code{tf_quote} is a China-A security \code{000002.SZ} (Wanke-A)'s
+quote of 81 days in total, from 2018-01-02 ~ 2018-05-07.
+\item \code{tf_quotes} is a list of quotes from 20140101 ~ 20180430,
+containing \code{300333.SZ},\code{601158.SH},\code{002788.SZ},\code{603101.SH},
+\code{600020.SH},\code{601668.SH},\code{600615.SH},\code{002721.SZ},\code{300517.SZ},
+\code{601567.SH},\code{603477.SH},\code{002297.SZ},\code{600537.SH},\code{603906.SH},
+\code{603183.SH},\code{002884.SZ},\code{300531.SZ},\code{002641.SZ},
+\code{002851.SZ},\code{600719.SH}.
+\item The column \code{VWAP}
 equals to \code{AMOUNT} / \code{VOLUME}. The columns \code{BMK_CLOSE} and
 \code{BMK_OPEN} is the close and open price data of the index
 \emph{China-A All Shares}.
 }
+}
 \keyword{data}
+\keyword{datasets}
