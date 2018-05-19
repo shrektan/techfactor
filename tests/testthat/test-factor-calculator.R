@@ -1,9 +1,10 @@
 context("test-factor-calculator.R")
 
-data("tf_quote")
+data("tf_quote", "tf_quotes")
 dt <- data.table::copy(tf_quote)
 qt <- tf_quote_xptr(dt)
-qts <- tf_quotes_xptr(list(aa = dt[-(1:5)], bb = dt[1:(.N - 5)]))
+qts <- tf_quotes_xptr(list(bb = dt[-(1:5)], aa = dt[1:(.N - 5)]))
+
 
 test_that("assert_class works", {
   x <- structure(list(a = 1), class = c("abc", "bcd"))
@@ -94,7 +95,8 @@ test_that("all factors can be run by tf_qts_cal()", {
     expect_is(res, "xts")
     expect_equal(nrow(res), 10)
     expect_equal(ncol(res), 2)
-    expect_named(res, c("aa", "bb"))
+    ## ensure it won't change the order of the name of the input list
+    expect_named(res, c("bb", "aa"))
     expect_equivalent(index(res), tail(dt$DATE, 10))
     expect_true(all(is.finite(res) | is.na(res)))
     expect_true(!any(is.nan(res)))
