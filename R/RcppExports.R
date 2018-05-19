@@ -109,16 +109,24 @@ tf_assert_valid_from_to <- function(from_to) {
     invisible(.Call(`_GCAMCTF_assert_valid`, from_to))
 }
 
-tf_assert_same_size <- function(x, y) {
-    invisible(.Call(`_GCAMCTF_assert_same_size`, x, y))
-}
-
 tf_any_na <- function(x) {
     .Call(`_GCAMCTF_any_na`, x)
 }
 
 tf_assert_no_na <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_no_na`, x))
+}
+
+tf_assert_valid_dates <- function(x, field) {
+    invisible(.Call(`_GCAMCTF_assert_valid_dates`, x, field))
+}
+
+tf_assert_valid_price <- function(x, field) {
+    invisible(.Call(`_GCAMCTF_assert_valid_price`, x, field))
+}
+
+tf_assert_valid_volume <- function(x, field) {
+    invisible(.Call(`_GCAMCTF_assert_valid_volume`, x, field))
 }
 
 tf_assert_is_sorted <- function(x) {
@@ -159,6 +167,10 @@ tf_assert_valid_panel <- function(x) {
 
 tf_panel_sum <- function(x) {
     .Call(`_GCAMCTF_tf_panel_sum`, x)
+}
+
+tf_assert_same_size <- function(x, y) {
+    invisible(.Call(`_GCAMCTF_tf_assert_same_size`, x, y))
 }
 
 create_xts <- function(x_mat, x_dates) {
