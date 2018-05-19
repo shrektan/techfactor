@@ -29,6 +29,10 @@ test_that("rcpp enc2utf8 works", {
 
 test_that("assert_class works", {
   x <- structure(list(a = 1), class = c("abc", "bcd"))
+  expect_error(
+    tf_assert_class(1, "integer"), # 1 actually has no class attributes
+    "must be integer"
+  )
   expect_silent(tf_assert_class(x, "abc"))
   expect_silent(tf_assert_class(x, "bcd"))
   expect_error(tf_assert_class(x, "ddd"), "must be ddd")
@@ -83,6 +87,20 @@ test_that("fails for undefined factor names", {
   expect_error(
     tf_qt_cal(qt, "#garbname#", anydate(c(20180101, 20180109))),
     "factor #garbname# must be defined before using"
+  )
+  expect_error(
+    tf_qts_cal(qts, "#garbname#", anydate(c(20180101, 20180109))),
+    "factor #garbname# must be defined before using"
+  )
+})
+
+test_that("tf_qt_cal throws errors if the factor is supporsed to be cal by qts", {
+  factors <- attr(tf_reg_factors(), "panel", exact = TRUE)
+  skip_if(length(factors) == 0)
+  expect_error(
+    tf_qt_cal(qt, factors[1], anydate(c(20180101, 20180109))),
+    "can only be used in tf_mcal()",
+    fixed = TRUE
   )
 })
 

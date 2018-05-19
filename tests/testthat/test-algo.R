@@ -400,3 +400,17 @@ test_that("panel apply", {
   )
 })
 
+test_that("assert_same_size", {
+  expect_silent(
+    tf_assert_same_size(double(), double())
+  )
+  expect_silent(
+    tf_assert_same_size(1, 2)
+  )
+  expect_error(
+    tf_assert_same_size(1, double()),
+    "The length of x (1) and y (0) must be the same",
+    fixed = TRUE
+  )
+})
+
