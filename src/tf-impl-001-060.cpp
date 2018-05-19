@@ -878,7 +878,7 @@ Alpha_fun alpha055 = [](const Quote& qt) -> double {
     const double l = qt.low();
     const double l1 = qt.low(1);
     double param2 = NA_REAL;
-    const double param1 = c - c1 + (c - qt.open()) / 2 + c1 - o1;
+    const double param1 = c - c1 + (c - o) / 2 + c1 - o1;
     const double param3 = std::max(std::abs(h - c1), std::abs(l - c1));
     if ((std::abs(h - c1) > std::abs(l - c1)) &&
         (std::abs(h - c1) > std::abs(h - l1))) {
