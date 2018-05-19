@@ -2,6 +2,7 @@
 
 export("%>%")
 export(anydate)
+export(hardware_cores)
 export(index)
 export(tf_qt_cal)
 export(tf_qts_cal)
