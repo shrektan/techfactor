@@ -218,7 +218,7 @@ public:
   }
   double ret(const int delay = 0) const
   {
-    if (pclose(delay) == 0.0) return NA_REAL;
+    if (near(pclose(delay), 0.0)) return NA_REAL;
     return close(delay) / pclose(delay) - 1.0;
   }
   double dtm(const int delay = 0) const

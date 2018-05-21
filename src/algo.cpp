@@ -120,7 +120,7 @@ double corr(const Timeseries& x, const Timeseries& y)
 {
   const double cov = covariance(x, y);
   const double deno = stdev(x) * stdev(y);
-  if (deno <= 0.0) return NA_REAL;
+  if (near(deno, 0.0)) return NA_REAL;
   return cov / deno;
 }
 
@@ -202,7 +202,7 @@ Timeseries log(const Timeseries& x)
 {
   Timeseries res(x.size());
   std::transform(x.cbegin(), x.cend(), res.begin(), [](double v) {
-    if (ISNAN(v) || v <= 0.0) return NA_REAL;
+    if (ISNAN(v) || v <= 0.0 || near(v, 0.0)) return NA_REAL;
     return std::log(v);
   });
   return res;
@@ -238,7 +238,7 @@ double regbeta(const Timeseries& y, const Timeseries& x)
   assert_length(x, 2);
   const double cov_xy = covariance(x, y);
   const double std_x = stdev(x);
-  if (std_x == 0.0) return NA_REAL;
+  if (near(std_x, 0.0)) return NA_REAL;
   return cov_xy / std_x / std_x;
 }
 
@@ -474,7 +474,7 @@ Timeseries operator/(const Timeseries& x, const double y)
   std::transform(
     x.cbegin(), x.cend(),
     res.begin(), [y](const double v) {
-      if (y == 0.0) return NA_REAL;
+      if (near(y, 0.0)) return NA_REAL;
       return v / y;
     }
   );
