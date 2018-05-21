@@ -44,6 +44,44 @@ extern Alpha_fun alpha057;
 extern Alpha_fun alpha058;
 extern Alpha_fun alpha059;
 extern Alpha_fun alpha060;
+extern Alpha_fun alpha063;
+extern Alpha_fun alpha065;
+extern Alpha_fun alpha066;
+extern Alpha_fun alpha067;
+extern Alpha_fun alpha068;
+extern Alpha_fun alpha069;
+extern Alpha_fun alpha070;
+extern Alpha_fun alpha071;
+extern Alpha_fun alpha072;
+extern Alpha_fun alpha075;
+extern Alpha_fun alpha076;
+extern Alpha_fun alpha078;
+extern Alpha_fun alpha079;
+extern Alpha_fun alpha080;
+extern Alpha_fun alpha081;
+extern Alpha_fun alpha082;
+extern Alpha_fun alpha084;
+extern Alpha_fun alpha085;
+extern Alpha_fun alpha086;
+extern Alpha_fun alpha088;
+extern Alpha_fun alpha089;
+extern Alpha_fun alpha093;
+extern Alpha_fun alpha094;
+extern Alpha_fun alpha095;
+extern Alpha_fun alpha096;
+extern Alpha_fun alpha097;
+extern Alpha_fun alpha098;
+extern Alpha_fun alpha100;
+extern Alpha_fun alpha102;
+extern Alpha_fun alpha103;
+extern Alpha_fun alpha106;
+extern Alpha_fun alpha109;
+extern Alpha_fun alpha110;
+extern Alpha_fun alpha111;
+extern Alpha_fun alpha112;
+extern Alpha_fun alpha116;
+extern Alpha_fun alpha117;
+extern Alpha_fun alpha118;
 extern Alpha_fun alpha122;
 extern Alpha_fun alpha126;
 extern Alpha_fun alpha127;
@@ -145,6 +183,44 @@ std::map<std::string, Alpha_fun&> tf_caculators
   {"alpha058", alpha_impl::alpha058},
   {"alpha059", alpha_impl::alpha059},
   {"alpha060", alpha_impl::alpha060},
+  {"alpha063", alpha_impl::alpha063},
+  {"alpha065", alpha_impl::alpha065},
+  {"alpha066", alpha_impl::alpha066},
+  {"alpha067", alpha_impl::alpha067},
+  {"alpha068", alpha_impl::alpha068},
+  {"alpha069", alpha_impl::alpha069},
+  {"alpha070", alpha_impl::alpha070},
+  {"alpha071", alpha_impl::alpha071},
+  {"alpha072", alpha_impl::alpha072},
+  {"alpha075", alpha_impl::alpha075},
+  {"alpha076", alpha_impl::alpha076},
+  {"alpha078", alpha_impl::alpha078},
+  {"alpha079", alpha_impl::alpha079},
+  {"alpha080", alpha_impl::alpha080},
+  {"alpha081", alpha_impl::alpha081},
+  {"alpha082", alpha_impl::alpha082},
+  {"alpha084", alpha_impl::alpha084},
+  {"alpha085", alpha_impl::alpha085},
+  {"alpha086", alpha_impl::alpha086},
+  {"alpha088", alpha_impl::alpha088},
+  {"alpha089", alpha_impl::alpha089},
+  {"alpha093", alpha_impl::alpha093},
+  {"alpha094", alpha_impl::alpha094},
+  {"alpha095", alpha_impl::alpha095},
+  {"alpha096", alpha_impl::alpha096},
+  {"alpha097", alpha_impl::alpha097},
+  {"alpha098", alpha_impl::alpha098},
+  {"alpha100", alpha_impl::alpha100},
+  {"alpha102", alpha_impl::alpha102},
+  {"alpha103", alpha_impl::alpha103},
+  {"alpha106", alpha_impl::alpha106},
+  {"alpha109", alpha_impl::alpha109},
+  {"alpha110", alpha_impl::alpha110},
+  {"alpha111", alpha_impl::alpha111},
+  {"alpha112", alpha_impl::alpha112},
+  {"alpha116", alpha_impl::alpha116},
+  {"alpha117", alpha_impl::alpha117},
+  {"alpha118", alpha_impl::alpha118},
   {"alpha122", alpha_impl::alpha122},
   {"alpha126", alpha_impl::alpha126},
   {"alpha127", alpha_impl::alpha127},
@@ -223,6 +299,28 @@ extern Alpha_mfun alpha045;
 extern Alpha_mfun alpha048;
 extern Alpha_mfun alpha054;
 extern Alpha_mfun alpha056;
+extern Alpha_mfun alpha061;
+extern Alpha_mfun alpha062;
+extern Alpha_mfun alpha064;
+extern Alpha_mfun alpha073;
+extern Alpha_mfun alpha074;
+extern Alpha_mfun alpha077;
+extern Alpha_mfun alpha083;
+extern Alpha_mfun alpha087;
+extern Alpha_mfun alpha090;
+extern Alpha_mfun alpha091;
+extern Alpha_mfun alpha092;
+extern Alpha_mfun alpha099;
+extern Alpha_mfun alpha101;
+extern Alpha_mfun alpha104;
+extern Alpha_mfun alpha105;
+extern Alpha_mfun alpha107;
+extern Alpha_mfun alpha108;
+extern Alpha_mfun alpha113;
+extern Alpha_mfun alpha114;
+extern Alpha_mfun alpha115;
+extern Alpha_mfun alpha119;
+extern Alpha_mfun alpha120;
 extern Alpha_mfun alpha121;
 extern Alpha_mfun alpha123;
 extern Alpha_mfun alpha124;
@@ -268,6 +366,28 @@ std::map<std::string, Alpha_mfun&> tf_mcaculators
   {"alpha048", alpha_impl::alpha048},
   {"alpha054", alpha_impl::alpha054},
   {"alpha056", alpha_impl::alpha056},
+  {"alpha061", alpha_impl::alpha061},
+  {"alpha062", alpha_impl::alpha062},
+  {"alpha064", alpha_impl::alpha064},
+  {"alpha073", alpha_impl::alpha073},
+  {"alpha074", alpha_impl::alpha074},
+  {"alpha077", alpha_impl::alpha077},
+  {"alpha083", alpha_impl::alpha083},
+  {"alpha087", alpha_impl::alpha087},
+  {"alpha090", alpha_impl::alpha090},
+  {"alpha091", alpha_impl::alpha091},
+  {"alpha092", alpha_impl::alpha092},
+  {"alpha099", alpha_impl::alpha099},
+  {"alpha101", alpha_impl::alpha101},
+  {"alpha104", alpha_impl::alpha104},
+  {"alpha105", alpha_impl::alpha105},
+  {"alpha107", alpha_impl::alpha107},
+  {"alpha108", alpha_impl::alpha108},
+  {"alpha113", alpha_impl::alpha113},
+  {"alpha114", alpha_impl::alpha114},
+  {"alpha115", alpha_impl::alpha115},
+  {"alpha119", alpha_impl::alpha119},
+  {"alpha120", alpha_impl::alpha120},
   {"alpha121", alpha_impl::alpha121},
   {"alpha123", alpha_impl::alpha123},
   {"alpha124", alpha_impl::alpha124},

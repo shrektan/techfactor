@@ -63,7 +63,8 @@ double mean(const Timeseries& x)
 // [[Rcpp::export("tf_stdev")]]
 double stdev(const Timeseries& x)
 {
-  return std::sqrt(covariance(x, x));
+  const auto cov = covariance(x, x);
+  return R_FINITE(cov) ? std::sqrt(cov) : NA_REAL;
 }
 
 
