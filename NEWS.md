@@ -1,4 +1,4 @@
-# GCAMCTF 0.0.16
+# GCAMCTF 0.1.0
 
 * Added a `NEWS.md` file to track changes to the package.
 * Set up CI and code coverage.
@@ -17,8 +17,6 @@
 * `Quote_raw()` constructor now checks the validity of price, volume and dates so that we can be sure that there's no zero or negative price, negative volume or NA date in the dataset.
 * `tf_qts_cal()` now supports non-ASCII names => all the non-UTF8 names will be converted to UTF-8 in the cpp level and return with UTF-8 marked strings.
 * Implemented the concurrency calculating.
+* Implemented all the 191 alpha factors.
+* Added `near()` to do the zero comparision.
 
-
-## TODO
-
-- [ ] Ensure all the timeseries is in acsending date order, i.e., `x[0]` is oldest while `x[x.size()-1]` is newest.

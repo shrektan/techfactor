@@ -1,10 +1,12 @@
 Package: GCAMCTF
 Type: Package
 Title: GCAMC's Technical Factors
-Version: 0.0.16
+Version: 0.1.0
 Authors@R: c(
     person("Xianying", "Tan", email = "shrektan@126.com", role = c("aut", "cre")),
-    person("Nick", "Wang", email = "nkwangpeng@126.com", role = c("aut"))
+    person("Nick", "Wang", email = "nkwangpeng@126.com", role = c("aut")),
+    person("Yu", "Nan", email = "nanyu201411@gmail.com", role = c("ctb"), 
+           comment = "Help to implement alpha 061 ~ 120")
     )
 Maintainer: Xianying Tan <shrektan@126.com>
 Description: Provide tools that calculate technical factors efficiently.
