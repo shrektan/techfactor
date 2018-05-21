@@ -110,7 +110,7 @@ Alpha_fun alpha181 = [](const Quote& qt) -> double {
     return std::pow(qt.bmk_close() - mean(qt.ts_bmk_close(20)), 3.0);
   };
   auto sum_right = sum(qt.ts<double>(20, muti_p2));
-  if (ISNAN(sum_right) || sum_right == 0.0) {
+  if (ISNAN(sum_right) || near(sum_right, 0.0)) {
     return NA_REAL;
   }
   return sum_left / sum_right;
@@ -136,7 +136,7 @@ Alpha_fun alpha183 = [](const Quote& qt) -> double {
   };
   double left = tsmax(sumac(qt.ts_close(24) - qt.ts<double>(24, m_close)));
   auto std_c24 = stdev(qt.ts_close(24));
-  if (ISNAN(std_c24) || std_c24 == 0.0) return NA_REAL;
+  if (ISNAN(std_c24) || near(std_c24, 0.0)) return NA_REAL;
   double right =
     tsmin(sumac(qt.ts_close(24) - qt.ts<double>(24, m_close))) / std_c24;
   return left - right;
@@ -188,7 +188,7 @@ Alpha_fun alpha186 = [](const Quote& qt) -> double {
     double param3 = sum(qt.ts<double>(14, choose_fun2));
     double abs1 = std::abs(param1 * 100 / param2 - param3 * 100 / param2);
     double sum1 = param1 * 100 / param2 + param3 * 100 / param2;
-    if (sum1 == 0.0) return NA_REAL;
+    if (near(sum1, 0.0)) return NA_REAL;
     return abs1 / sum1 * 100;
   };
   auto left =  mean(qt.ts<double>(6, abs_sum1));
@@ -205,7 +205,7 @@ Alpha_fun alpha186 = [](const Quote& qt) -> double {
     double param3 = sum(qt.ts<double>(14, delay_choose_fun2));
     double abs1 = std::abs(param1 * 100 / param2 - param3 * 100 / param2);
     double sum1 = param1 * 100 / param2 + param3 * 100 / param2;
-    if (sum1 == 0.0) return NA_REAL;
+    if (near(sum1, 0.0)) return NA_REAL;
     return abs1 / sum1 * 100;
   };
   auto right =  mean(qt.ts<double>(6, abs_sum2));
@@ -228,7 +228,7 @@ Alpha_fun alpha187 = [](const Quote& qt) -> double {
 Alpha_fun alpha188 = [](const Quote& qt) -> double {
   auto left = qt.high() - qt.low() - sma(qt.ts_high(11) - qt.ts_low(11), 2);
   auto right = sma(qt.ts_high(11) - qt.ts_low(11), 2);
-  if (ISNAN(right) || right == 0.0) return NA_REAL;
+  if (ISNAN(right) || near(right, 0.0)) return NA_REAL;
   return left / right * 100;
 };
 
@@ -290,7 +290,7 @@ Alpha_fun alpha190 = [](const Quote& qt) -> double {
     qt.ts<bool>(20, bool_muti_p2)
   ));
 
-  if ((param1 * param2 == 0.0) || (param3 * param4 == 0.0)) {
+  if ((near(param1 * param2, 0.0)) || (near(param3 * param4, 0.0))) {
     return NA_REAL;
   }
   return std::log(param1 * param2 / (param3 * param4));
