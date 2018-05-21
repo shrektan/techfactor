@@ -535,7 +535,7 @@ Alpha_mfun alpha039 = [](const Quotes& qts) -> Timeseries {
     return qt.vwap() * 0.3 + qt.open() * 0.7;
   };
   auto volume = [](const Quote& qt) {
-    return mean((qt.ts_volume(180)));
+    return mean(qt.ts_volume(180));
   };
   auto sum_v = [volume](const Quote& qt) {
     return sum(qt.ts<double>(37, volume));

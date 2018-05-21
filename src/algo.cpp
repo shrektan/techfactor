@@ -174,7 +174,7 @@ double decaylinear(const Timeseries& x)
   const int n = x.size();
   Timeseries weights(sequence(n));
   const double sum_weights = std::accumulate(weights.cbegin(), weights.cend(), 0.0);
-  return sum(weights / sum_weights * x);
+  return sum(weights * x) / sum_weights;
 }
 
 
