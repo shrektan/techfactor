@@ -47,7 +47,8 @@ Alpha_mfun alpha062 = [](const Quotes& qts) -> Timeseries {
 };
 
 
-// SMA(MAX(CLOSE - DELAY(CLOSE, 1), 0), 6, 1) / SMA(ABS(CLOSE - DELAY(CLOSE, 1)), 6, 1) * 100
+// SMA(MAX(CLOSE - DELAY(CLOSE, 1), 0), 6, 1) /
+// SMA(ABS(CLOSE - DELAY(CLOSE, 1)), 6, 1) * 100
 Alpha_fun alpha063 = [](const Quote& qt) -> double {
   auto get_hinge_diff = [](const Quote& qt) {
     return std::max(qt.close() - qt.pclose(), 0.0);
@@ -63,7 +64,8 @@ Alpha_fun alpha063 = [](const Quote& qt) -> double {
 
 
 // MAX(RANK(DECAYLINEAR(CORR(RANK(VWAP), RANK(VOLUME), 4), 4)),
-//     RANK(DECAYLINEAR(MAX(CORR(RANK(VWAP), RANK(MEAN(VOLUME, 60)), 4), 13), 14))) * -1
+//     RANK(DECAYLINEAR(MAX(CORR(RANK(VWAP),
+// RANK(MEAN(VOLUME, 60)), 4), 13), 14))) * -1
 Alpha_mfun alpha064 = [](const Quotes& qts) -> Timeseries {
   auto rk_vwap = [](const Quotes& qts) {
     return rank(qts.apply([](const Quote& qt) { return qt.vwap(); }));
@@ -195,7 +197,8 @@ Alpha_fun alpha072 = [](const Quote& qt) -> double {
 };
 
 
-// -(TSRANK(DECAYLINEAR(CORR((CLOSE), VOLUME, 10), 16), 4), 5) - RANK(DECAYLINEAR(CORR(RANK(VWAP), MEAN(VOLUME, 30), 4), 3)))
+// -(TSRANK(DECAYLINEAR(CORR((CLOSE), VOLUME, 10), 16), 4), 5) -
+// RANK(DECAYLINEAR(CORR(RANK(VWAP), MEAN(VOLUME, 30), 4), 3)))
 Alpha_mfun alpha073 = [](const Quotes& qts) -> Timeseries {
   auto cor1 = [](const Quote& qt) {
     return corr(qt.ts_close(10), qt.ts_volume(10));
@@ -570,7 +573,8 @@ Alpha_fun alpha095 = [](const Quote& qt) -> double {
 };
 
 
-// SMA(SMA((CLOSE - TSMIN(LOW, 9)) / (TSMAX(HIGH, 9) - TSMIN(LOW, 9)) * 100, 3, 1), 3, 1)
+// SMA(SMA((CLOSE - TSMIN(LOW, 9)) /
+// (TSMAX(HIGH, 9) - TSMIN(LOW, 9)) * 100, 3, 1), 3, 1)
 Alpha_fun alpha096 = [](const Quote& qt) -> double {
   auto tmp_ser = [](const Quote& qt) {
     auto minl9 = tsmin(qt.ts_low(9));
@@ -660,7 +664,8 @@ Alpha_mfun alpha101= [](const Quotes& qts) -> Timeseries{
 };
 
 
-// SMA(MAX(VOLUME-DELAY(VOLUME, 1), 0), 6, 1) / SMA(ABS(VOLUME-DELAY(VOLUME, 1)), 6, 1) * 100
+// SMA(MAX(VOLUME-DELAY(VOLUME, 1), 0), 6, 1) /
+// SMA(ABS(VOLUME-DELAY(VOLUME, 1)), 6, 1) * 100
 Alpha_fun alpha102 = [](const Quote& qt) -> double {
   auto fun_max = [](const Quote& qt) {
     return std::max(qt.volume() - qt.volume(1), 0.0);
@@ -736,7 +741,8 @@ Alpha_mfun alpha107= [](const Quotes& qts) -> Timeseries{
 };
 
 
-// (RANK((HIGH - MIN(HIGH, 2))) ^ RANK(CORR((VWAP), (MEAN(VOLUME,120)), 6))) * -1
+// (RANK((HIGH - MIN(HIGH, 2))) ^
+// RANK(CORR((VWAP), (MEAN(VOLUME,120)), 6))) * -1
 Alpha_mfun alpha108= [](const Quotes& qts) -> Timeseries{
   auto part1 = [](const Quote& qt) {
     return qt.high() - tsmin(qt.ts_high(2));
@@ -763,7 +769,8 @@ Alpha_fun alpha109 = [](const Quote& qt) -> double {
 };
 
 
-// SUM(MAX(0, HIGH - DELAY(CLOSE, 1)), 20) / SUM(MAX(0, DELAY(CLOSE, 1) - LOW), 20) * 100
+// SUM(MAX(0, HIGH - DELAY(CLOSE, 1)), 20) /
+// SUM(MAX(0, DELAY(CLOSE, 1) - LOW), 20) * 100
 Alpha_fun alpha110 = [](const Quote& qt) -> double {
   auto fun1 = [](const Quote& qt) {
     return std::max(0.0, qt.high() - qt.pclose());
@@ -813,7 +820,8 @@ Alpha_fun alpha112 = [](const Quote& qt) -> double {
 };
 
 
-// -1 * ((RANK((SUM(DELAY(CLOSE, 5), 20) / 20)) * CORR(CLOSE, VOLUME, 2)) * RANK(CORR(SUM(CLOSE, 5), SUM(CLOSE, 20), 2)))
+// -1 * ((RANK((SUM(DELAY(CLOSE, 5), 20) / 20)) *
+// CORR(CLOSE, VOLUME, 2)) * RANK(CORR(SUM(CLOSE, 5), SUM(CLOSE, 20), 2)))
 Alpha_mfun alpha113= [](const Quotes& qts) -> Timeseries{
   auto part1 = [](const Quote& qt) {
     return sum(qt.ts<double>(20, [](const Quote& qt) { return qt.close(5); })) / 20;
@@ -835,7 +843,8 @@ Alpha_mfun alpha113= [](const Quotes& qts) -> Timeseries{
 };
 
 
-// RANK(DELAY(((HIGH - LOW) / (SUM(CLOSE, 5) / 5)), 2)) * RANK(RANK(VOLUME)) / (((HIGH - LOW) / (SUM(CLOSE, 5) / 5)) / (VWAP - CLOSE))
+// RANK(DELAY(((HIGH - LOW) / (SUM(CLOSE, 5) / 5)), 2)) *
+// RANK(RANK(VOLUME)) / (((HIGH - LOW) / (SUM(CLOSE, 5) / 5)) / (VWAP - CLOSE))
 Alpha_mfun alpha114= [](const Quotes& qts) -> Timeseries{
   auto part1 = [](const Quote& qt) {
     auto sc_5_2 = sum(qt.ts_close(5, 2));
@@ -909,7 +918,8 @@ Alpha_fun alpha118 = [](const Quote& qt) -> double {
 
 
 // (RANK(DECAYLINEAR(CORR(VWAP, SUM(MEAN(VOLUME,5), 26), 5), 7)) -
-//  RANK(DECAYLINEAR(TSRANK(MIN(CORR(RANK(OPEN), RANK(MEAN(VOLUME,15)), 21), 9), 7), 8)))
+//  RANK(DECAYLINEAR(TSRANK(MIN(CORR(RANK(OPEN),
+// RANK(MEAN(VOLUME,15)), 21), 9), 7), 8)))
 Alpha_mfun alpha119 = [](const Quotes& qts) -> Timeseries{
   auto sum_mean_vol5 = [](const Quote& qt) {
     auto mvol5 = [](const Quote& qt) { return mean(qt.ts_volume(5)); };
