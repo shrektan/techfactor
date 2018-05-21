@@ -372,6 +372,18 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// near
+bool near(const double x, const double y);
+RcppExport SEXP _GCAMCTF_near(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const double >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(near(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tf_qt_tdates
 Rcpp::newDateVector tf_qt_tdates(SEXP quote_ptr, const Rcpp::newDateVector from_to);
 RcppExport SEXP _GCAMCTF_tf_qt_tdates(SEXP quote_ptrSEXP, SEXP from_toSEXP) {
@@ -635,6 +647,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GCAMCTF_assert_valid_price", (DL_FUNC) &_GCAMCTF_assert_valid_price, 2},
     {"_GCAMCTF_assert_valid_volume", (DL_FUNC) &_GCAMCTF_assert_valid_volume, 2},
     {"_GCAMCTF_assert_sorted", (DL_FUNC) &_GCAMCTF_assert_sorted, 1},
+    {"_GCAMCTF_near", (DL_FUNC) &_GCAMCTF_near, 2},
     {"_GCAMCTF_tf_qt_tdates", (DL_FUNC) &_GCAMCTF_tf_qt_tdates, 2},
     {"_GCAMCTF_tf_qt_today", (DL_FUNC) &_GCAMCTF_tf_qt_today, 2},
     {"_GCAMCTF_tf_qt_get", (DL_FUNC) &_GCAMCTF_tf_qt_get, 4},

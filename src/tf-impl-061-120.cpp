@@ -58,7 +58,7 @@ Alpha_fun alpha063 = [](const Quote& qt) -> double {
   };
   const auto sma_hinge = sma(qt.ts<double>(6, get_hinge_diff), 1);
   const auto sma_abs   = sma(qt.ts<double>(6, get_abs_diff), 1);
-  if (sma_abs == 0.0) return NA_REAL;
+  if (near(sma_abs, 0.0)) return NA_REAL;
   return sma_hinge / sma_abs * 100;
 };
 
@@ -131,7 +131,7 @@ Alpha_fun alpha067 = [](const Quote& qt) -> double {
   };
   const auto sma_hinge = sma(qt.ts<double>(24, get_hinge_diff), 1);
   const auto sma_abs   = sma(qt.ts<double>(24, get_abs_diff), 1);
-  if (sma_abs == 0.0) return NA_REAL;
+  if (near(sma_abs, 0.0)) return NA_REAL;
   return sma_hinge / sma_abs * 100;
 };
 
@@ -154,7 +154,7 @@ Alpha_fun alpha069 = [](const Quote& qt) -> double {
   const auto sum_dtm_20 = sum(qt.ts_dtm(20));
   const auto sum_dbm_20 = sum(qt.ts_dbm(20));
   if (sum_dtm_20 > sum_dbm_20) {
-    return sum_dtm_20 == 0.0 ?
+    return near(sum_dtm_20, 0.0) ?
     NA_REAL :
     (sum_dtm_20 - sum_dbm_20) / sum_dtm_20;
   }
@@ -162,7 +162,7 @@ Alpha_fun alpha069 = [](const Quote& qt) -> double {
     return 0.0;
   }
   else {
-    return sum_dbm_20 == 0.0 ?
+    return near(sum_dbm_20, 0.0) ?
     NA_REAL :
     (sum_dtm_20 - sum_dbm_20) / sum_dbm_20;
   }
@@ -178,7 +178,7 @@ Alpha_fun alpha070 = [](const Quote& qt) -> double {
 // (CLOSE - MEAN(CLOSE, 24)) / MEAN(CLOSE, 24) * 100
 Alpha_fun alpha071 = [](const Quote& qt) -> double {
   const auto mean_close_24 = mean(qt.ts_close(24));
-  if (mean_close_24 == 0.0) return NA_REAL;
+  if (near(mean_close_24, 0.0)) return NA_REAL;
   return (qt.close() - mean_close_24) / mean_close_24 * 100;
 };
 
@@ -190,7 +190,7 @@ Alpha_fun alpha072 = [](const Quote& qt) -> double {
     // The highest price in the past six days minus the closing price.
     const auto hmc = tsmax(qt.ts_close(6)) - qt.close();
     const auto ran = tsmax(qt.ts_high(6)) - tsmin(qt.ts_low(6));
-    if (ran == 0.0) return NA_REAL;
+    if (near(ran, 0.0)) return NA_REAL;
     return hmc / ran * 100;
   };
   return sma(qt.ts<double>(15, foo), 1);
@@ -268,7 +268,7 @@ Alpha_fun alpha075 = [](const Quote& qt) -> double {
   };
   auto count1 = count(qt.ts<bool>(50, count1_fun));
   auto count2 = count(qt.ts<bool>(50, count2_fun));
-  if (count2 == 0.0) return NA_REAL;
+  if (near(count2, 0.0)) return NA_REAL;
   return count1 / count2;
 };
 
@@ -277,11 +277,11 @@ Alpha_fun alpha075 = [](const Quote& qt) -> double {
 // MEAN(ABS(CLOSE / DELAY(CLOSE, 1) - 1) / VOLUME, 20)
 Alpha_fun alpha076 = [](const Quote& qt) -> double {
   auto get_abs_dc = [](const Quote& qt) {
-    if (qt.volume() == 0.0) return NA_REAL;
+    if (near(qt.volume(), 0.0)) return NA_REAL;
     return std::abs(qt.close() / qt.close(1) - 1) / qt.volume();
   };
   auto mdc20 = mean(qt.ts<double>(20, get_abs_dc));
-  if (mdc20 == 0.0) return NA_REAL;
+  if (near(mdc20, 0.0)) return NA_REAL;
   return stdev(qt.ts<double>(20, get_abs_dc)) / mdc20;
 };
 
@@ -322,7 +322,7 @@ Alpha_fun alpha078 = [](const Quote& qt) -> double {
   auto aver_12  = qt.ts<double>(12, get_aver);
   auto aver_ser = qt.ts<double>(12, get_tmp_ser);
   auto mean_abs = mean(abs(aver_ser));
-  if (mean_abs == 0.0) return NA_REAL;
+  if (near(mean_abs, 0.0)) return NA_REAL;
   return (aver - mean(aver_12)) / (0.015 * mean_abs);
 };
 
@@ -337,14 +337,14 @@ Alpha_fun alpha079 = [](const Quote& qt) -> double {
   };
   const auto sma_hinge = sma(qt.ts<double>(12, get_hinge_diff), 1);
   const auto sma_abs   = sma(qt.ts<double>(12, get_abs_diff), 1);
-  if (sma_abs == 0.0) return NA_REAL;
+  if (near(sma_abs, 0.0)) return NA_REAL;
   return sma_hinge / sma_abs * 100;
 };
 
 
 // (VOLUME - DELAY(VOLUME, 5)) / DELAY(VOLUME, 5) * 100
 Alpha_fun alpha080 = [](const Quote& qt) -> double {
-  if (qt.volume(5) == 0.0) return NA_REAL;
+  if (near(qt.volume(5), 0.0)) return NA_REAL;
   return (qt.volume() - qt.volume(5)) / qt.volume(5) * 100;
 };
 
@@ -359,7 +359,7 @@ Alpha_fun alpha081 = [](const Quote& qt) -> double {
 Alpha_fun alpha082 = [](const Quote& qt) -> double {
   auto get_tmp_ser = [](const Quote& qt) {
     const auto hl = tsmax(qt.ts_high(6)) - tsmin(qt.ts_low(6));
-    if (hl == 0.0) return NA_REAL;
+    if (near(hl, 0.0)) return NA_REAL;
     return (tsmax(qt.ts_high(6)) - qt.close()) / hl * 100.0;
   };
   return sma(qt.ts<double>(20, get_tmp_ser), 1);
@@ -408,7 +408,7 @@ Alpha_fun alpha085 = [](const Quote& qt) -> double {
   };
   auto get_tmp   = [](const Quote& qt) {
     auto mvol20 = mean(qt.ts_volume(20));
-    if (mvol20 == 0.0) return NA_REAL;
+    if (near(mvol20, 0.0)) return NA_REAL;
     return qt.volume() / mvol20;
   };
   const double trank_8 = tsrank(qt.ts<double>(8, get_delta));
@@ -779,7 +779,7 @@ Alpha_fun alpha110 = [](const Quote& qt) -> double {
     return std::max(0.0, qt.pclose() - qt.low());
   };
   auto deno = sum(qt.ts<double>(20, fun2));
-  if (deno == 0.0) return NA_REAL;
+  if (near(deno, 0.0)) return NA_REAL;
   auto num = sum(qt.ts<double>(20, fun1));
   return num / deno * 100.0;
 };
@@ -794,7 +794,7 @@ Alpha_fun alpha111 = [](const Quote& qt) -> double {
     auto l = qt.low();
     auto c = qt.close();
     auto hl = h - l;
-    if (hl == 0.0) return NA_REAL;
+    if (near(hl, 0.0)) return NA_REAL;
     return v * ((c - l) - (h - c)) / hl;
   };
   return sma(qt.ts<double>(11, fun), 2) - sma(qt.ts<double>(4, fun), 2);
@@ -815,7 +815,7 @@ Alpha_fun alpha112 = [](const Quote& qt) -> double {
   const auto sum_1_12 = sum(qt.ts<double>(12, fun1));
   const auto sum_2_12 = sum(qt.ts<double>(12, fun2));
   auto deno = sum_1_12 + sum_2_12;
-  if (deno == 0.0) return NA_REAL;
+  if (near(deno, 0.0)) return NA_REAL;
   return (sum_1_12 - sum_2_12) / deno * 100;
 };
 
@@ -848,14 +848,14 @@ Alpha_mfun alpha113= [](const Quotes& qts) -> Timeseries{
 Alpha_mfun alpha114= [](const Quotes& qts) -> Timeseries{
   auto part1 = [](const Quote& qt) {
     auto sc_5_2 = sum(qt.ts_close(5, 2));
-    if (sc_5_2 == 0.0) return NA_REAL;
+    if (near(sc_5_2, 0.0)) return NA_REAL;
     return (qt.high(2) - qt.low(2)) / (sc_5_2 / 5);
   };
 
   auto part2 = [](const Quote& qt) {
     auto sc_5 = sum(qt.ts_close(5));
     auto vc = qt.vwap() - qt.close();
-    if (sc_5 == 0.0 || vc == 0.0) return NA_REAL;
+    if (near(sc_5, 0.0) || near(vc, 0.0)) return NA_REAL;
     return (qt.high() - qt.low()) / (sc_5 / 5) / vc;
   };
 
@@ -912,7 +912,7 @@ Alpha_fun alpha118 = [](const Quote& qt) -> double {
   auto o20 = qt.ts_open(20);
   auto l20 = qt.ts_low(20);
   auto deno = sum(o20 - l20);
-  if (deno == 0.0) return NA_REAL;
+  if (near(deno, 0.0)) return NA_REAL;
   return sum(h20 - o20) / deno * 100;
 };
 

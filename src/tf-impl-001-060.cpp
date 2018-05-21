@@ -190,9 +190,6 @@ Alpha_fun alpha014 = [](const Quote& qt) -> double {
 
 // OPEN/DELAY(CLOSE,1)-1
 Alpha_fun alpha015 = [](const Quote& qt) -> double {
-  if (ISNAN(qt.close(1)) || qt.close(1) == 0.0) {
-    return NA_REAL;
-  }
   return qt.open() / qt.close(1) - 1.0;
 };
 
@@ -231,9 +228,6 @@ Alpha_mfun alpha017 = [](const Quotes& qts) -> Timeseries {
 
 // CLOSE/DELAY(CLOSE,5)
 Alpha_fun alpha018 = [](const Quote& qt) -> double {
-  if (ISNAN(qt.close(5)) || qt.close(5) == 0.0) {
-    return NA_REAL;
-  }
   return qt.close() / qt.close(5);
 };
 
@@ -242,27 +236,22 @@ Alpha_fun alpha018 = [](const Quote& qt) -> double {
 // (CLOSE-DELAY(CLOSE,5))/DELAY(CLOSE,5):(CLOSE=DELAY(CLOSE,5)?
 // 0:(CLOSE-DELAY(CLOSE,5))/CLOSE))
 Alpha_fun alpha019 = [](const Quote& qt) -> double {
-  if (ISNAN(qt.close()) || ISNAN(qt.close(5)) ||
-      qt.close() == 0.0 || qt.close(5) == 0.0) {
-    return NA_REAL;
+  auto c0 = qt.close();
+  auto c5 = qt.close(5);
+  if (c0 < c5) {
+    return (c0 - c5) / c5;
   }
-  if (qt.close() < qt.close(5)) {
-    return (qt.close() - qt.close(5)) / qt.close(5);
-  }
-  else if (qt.close() == qt.close(5)) {
+  else if (c0 == c5) {
     return 0.0;
   }
   else {
-    return (qt.close() - qt.close(5)) / qt.close();
+    return (c0 - c5) / c0;
   }
 };
 
 
 // (CLOSE-DELAY(CLOSE,6))/DELAY(CLOSE,6)*100
 Alpha_fun alpha020 = [](const Quote& qt) -> double {
-  if (ISNAN(qt.close(6)) || qt.close(6) == 0.0) {
-    return NA_REAL;
-  }
   return (qt.close() - qt.close(6)) / qt.close(6) * 100;
 };
 
@@ -310,7 +299,7 @@ Alpha_fun alpha023 = [](const Quote& qt) -> double {
   };
   double sma1 = sma(qt.ts<double>(20, p_con1), 1);
   double sma2 = sma(qt.ts<double>(20, p_con2), 1);
-  if (sma1 + sma2 == 0.0) return NA_REAL;
+  if (near(sma1 + sma2, 0.0)) return NA_REAL;
   return sma1 / (sma1 + sma2) * 100;
 };
 
@@ -393,9 +382,6 @@ Alpha_fun alpha028 = [](const Quote& qt) -> double {
 
 // (CLOSE-DELAY(CLOSE,6))/DELAY(CLOSE,6)*VOLUME
 Alpha_fun alpha029 = [](const Quote& qt) -> double {
-  if (ISNAN(qt.close(6)) || qt.close(6) == 0.0) {
-    return NA_REAL;
-  }
   return (qt.close() - qt.close(6)) / qt.close(6) * qt.volume();
 };
 
@@ -416,7 +402,7 @@ Alpha_fun alpha030 = [](const Quote& qt) -> double {
 // (CLOSE-MEAN(CLOSE,12))/MEAN(CLOSE,12)*100
 Alpha_fun alpha031 = [](const Quote& qt) -> double {
   const auto mc12 = mean(qt.ts_close(12));
-  if (ISNAN(mc12) || mc12 == 0.0) return NA_REAL;
+  if (ISNAN(mc12) || near(mc12, 0.0)) return NA_REAL;
   return (qt.close() - mc12) / mc12 * 100;
 };
 
@@ -464,7 +450,6 @@ Alpha_mfun alpha033 = [](const Quotes& qts) -> Timeseries {
 
 // MEAN(CLOSE,12)/CLOSE
 Alpha_fun alpha034 = [](const Quote& qt) -> double {
-  if (ISNAN(qt.close()) || qt.close() == 0.0) return NA_REAL;
   return mean(qt.ts_close(12)) / qt.close();
 };
 
@@ -588,7 +573,7 @@ Alpha_fun alpha040 = [](const Quote& qt) -> double {
   };
 
   auto right = sum(qt.ts<double>(26, base_fun2));
-  if (right == 0.0 || ISNAN(right)) return NA_REAL;
+  if (near(right, 0.0) || ISNAN(right)) return NA_REAL;
   auto left = sum(qt.ts<double>(26, base_fun1));
   return left / right * 100;
 };
@@ -677,7 +662,6 @@ Alpha_mfun alpha045 = [](const Quotes& qts) -> Timeseries {
 Alpha_fun alpha046 = [](const Quote& qt) -> double {
   double mean_p = mean(qt.ts_close(3)) + mean(qt.ts_close(6)) +
                   mean(qt.ts_close(12)) + mean(qt.ts_close(24));
-  if (ISNAN(qt.close()) || qt.close() == 0.0) return NA_REAL;
   return mean_p / (4 * qt.close());
 };
 
@@ -739,7 +723,7 @@ Alpha_fun alpha049 = [](const Quote& qt) -> double {
   };
   auto sum_ts1 = sum(qt.ts<double>(12, sum1));
   auto sum_ts2 = sum(qt.ts<double>(12, sum2));
-  if ((sum_ts1 + sum_ts2) == 0.0) return NA_REAL;
+  if (near(sum_ts1 + sum_ts2, 0.0)) return NA_REAL;
   return sum_ts2 / (sum_ts1 + sum_ts2);
 };
 
@@ -779,7 +763,7 @@ Alpha_fun alpha050 = [](const Quote& qt) -> double {
   };
   auto sum_ts1 = sum(qt.ts<double>(12, sum1));
   auto sum_ts2 = sum(qt.ts<double>(12, sum2));
-  if ((sum_ts1 + sum_ts2) == 0.0) return NA_REAL;
+  if (near(sum_ts1 + sum_ts2, 0.0)) return NA_REAL;
   return (sum_ts1 - sum_ts2) / (sum_ts1 + sum_ts2);
 };
 
@@ -813,7 +797,7 @@ Alpha_fun alpha051 = [](const Quote& qt) -> double {
   };
   auto sum_ts1 = sum(qt.ts<double>(12, sum1));
   auto sum_ts2 = sum(qt.ts<double>(12, sum2));
-  if ((sum_ts1 + sum_ts2) == 0.0) return NA_REAL;
+  if (near(sum_ts1 + sum_ts2, 0.0)) return NA_REAL;
   return sum_ts1 / (sum_ts1 + sum_ts2);
 };
 
@@ -829,7 +813,7 @@ Alpha_fun alpha052 = [](const Quote& qt) -> double {
   };
   auto sum_ts1 = sum(qt.ts<double>(26, sum1));
   auto sum_ts2 = sum(qt.ts<double>(26, sum2));
-  if (ISNAN(sum_ts2) || sum_ts2 == 0.0) return NA_REAL;
+  if (ISNAN(sum_ts2) || near(sum_ts2, 0.0)) return NA_REAL;
   return sum_ts1 / sum_ts2 * 100;
 };
 
@@ -891,7 +875,7 @@ Alpha_fun alpha055 = [](const Quote& qt) -> double {
     else {
       param2 = std::abs(h - l1) + std::abs(c1 - o1) / 4;
     }
-    if (param2 == 0.0) return NA_REAL;
+    if (near(param2, 0.0)) return NA_REAL;
     return 16.0 * param1 / param2 * param3;
   };
   return sum(qt.ts<double>(20, base_fun));
@@ -929,7 +913,7 @@ Alpha_fun alpha057 = [](const Quote& qt) -> double {
   auto muti_p = [](const Quote& qt) {
     double left = qt.close() - tsmin(qt.ts_low(9));
     double right = tsmax(qt.ts_high(9)) - tsmin(qt.ts_low(9));
-    if (right == 0.0) return NA_REAL;
+    if (near(right, 0.0)) return NA_REAL;
     return left / right * 100;
   };
   return sma(qt.ts<double>(3, muti_p), 1);
@@ -970,7 +954,7 @@ Alpha_fun alpha060 = [](const Quote& qt) -> double {
   auto base_fun = [](const Quote& qt) {
     double left = (qt.close() - qt.low()) - (qt.high() - qt.close());
     double right = (qt.high() - qt.low()) / qt.volume();
-    if (right == 0.0) return NA_REAL;
+    if (near(right, 0.0)) return NA_REAL;
     return left / right;
   };
   return sum(qt.ts<double>(20, base_fun));
