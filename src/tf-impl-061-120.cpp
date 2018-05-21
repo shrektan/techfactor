@@ -522,7 +522,7 @@ Alpha_mfun alpha092 = [](const Quotes& qts) -> Timeseries{
     auto mean_ser = qt.ts<double>(13, [](const Quote& qt) {
       return mean(qt.ts_volume(180));
     });
-    return decaylinear(qt.ts<double>(5, [&](const Quote& qt) {
+    return decaylinear(qt.ts<double>(5, [mean_ser](const Quote& qt) {
       return abs(corr(mean_ser, qt.ts_close(13)));
     }));
   };
@@ -573,8 +573,10 @@ Alpha_fun alpha095 = [](const Quote& qt) -> double {
 // SMA(SMA((CLOSE - TSMIN(LOW, 9)) / (TSMAX(HIGH, 9) - TSMIN(LOW, 9)) * 100, 3, 1), 3, 1)
 Alpha_fun alpha096 = [](const Quote& qt) -> double {
   auto tmp_ser = [](const Quote& qt) {
-    return (qt.close() - tsmin(qt.ts_low(9))) /
-      (tsmax(qt.ts_high(9)) - tsmin(qt.ts_low(9))) * 100;
+    auto minl9 = tsmin(qt.ts_low(9));
+    auto maxh9 = tsmin(qt.ts_high(9));
+    if (maxh9 == minl9) return NA_REAL;
+    return (qt.close() - minl9) / (maxh9 - minl9) * 100;
   };
   auto fun = [tmp_ser](const Quote& qt) {
     return sma(qt.ts<double>(3, tmp_ser), 1);
@@ -585,22 +587,21 @@ Alpha_fun alpha096 = [](const Quote& qt) -> double {
 
 // STD(VOLUME, 10)
 Alpha_fun alpha097 = [](const Quote& qt) -> double {
-  if(ISNA(sum(qt.ts_amount(10))))
-  {
-    return NA_REAL;
-  }
   return stdev(qt.ts_volume(10));
 };
 
 
-// (((DELTA((SUM(CLOSE, 100) / 100), 100) / DELAY(CLOSE, 100)) < 0.05) || ((DELTA((SUM(CLOSE, 100) / 100), 100) /
-// DELAY(CLOSE, 100)) == 0.05)) ? (-1 * (CLOSE - TSMIN(CLOSE, 100))) : (-1 * DELTA(CLOSE, 3))
+// (((DELTA((SUM(CLOSE, 100) / 100), 100) /
+// DELAY(CLOSE, 100)) < 0.05) || ((DELTA((SUM(CLOSE, 100) / 100), 100) /
+// DELAY(CLOSE, 100)) == 0.05)) ?
+// (-1 * (CLOSE - TSMIN(CLOSE, 100))) : (-1 * DELTA(CLOSE, 3))
 Alpha_fun alpha098 = [](const Quote& qt) -> double {
-  bool statement = [](const Quote& qt) {
-    auto tmp = [](const Quote& qt) { return mean(qt.ts_close(100)); };
-    return delta(qt.ts<double>(100, tmp)) / qt.close(100) <= 0.05;
-  };
-  return statement ? -(qt.close() - tsmin(qt.ts_close(100))) : -delta(qt.ts_close(3));
+  auto fun = [](const Quote& qt) { return mean(qt.ts_close(100)); };
+  auto delta100 = delta(qt.ts<double>(100, fun));
+  auto close100 = qt.close(100);
+  bool statement = (delta100 / close100) <= 0.05;
+  auto min_close_100 = tsmin(qt.ts_close(100));
+  return statement ? -(qt.close() - min_close_100) : -delta(qt.ts_close(3));
 };
 
 
@@ -609,11 +610,9 @@ Alpha_mfun alpha099 = [](const Quotes& qts) -> Timeseries{
   auto rk_close = [](const Quotes& qts) {
     return rank(qts.apply([](const Quote& qt) { return qt.close(); }));
   };
-
   auto rk_vol = [](const Quotes& qts) {
     return rank(qts.apply([](const Quote& qt) { return qt.volume(); }));
   };
-
   auto rk1 = qts.tsapply(5, rk_close);
   auto rk2 = qts.tsapply(5, rk_vol);
   Timeseries tmp = apply(rk1, rk2, covariance);
@@ -623,10 +622,6 @@ Alpha_mfun alpha099 = [](const Quotes& qts) -> Timeseries{
 
 // STD(VOLUME, 20)
 Alpha_fun alpha100 = [](const Quote& qt) -> double {
-  if(ISNA(sum(qt.ts_volume(20))))
-  {
-    return NA_REAL;
-  }
   return stdev(qt.ts_volume(20));
 };
 
@@ -637,18 +632,23 @@ Alpha_mfun alpha101= [](const Quotes& qts) -> Timeseries{
   auto mean_ser = [](const Quote& qt) {
     return mean(qt.ts_volume(30));
   };
-
-  auto corr1 = [&](const Quote& qt) {
-    auto sum_mean_vol = [&](const Quote& qt) { return sum(qt.ts<double>(37, mean_ser)); };
+  auto sum_mean_vol = [mean_ser](const Quote& qt) {
+    return sum(qt.ts<double>(37, mean_ser));
+  };
+  auto corr1 = [sum_mean_vol](const Quote& qt) {
     return corr(qt.ts_close(15), qt.ts<double>(15, sum_mean_vol));
   };
 
   auto rk_hav = [](const Quotes& qts) {
-    return rank(qts.apply([](const Quote& qt) { return qt.high() * 0.1 + qt.vwap() * 0.9; }));
+    return rank(qts.apply([](const Quote& qt) {
+      return qt.high() * 0.1 + qt.vwap() * 0.9;
+    }));
   };
 
   auto rk_vol = [](const Quotes& qts) {
-    return rank(qts.apply([](const Quote& qt) { return qt.volume(); }));
+    return rank(qts.apply([](const Quote& qt) {
+      return qt.volume();
+    }));
   };
 
   auto corr2 = [rk_hav, rk_vol](const Quotes& qts) {
@@ -870,7 +870,7 @@ Alpha_mfun alpha115 = [](const Quotes& qts) -> Timeseries{
     return tsrank(qt.ts_volume(10));
   };
 
-  auto corr2 = [&](const Quote& qt) {
+  auto corr2 = [tsrank1, tsrank2](const Quote& qt) {
     return corr(qt.ts<double>(7, tsrank1), qt.ts<double>(7, tsrank2));
   };
   return pow(rank(qts.apply(corr1)), rank(qts.apply(corr2)));
@@ -905,10 +905,10 @@ Alpha_mfun alpha119 = [](const Quotes& qts) -> Timeseries{
     auto tmp = qt.ts<double>(26, [](const Quote& qt) { return mean(qt.ts_volume(5)); });
     return sum(tmp);
   };
-  auto cor = [&](const Quote& qt) {
+  auto cor = [sum_mean_vol5](const Quote& qt) {
     return corr(qt.ts_vwap(5), qt.ts<double>(5, sum_mean_vol5));
   };
-  auto decay_linear1 = [&](const Quote& qt) {
+  auto decay_linear1 = [cor](const Quote& qt) {
     return decaylinear(qt.ts<double>(7, cor));
   };
   auto rk_open = [](const Quotes& qts) {
@@ -917,14 +917,14 @@ Alpha_mfun alpha119 = [](const Quotes& qts) -> Timeseries{
   auto rk_mean_vol = [](const Quotes& qts) {
     return rank(qts.apply([](const Quote& qt) { return mean(qt.ts_volume(15)); }));
   };
-  auto decay_linear2 = [&](const Quotes& qts) {
+  auto decay_linear2 = [rk_open, rk_mean_vol](const Quotes& qts) {
     auto rk1 = qts.tsapply(21, rk_open);
     auto rk2 = qts.tsapply(21, rk_mean_vol);
-    auto cor = [&](const Quotes& quotes) { return apply(rk1, rk2, corr); };
+    auto cor = [rk1, rk2](const Quotes& quotes) { return apply(rk1, rk2, corr); };
     auto corr1 = qts.tsapply(9, cor);
-    auto mi1 = [&](const Quotes& quotes) { return apply(corr1, tsmin); };
+    auto mi1 = [corr1](const Quotes& quotes) { return apply(corr1, tsmin); };
     auto min1 = qts.tsapply(7, mi1);
-    auto ts_rank = [&](const Quotes& quotes) { return apply(min1, tsrank); };
+    auto ts_rank = [min1](const Quotes& quotes) { return apply(min1, tsrank); };
     return apply(qts.tsapply(8, ts_rank), decaylinear);
   };
   return rank(qts.apply(decay_linear1)) - rank(decay_linear2(qts));
