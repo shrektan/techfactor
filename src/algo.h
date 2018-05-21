@@ -46,7 +46,7 @@ double regresi(const Timeseries& x, const Timeseries& y);
 Timeseries filter(const Timeseries& x, const std::vector<bool>& cond);
 double highday(const Timeseries& x);
 double lowday(const Timeseries& x);
-
+bool near(const double x, const double y);
 
 template<typename T>
 std::vector<T> ts(const int n, std::function<T(const int delay)> fun)

@@ -133,6 +133,10 @@ tf_assert_is_sorted <- function(x) {
     invisible(.Call(`_GCAMCTF_assert_sorted`, x))
 }
 
+tf_near <- function(x, y) {
+    .Call(`_GCAMCTF_near`, x, y)
+}
+
 tf_qt_tdates <- function(quote_ptr, from_to) {
     .Call(`_GCAMCTF_tf_qt_tdates`, quote_ptr, from_to)
 }

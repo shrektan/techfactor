@@ -424,3 +424,12 @@ test_that("assert_same_size", {
   )
 })
 
+test_that("near", {
+  expect_false(0.3 + 0.6 == 0.9)
+  expect_true(tf_near(0.3 + 0.6, 0.9))
+  expect_false(sqrt(2) ^ 2 == 2)
+  expect_true(tf_near(sqrt(2) ^ 2, 2))
+  expect_false(tf_near(2 + .Machine$double.eps ^ 0.5 * 1.01, 2))
+  expect_true(tf_near(2 + .Machine$double.eps ^ 0.5 * 0.99, 2))
+})
+

@@ -639,3 +639,13 @@ void assert_sorted(const std::vector<RDate>& x)
     "x must be a sorted date vector."
   );
 }
+
+
+// [[Rcpp::export("tf_near")]]
+bool near(const double x, const double y)
+{
+  static const double epsilon =
+    std::pow(std::numeric_limits<double>::epsilon(), 0.5);
+  if (!R_FINITE(x) || !R_FINITE(y)) return NA_REAL;
+  return std::abs(x - y) < epsilon;
+}
