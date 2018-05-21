@@ -175,11 +175,11 @@ test_that("qt.ts_get()", {
     purrr::map(tags, ~tf_qt_ts_get(qt, anydate(20180104), ., 5, 10)),
     purrr::map(tags, ~rep(NA_real_, 5))
   )
-  expect_equal(
+  expect_identical(
     tf_qt_ts_get(qt, anydate(20180104), "close", 3, 3),
     rep(NA_real_, 3)
   )
-  expect_equal(
+  expect_identical(
     tf_qt_ts_get(qt, anydate(20180104), "close", 3, 4),
     rep(NA_real_, 3)
   )

@@ -8,9 +8,9 @@ test_that("any_na", {
 })
 
 test_that("na_vector", {
-  expect_equal(tf_na_vector(1), c(NA_real_))
-  expect_equal(tf_na_vector(5), rep(NA_real_, 5))
-  expect_equal(tf_na_vector(0), double())
+  expect_identical(tf_na_vector(1), c(NA_real_))
+  expect_identical(tf_na_vector(5), rep(NA_real_, 5))
+  expect_identical(tf_na_vector(0), double())
 })
 
 test_that("delta", {
@@ -18,8 +18,8 @@ test_that("delta", {
   expect_error(tf_delta(c(0)), "x must have at least 2 elements.", fixed = TRUE)
   expect_equal(tf_delta(c(0, 1)), 1)
   expect_equal(tf_delta(c(-3, 8, 2)), 2 - (-3))
-  expect_equal(tf_delta(c(NA, 8, 2)), NA_real_)
-  expect_equal(tf_delta(c(NA, 8, NA)), NA_real_)
+  expect_identical(tf_delta(c(NA, 8, 2)), NA_real_)
+  expect_identical(tf_delta(c(NA, 8, NA)), NA_real_)
 })
 
 test_that("rank", {
@@ -30,19 +30,20 @@ test_that("rank", {
   expect_equal(tf_rank(x), frank(x, ties.method = "min"))
   x <- c(10, 1, 2, NA_real_, 8, 1.3, 1.34, NA_real_, 1, 1.3)
   expect_equal(tf_rank(x), frank(x, ties.method = "min", na.last = "keep"))
+  expect_false(any(is.nan(tf_rank(x))))
 })
 
 test_that("sum", {
   expect_equal(tf_sum(double()), 0)
   expect_equal(tf_sum(1.5), 1.5)
   expect_equal(tf_sum(c(0.3, 1.5)), 1.8)
-  expect_equal(tf_sum(c(0.3, 1.5, NA_real_)), NA_real_)
+  expect_identical(tf_sum(c(0.3, 1.5, NA_real_)), NA_real_)
 })
 
 test_that("mean", {
   expect_error(tf_mean(double()), "x must have at least 1 elements.", fixed = TRUE)
   expect_equal(tf_mean(1.5), 1.5)
-  expect_equal(tf_mean(c(1.5, NA_real_)), NA_real_)
+  expect_identical(tf_mean(c(1.5, NA_real_)), NA_real_)
   expect_equal(tf_mean(c(0.3, 1.5)), 0.9)
 })
 
@@ -52,13 +53,13 @@ test_that("stdev", {
 
   x <- rnorm(10)
   expect_equal(tf_stdev(x), sd(x))
-  expect_equal(tf_stdev(c(NA, x)), NA_real_)
+  expect_identical(tf_stdev(c(NA, x)), NA_real_)
 })
 
 test_that("tsmin", {
   x <- rnorm(10)
   expect_equal(tf_tsmin(x), min(x))
-  expect_equal(tf_tsmin(c(NA, x)), NA_real_)
+  expect_identical(tf_tsmin(c(NA, x)), NA_real_)
   expect_error(tf_tsmin(double()), "at least 1 elements")
   expect_equal(tf_tsmin(1.2), 1.2)
 })
@@ -66,7 +67,7 @@ test_that("tsmin", {
 test_that("tsmax", {
   x <- rnorm(10)
   expect_equal(tf_tsmax(x), max(x))
-  expect_equal(tf_tsmax(c(NA, x)), NA_real_)
+  expect_identical(tf_tsmax(c(NA, x)), NA_real_)
   expect_error(tf_tsmax(double()), "at least 1 elements")
   expect_equal(tf_tsmax(1.2), 1.2)
 })
@@ -74,7 +75,7 @@ test_that("tsmax", {
 test_that("tsrank", {
   x <- c(5, 3, 2, 4, 8)
   expect_equal(tf_tsrank(x), 5)
-  expect_equal(tf_tsrank(c(NA, x)), NA_real_)
+  expect_identical(tf_tsrank(c(NA, x)), NA_real_)
   expect_error(tf_tsrank(double()), "at least 1 elements")
   expect_equal(tf_tsrank(1.2), 1)
 })
@@ -89,8 +90,8 @@ test_that("covariance", {
   x <- rnorm(10)
   y <- rnorm(10)
   expect_equal(tf_covariance(x, y), cov(x, y))
-  expect_equal(tf_covariance(c(NA, x), c(1, y)), NA_real_)
-  expect_equal(tf_covariance(c(1, x), c(NA, y)), NA_real_)
+  expect_identical(tf_covariance(c(NA, x), c(1, y)), NA_real_)
+  expect_identical(tf_covariance(c(1, x), c(NA, y)), NA_real_)
 })
 
 test_that("corr", {
@@ -103,8 +104,8 @@ test_that("corr", {
   x <- rnorm(10)
   y <- rnorm(10)
   expect_equal(tf_corr(x, y), cor(x, y))
-  expect_equal(tf_corr(c(NA, x), c(1, y)), NA_real_)
-  expect_equal(tf_corr(c(1, x), c(NA, y)), NA_real_)
+  expect_identical(tf_corr(c(NA, x), c(1, y)), NA_real_)
+  expect_identical(tf_corr(c(1, x), c(NA, y)), NA_real_)
 })
 
 test_that("sign", {
@@ -136,7 +137,7 @@ test_that("wma", {
     wts <- 0.9 ^ (length(x) - seq_along(x))
     sum(x * wts)
   })
-  expect_equal(tf_wma(c(x, NA)), NA_real_)
+  expect_identical(tf_wma(c(x, NA)), NA_real_)
   expect_equal(tf_wma(1.2), 1.2)
   expect_error(tf_wma(double()), "x must have at least 1 elements")
 })
@@ -163,7 +164,9 @@ test_that("sumac", {
   x <- rnorm(10)
   expect_equal(tf_sumac(x), cumsum(x))
   expect_equal(tf_sumac(c(x, NA)), cumsum(c(x, NA)))
+  expect_false(any(is.nan(tf_sumac(c(x, NA)))))
   expect_equal(tf_sumac(c(NA, x)), cumsum(c(NA, x)))
+  expect_false(any(is.nan(tf_sumac(c(NA, x)))))
 })
 
 test_that("abs", {
@@ -173,13 +176,14 @@ test_that("abs", {
   expect_equal(tf_abs(x), abs(x))
   expect_equal(tf_abs(c(x, NA)), abs(c(x, NA)))
   expect_equal(tf_abs(c(NA, x)), abs(c(NA, x)))
+  expect_false(any(is.nan(tf_abs(c(NA, x)))))
 })
 
 test_that("log", {
   expect_equal(tf_log(double()), double())
   expect_equal(tf_log(1.3), log(1.3))
-  expect_equal(tf_log(-1.3), NA_real_)
-  expect_equal(tf_log(0), NA_real_)
+  expect_identical(tf_log(-1.3), NA_real_)
+  expect_identical(tf_log(0), NA_real_)
   x <- rnorm(10)
   expect_equal(tf_log(x), {
     res <- rep(NA_real_, 10)
@@ -187,6 +191,9 @@ test_that("log", {
     res
   })
   expect_equal(tf_log(c(1.0, NA)), c(0, NA))
+  expect_false(any(is.nan(
+    tf_log(c(1.0, NA))
+  )))
 })
 
 test_that("prod", {
@@ -196,6 +203,9 @@ test_that("prod", {
   expect_equal(tf_prod(x), prod(x))
   expect_equal(tf_prod(c(x, NA)), prod(c(x, NA)))
   expect_equal(tf_prod(c(NA, x)), prod(c(NA, x)))
+  expect_false(any(is.nan(
+    tf_prod(c(NA, x))
+  )))
 })
 
 test_that("count", {
@@ -216,8 +226,8 @@ test_that("regbeta", {
   x <- rnorm(10)
   y <- rnorm(10)
   expect_equal(tf_regbeta(y, x), coef(lm(y ~ x))[["x"]])
-  expect_equal(tf_regbeta(c(NA, x), c(1, y)), NA_real_)
-  expect_equal(tf_regbeta(c(1, x), c(NA, y)), NA_real_)
+  expect_identical(tf_regbeta(c(NA, x), c(1, y)), NA_real_)
+  expect_identical(tf_regbeta(c(1, x), c(NA, y)), NA_real_)
 })
 
 test_that("regresi", {
@@ -230,8 +240,8 @@ test_that("regresi", {
   x <- rnorm(10)
   y <- rnorm(10)
   expect_equivalent(tf_regresi(y, x), tail(resid(lm(y ~ x)), 1))
-  expect_equal(tf_regresi(c(NA, x), c(1, y)), NA_real_)
-  expect_equal(tf_regresi(c(1, x), c(NA, y)), NA_real_)
+  expect_identical(tf_regresi(c(NA, x), c(1, y)), NA_real_)
+  expect_identical(tf_regresi(c(1, x), c(NA, y)), NA_real_)
 })
 
 test_that("filter", {
@@ -252,14 +262,14 @@ test_that("highday", {
   expect_error(tf_highday(double()), "x must have at least 1 elements")
   expect_equal(tf_highday(1.2), 0.0)
   expect_equal(tf_highday(c(0.2, 8.8, 2.3, 1.2)), 2.0)
-  expect_equal(tf_highday(c(0.2, NA, 8.8, 2.3, 1.2)), NA_real_)
+  expect_identical(tf_highday(c(0.2, NA, 8.8, 2.3, 1.2)), NA_real_)
 })
 
 test_that("lowday", {
   expect_error(tf_lowday(double()), "x must have at least 1 elements")
   expect_equal(tf_lowday(1.2), 0.0)
   expect_equal(tf_lowday(c(0.2, 8.8, 2.3, 1.2)), 3.0)
-  expect_equal(tf_lowday(c(0.2, NA, 8.8, 2.3, 1.2)), NA_real_)
+  expect_identical(tf_lowday(c(0.2, NA, 8.8, 2.3, 1.2)), NA_real_)
 })
 
 test_that("assert_valid_from_to", {
