@@ -48,7 +48,7 @@ Alpha_fun alpha122 = [](const Quote& qt) -> double {
     return sma_3(qt.clock_back(delay));
   };
   const double second = tripple_sma(1);
-  if (second == 0) return NA_REAL;
+  if (near(second, 0.0)) return NA_REAL;
   const double first = tripple_sma(0);
   return first / second - 1.0;
 };

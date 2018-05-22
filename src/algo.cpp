@@ -370,7 +370,7 @@ Timeseries operator/(const Timeseries& x, const Timeseries& y)
   std::transform(
     x.cbegin(), x.cend(), y.cbegin(),
     res.begin(), [](const double v1, const double v2) {
-      if (v2 == 0) return NA_REAL;
+      if (near(v2, 0.0)) return NA_REAL;
       return v1 / v2;
     });
   return res;
