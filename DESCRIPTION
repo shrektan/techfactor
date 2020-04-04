@@ -10,7 +10,7 @@ Authors@R: c(
     )
 Maintainer: Xianying Tan <shrektan@126.com>
 Description: Provide tools that calculate technical factors efficiently.
-License: file LICENSE
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/shrektan/techfactor
