@@ -3,9 +3,12 @@
 
 # techfactor
 
+<!-- badges: start -->
+
 [![R build
-status](https://github.com/shrektan/techfactor/workflows/R-CMD-check/badge.svg)](https://github.com/shrektan/techfactor/actions)
+status](https://github.com/shrektan/techfactor/workflows/test-coverage/badge.svg)](https://github.com/shrektan/techfactor/actions)
 [![codecov](https://codecov.io/gh/shrektan/techfactor/branch/master/graph/badge.svg)](https://codecov.io/gh/shrektan/techfactor)
+<!-- badges: end -->
 
 The goal of techfactor is to provide tools that calculate technical
 factors efficiently.
