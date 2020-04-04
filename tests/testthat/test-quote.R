@@ -44,7 +44,7 @@ test_that("quote input must be a sorted tbl", {
   dt_copy[, CLOSE := NULL]
   expect_error(
     tf_quote_xptr(dt_copy),
-    "CLOSE"
+    class = "Rcpp::index_out_of_bounds"
   )
 })
 
