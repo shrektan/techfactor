@@ -15,8 +15,8 @@ knitr::opts_chunk$set(
 
 # techfactor
 
-[![wercker status](https://app.wercker.com/status/0a35da2d046e40b24a2854439fc88e0f/s/master "wercker status")](https://app.wercker.com/project/byKey/0a35da2d046e40b24a2854439fc88e0f)
-[![codecov](https://codecov.io/gh/shrektan/techfactor/branch/master/graph/badge.svg?token=ck4uoArnhK)](https://codecov.io/gh/shrektan/techfactor)
+[![R build status](https://github.com/shrektan/techfactor/workflows/R-CMD-check/badge.svg)](https://github.com/shrektan/techfactor/actions)
+[![codecov](https://codecov.io/gh/shrektan/techfactor/branch/master/graph/badge.svg)](https://codecov.io/gh/shrektan/techfactor)
 
 The goal of techfactor is to provide tools that calculate technical factors efficiently.
 
