@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-#include "GCAMCTF_types.h"
+#include "techfactor_types.h"
 #include <string>
 #include <map>
 

@@ -1,4 +1,4 @@
-# GCAMCTF 0.1.0
+# techfactor 0.1.0
 
 * Added a `NEWS.md` file to track changes to the package.
 * Set up CI and code coverage.

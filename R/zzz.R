@@ -1,3 +1,3 @@
 .onUnload <- function(libpath) {
-  library.dynam.unload("GCAMCTF", libpath)
+  library.dynam.unload("techfactor", libpath)
 }

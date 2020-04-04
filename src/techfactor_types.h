@@ -1,5 +1,5 @@
-#ifndef __GCAMCTF_TYPES__
-#define __GCAMCTF_TYPES__
+#ifndef __TECHFACTOR_TYPES__
+#define __TECHFACTOR_TYPES__
 
 #include <vector>
 #include <functional>
@@ -13,4 +13,4 @@ using Alpha_fun = std::function<double(const Quote&)>;
 class Quotes;
 using Alpha_mfun = std::function<Timeseries(const Quotes&)>;
 
-#endif // __GCAMCTF_TYPES__
+#endif // __TECHFACTOR_TYPES__

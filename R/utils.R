@@ -1,4 +1,4 @@
-#' @useDynLib GCAMCTF, .registration = TRUE
+#' @useDynLib techfactor, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @importFrom data.table data.table setkey setorder frank
 #' @importFrom xts xts

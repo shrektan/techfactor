@@ -1,4 +1,4 @@
 library(testthat)
-library(GCAMCTF)
+library(techfactor)
 
-test_check("GCAMCTF")
+test_check("techfactor")

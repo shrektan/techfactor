@@ -1,9 +1,9 @@
-#ifndef __GCAMCTF_ALGO__
-#define __GCAMCTF_ALGO__
+#ifndef __TECHFACTOR_ALGO__
+#define __TECHFACTOR_ALGO__
 
 #include <Rcpp.h>
 #include <map>
-#include "GCAMCTF_types.h"
+#include "techfactor_types.h"
 
 template <typename T>
 void assert_same_size(const T& x, const T& y)
@@ -477,4 +477,4 @@ private:
   }
 };
 
-#endif //__GCAMCTF_ALGO__
+#endif //__TECHFACTOR_ALGO__

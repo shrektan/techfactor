@@ -2,183 +2,183 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 tf_na_vector <- function(length) {
-    .Call(`_GCAMCTF_na_vector`, length)
+    .Call(`_techfactor_na_vector`, length)
 }
 
 tf_delta <- function(x) {
-    .Call(`_GCAMCTF_delta`, x)
+    .Call(`_techfactor_delta`, x)
 }
 
 tf_rank <- function(x) {
-    .Call(`_GCAMCTF_rank`, x)
+    .Call(`_techfactor_rank`, x)
 }
 
 tf_sum <- function(x) {
-    .Call(`_GCAMCTF_sum`, x)
+    .Call(`_techfactor_sum`, x)
 }
 
 tf_mean <- function(x) {
-    .Call(`_GCAMCTF_mean`, x)
+    .Call(`_techfactor_mean`, x)
 }
 
 tf_stdev <- function(x) {
-    .Call(`_GCAMCTF_stdev`, x)
+    .Call(`_techfactor_stdev`, x)
 }
 
 tf_tsmin <- function(x) {
-    .Call(`_GCAMCTF_tsmin`, x)
+    .Call(`_techfactor_tsmin`, x)
 }
 
 tf_tsmax <- function(x) {
-    .Call(`_GCAMCTF_tsmax`, x)
+    .Call(`_techfactor_tsmax`, x)
 }
 
 tf_tsrank <- function(x) {
-    .Call(`_GCAMCTF_tsrank`, x)
+    .Call(`_techfactor_tsrank`, x)
 }
 
 tf_covariance <- function(x, y) {
-    .Call(`_GCAMCTF_covariance`, x, y)
+    .Call(`_techfactor_covariance`, x, y)
 }
 
 tf_corr <- function(x, y) {
-    .Call(`_GCAMCTF_corr`, x, y)
+    .Call(`_techfactor_corr`, x, y)
 }
 
 tf_sign <- function(x) {
-    .Call(`_GCAMCTF_sign`, x)
+    .Call(`_techfactor_sign`, x)
 }
 
 tf_sma <- function(x, m) {
-    .Call(`_GCAMCTF_sma`, x, m)
+    .Call(`_techfactor_sma`, x, m)
 }
 
 tf_wma <- function(x) {
-    .Call(`_GCAMCTF_wma`, x)
+    .Call(`_techfactor_wma`, x)
 }
 
 tf_decaylinear <- function(x) {
-    .Call(`_GCAMCTF_decaylinear`, x)
+    .Call(`_techfactor_decaylinear`, x)
 }
 
 tf_sequence <- function(n) {
-    .Call(`_GCAMCTF_sequence`, n)
+    .Call(`_techfactor_sequence`, n)
 }
 
 tf_sumac <- function(x) {
-    .Call(`_GCAMCTF_sumac`, x)
+    .Call(`_techfactor_sumac`, x)
 }
 
 tf_log <- function(x) {
-    .Call(`_GCAMCTF_log`, x)
+    .Call(`_techfactor_log`, x)
 }
 
 tf_abs <- function(x) {
-    .Call(`_GCAMCTF_abs`, x)
+    .Call(`_techfactor_abs`, x)
 }
 
 tf_prod <- function(x) {
-    .Call(`_GCAMCTF_prod`, x)
+    .Call(`_techfactor_prod`, x)
 }
 
 tf_count <- function(x) {
-    .Call(`_GCAMCTF_count`, x)
+    .Call(`_techfactor_count`, x)
 }
 
 tf_regbeta <- function(y, x) {
-    .Call(`_GCAMCTF_regbeta`, y, x)
+    .Call(`_techfactor_regbeta`, y, x)
 }
 
 tf_regresi <- function(y, x) {
-    .Call(`_GCAMCTF_regresi`, y, x)
+    .Call(`_techfactor_regresi`, y, x)
 }
 
 tf_filter <- function(x, cond) {
-    .Call(`_GCAMCTF_filter`, x, cond)
+    .Call(`_techfactor_filter`, x, cond)
 }
 
 tf_highday <- function(x) {
-    .Call(`_GCAMCTF_highday`, x)
+    .Call(`_techfactor_highday`, x)
 }
 
 tf_lowday <- function(x) {
-    .Call(`_GCAMCTF_lowday`, x)
+    .Call(`_techfactor_lowday`, x)
 }
 
 tf_assert_valid_from_to <- function(from_to) {
-    invisible(.Call(`_GCAMCTF_assert_valid`, from_to))
+    invisible(.Call(`_techfactor_assert_valid`, from_to))
 }
 
 tf_any_na <- function(x) {
-    .Call(`_GCAMCTF_any_na`, x)
+    .Call(`_techfactor_any_na`, x)
 }
 
 tf_assert_no_na <- function(x) {
-    invisible(.Call(`_GCAMCTF_assert_no_na`, x))
+    invisible(.Call(`_techfactor_assert_no_na`, x))
 }
 
 tf_assert_valid_dates <- function(x, field) {
-    invisible(.Call(`_GCAMCTF_assert_valid_dates`, x, field))
+    invisible(.Call(`_techfactor_assert_valid_dates`, x, field))
 }
 
 tf_assert_valid_price <- function(x, field) {
-    invisible(.Call(`_GCAMCTF_assert_valid_price`, x, field))
+    invisible(.Call(`_techfactor_assert_valid_price`, x, field))
 }
 
 tf_assert_valid_volume <- function(x, field) {
-    invisible(.Call(`_GCAMCTF_assert_valid_volume`, x, field))
+    invisible(.Call(`_techfactor_assert_valid_volume`, x, field))
 }
 
 tf_assert_is_sorted <- function(x) {
-    invisible(.Call(`_GCAMCTF_assert_sorted`, x))
+    invisible(.Call(`_techfactor_assert_sorted`, x))
 }
 
 tf_near <- function(x, y) {
-    .Call(`_GCAMCTF_near`, x, y)
+    .Call(`_techfactor_near`, x, y)
 }
 
 tf_qt_tdates <- function(quote_ptr, from_to) {
-    .Call(`_GCAMCTF_tf_qt_tdates`, quote_ptr, from_to)
+    .Call(`_techfactor_tf_qt_tdates`, quote_ptr, from_to)
 }
 
 tf_qt_today <- function(quote_ptr, today) {
-    .Call(`_GCAMCTF_tf_qt_today`, quote_ptr, today)
+    .Call(`_techfactor_tf_qt_today`, quote_ptr, today)
 }
 
 tf_qt_get <- function(quote_ptr, today, tag, delay) {
-    .Call(`_GCAMCTF_tf_qt_get`, quote_ptr, today, tag, delay)
+    .Call(`_techfactor_tf_qt_get`, quote_ptr, today, tag, delay)
 }
 
 tf_qt_ts_get <- function(quote_ptr, today, tag, n, delay) {
-    .Call(`_GCAMCTF_tf_qt_ts_get`, quote_ptr, today, tag, n, delay)
+    .Call(`_techfactor_tf_qt_ts_get`, quote_ptr, today, tag, n, delay)
 }
 
 tf_ts_op <- function(x, y, op) {
-    .Call(`_GCAMCTF_tf_ts_op`, x, y, op)
+    .Call(`_techfactor_tf_ts_op`, x, y, op)
 }
 
 tf_ts_scalar_op <- function(x, y, op) {
-    .Call(`_GCAMCTF_tf_ts_scalar_op`, x, y, op)
+    .Call(`_techfactor_tf_ts_scalar_op`, x, y, op)
 }
 
 tf_ts <- function(quote_ptr, today, n) {
-    .Call(`_GCAMCTF_tf_ts`, quote_ptr, today, n)
+    .Call(`_techfactor_tf_ts`, quote_ptr, today, n)
 }
 
 tf_assert_valid_panel <- function(x) {
-    invisible(.Call(`_GCAMCTF_tf_assert_valid_panel`, x))
+    invisible(.Call(`_techfactor_tf_assert_valid_panel`, x))
 }
 
 tf_panel_sum <- function(x) {
-    .Call(`_GCAMCTF_tf_panel_sum`, x)
+    .Call(`_techfactor_tf_panel_sum`, x)
 }
 
 tf_assert_same_size <- function(x, y) {
-    invisible(.Call(`_GCAMCTF_tf_assert_same_size`, x, y))
+    invisible(.Call(`_techfactor_tf_assert_same_size`, x, y))
 }
 
 create_xts <- function(x_mat, x_dates) {
-    .Call(`_GCAMCTF_create_xts`, x_mat, x_dates)
+    .Call(`_techfactor_create_xts`, x_mat, x_dates)
 }
 
 #' The registered factor names
@@ -187,7 +187,7 @@ create_xts <- function(x_mat, x_dates) {
 #'
 #' @export
 tf_reg_factors <- function() {
-    .Call(`_GCAMCTF_tf_reg_factors`)
+    .Call(`_techfactor_tf_reg_factors`)
 }
 
 #' The quote external pointer
@@ -201,21 +201,21 @@ tf_reg_factors <- function() {
 #' @return An R external pointer than can hold a `Quote` object.
 #' @export
 tf_quote_xptr <- function(qt_tbl) {
-    .Call(`_GCAMCTF_tf_quote_xptr`, qt_tbl)
+    .Call(`_techfactor_tf_quote_xptr`, qt_tbl)
 }
 
 tf_enc2utf8 <- function(x, only_mark = FALSE) {
-    .Call(`_GCAMCTF_enc2utf8`, x, only_mark)
+    .Call(`_techfactor_enc2utf8`, x, only_mark)
 }
 
 #' @rdname tf_quote_xptr
 #' @export
 tf_quotes_xptr <- function(qt_tbls) {
-    .Call(`_GCAMCTF_tf_quotes_xptr`, qt_tbls)
+    .Call(`_techfactor_tf_quotes_xptr`, qt_tbls)
 }
 
 tf_assert_class <- function(x, classname) {
-    invisible(.Call(`_GCAMCTF_assert_valid_class`, x, classname))
+    invisible(.Call(`_techfactor_assert_valid_class`, x, classname))
 }
 
 #' Calculate the TF for single security
@@ -228,7 +228,7 @@ tf_assert_class <- function(x, classname) {
 #' @return An `xts` object in which the columns are the factors' value.
 #' @export
 tf_qt_cal <- function(qt_ptr, names, from_to) {
-    .Call(`_GCAMCTF_tf_qt_cal`, qt_ptr, names, from_to)
+    .Call(`_techfactor_tf_qt_cal`, qt_ptr, names, from_to)
 }
 
 #' The cores on your compture
@@ -238,7 +238,7 @@ tf_qt_cal <- function(qt_ptr, names, from_to) {
 #'
 #' @export
 tf_hardware_cores <- function() {
-    .Call(`_GCAMCTF_hardware_cores`)
+    .Call(`_techfactor_hardware_cores`)
 }
 
 #' Calculate the TF for a security pool
@@ -251,6 +251,6 @@ tf_hardware_cores <- function() {
 #'   each security in the pool.
 #' @export
 tf_qts_cal <- function(qts_ptr, name, from_to, threads_no = 1L) {
-    .Call(`_GCAMCTF_tf_qts_cal`, qts_ptr, name, from_to, threads_no)
+    .Call(`_techfactor_tf_qts_cal`, qts_ptr, name, from_to, threads_no)
 }
 
