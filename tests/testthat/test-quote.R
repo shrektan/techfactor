@@ -122,16 +122,16 @@ test_that("quote.set()", {
 test_that("qt.get()", {
   date <- anydate(20180504)
   expect_equal(
-    purrr::map_dbl(tags, ~tf_qt_get(qt, date, ., 0)),
+    vapply(tags, function(tag) tf_qt_get(qt, date, tag, 0), 0.0, USE.NAMES = FALSE),
     as.double(dt[DATE == date, seq_len(ncol(dt))[-1], with = FALSE])
   )
   date <- anydate(20180501)
   expect_equal(
-    purrr::map_dbl(tags, ~tf_qt_get(qt, date, ., 0)),
+    vapply(tags, function(tag) tf_qt_get(qt, date, tag, 0), 0.0, USE.NAMES = FALSE),
     as.double(dt[DATE == date, seq_len(ncol(dt))[-1], with = FALSE])
   )
   expect_equal(
-    purrr::map_dbl(tags, ~tf_qt_get(qt, anydate(20180507), ., 5)),
+    vapply(tags, function(tag) tf_qt_get(qt, anydate(20180507), tag, 5), 0.0, USE.NAMES = FALSE),
     as.double(dt[DATE == anydate(20180426), seq_len(ncol(dt))[-1], with = FALSE])
   )
   expect_error(
@@ -150,30 +150,30 @@ test_that("qt.get()", {
 
 test_that("qt.ts_get()", {
   expect_equal(
-    purrr::map(tags, ~tf_qt_ts_get(qt, anydate(20180503), ., 3, 0)),
-    purrr::map(tags, ~as.double(
+    lapply(tags, function(tag) tf_qt_ts_get(qt, anydate(20180503), tag, 3, 0)),
+    lapply(tags, function(tag) as.double(
       dt[DATE %in% anydate(c(20180427, 20180502, 20180503)),
-         toupper(.), with = FALSE][[1L]]
+         toupper(tag), with = FALSE][[1L]]
     ))
   )
   expect_equal(
-    purrr::map(tags, ~tf_qt_ts_get(qt, anydate(20180503), ., 3, 5)),
-    purrr::map(tags, ~as.double(
+    lapply(tags, function(tag) tf_qt_ts_get(qt, anydate(20180503), tag, 3, 5)),
+    lapply(tags, function(tag) as.double(
       dt[DATE %in% anydate(c(20180420, 20180423, 20180424)),
-         toupper(.), with = FALSE][[1L]]
+         toupper(tag), with = FALSE][[1L]]
     ))
   )
   expect_equal(
-    purrr::map(tags, ~tf_qt_ts_get(qt, anydate(20180104), ., 5, 0)),
-    purrr::map(tags, ~{
+    lapply(tags, function(tag) tf_qt_ts_get(qt, anydate(20180104), tag, 5, 0)),
+    lapply(tags, function(tag) {
       res <- dt[DATE %in% anydate(c(20180102, 20180103, 20180104)),
-                toupper(.), with = FALSE][[1L]]
+                toupper(tag), with = FALSE][[1L]]
       c(NA, NA, res)
     })
   )
   expect_equal(
-    purrr::map(tags, ~tf_qt_ts_get(qt, anydate(20180104), ., 5, 10)),
-    purrr::map(tags, ~rep(NA_real_, 5))
+    lapply(tags, function(tag) tf_qt_ts_get(qt, anydate(20180104), tag, 5, 10)),
+    lapply(tags, function(tag) rep(NA_real_, 5))
   )
   expect_identical(
     tf_qt_ts_get(qt, anydate(20180104), "close", 3, 3),
@@ -266,11 +266,10 @@ test_that("ts_qt_misc_getter", {
 test_that("ts_qt_misc_ts_getter", {
   date <- anydate(20180504)
   vars <- c("tr", "ret", "dtm", "dbm", "hd", "ld")
-  purrr::walk(vars, ~{
-    var <- .x
+  lapply(vars, function(var) {
     expect_equal(
       tf_qt_ts_get(qt, date, var, 5, 2),
-      purrr::map_dbl(4:0, ~tf_qt_get(qt, date, var, 2 + .x))
+      vapply(4:0, function(.) tf_qt_get(qt, date, var, 2 + .), 0.0, USE.NAMES = FALSE)
     )
   })
 })
@@ -336,20 +335,20 @@ test_that("ts_op_scalar", {
   x <- c(-1.0, 0.0, 1.0, 2.0, NA_real_, NA_real_, 0.0)
   y <- c(-1.3, 1.3, NA_real_, 0.0, -0.3, NA_real_, 0.0)
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "+")),
-    purrr::map(y, ~`+`(x, .))
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "+")),
+    lapply(y, function(.) `+`(x, .))
   )
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "-")),
-    purrr::map(y, ~`-`(x, .))
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "-")),
+    lapply(y, function(.) `-`(x, .))
   )
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "*")),
-    purrr::map(y, ~`*`(x, .))
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "*")),
+    lapply(y, function(.) `*`(x, .))
   )
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "^")),
-    purrr::map(y, ~{
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "^")),
+    lapply(y, function(.) {
       res <- `^`(x, .)
       res[is.infinite(res)] <- NA_real_
       res
@@ -357,44 +356,44 @@ test_that("ts_op_scalar", {
   )
   # return NA if any NA or find zero in the denominator
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "/")),
-    purrr::map(y, ~{
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "/")),
+    lapply(y, function(.) {
       if (is.na(.) || . == 0.0) return(rep(NA_real_, length(x)))
       x / .
     })
   )
   # return FALSE if any NA
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., ">")),
-    purrr::map(y, ~{
+    lapply(y, function(.) tf_ts_scalar_op(x, ., ">")),
+    lapply(y, function(.) {
       res <- as.double(`>`(x, .))
       res[is.na(res)] <- 0.0
       res
     })
   )
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "<")),
-    purrr::map(y, ~{
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "<")),
+    lapply(y, function(.) {
       res <- as.double(`<`(x, .))
       res[is.na(res)] <- 0.0
       res
     })
   )
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "==")),
-    purrr::map(y, ~{
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "==")),
+    lapply(y, function(.) {
       res <- as.double(`==`(x, .))
       res[is.na(res)] <- 0.0
       res
     })
   )
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "pmin")),
-    purrr::map(y, ~pmin(x, .))
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "pmin")),
+    lapply(y, function(.) pmin(x, .))
   )
   expect_equal(
-    purrr::map(y, ~tf_ts_scalar_op(x, ., "pmax")),
-    purrr::map(y, ~pmax(x, .))
+    lapply(y, function(.) tf_ts_scalar_op(x, ., "pmax")),
+    lapply(y, function(.) pmax(x, .))
   )
 })
 

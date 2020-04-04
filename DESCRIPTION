@@ -29,7 +29,6 @@ Imports:
     zoo
 Suggests: 
     testthat,
-    covr,
-    purrr
+    covr
 LinkingTo: 
     Rcpp
