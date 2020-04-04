@@ -3,10 +3,9 @@
 
 # techfactor
 
-[![wercker
-status](https://app.wercker.com/status/0a35da2d046e40b24a2854439fc88e0f/s/master
-"wercker status")](https://app.wercker.com/project/byKey/0a35da2d046e40b24a2854439fc88e0f)
-[![codecov](https://codecov.io/gh/shrektan/techfactor/branch/master/graph/badge.svg?token=ck4uoArnhK)](https://codecov.io/gh/shrektan/techfactor)
+[![R build
+status](https://github.com/shrektan/techfactor/workflows/R-CMD-check/badge.svg)](https://github.com/shrektan/techfactor/actions)
+[![codecov](https://codecov.io/gh/shrektan/techfactor/branch/master/graph/badge.svg)](https://codecov.io/gh/shrektan/techfactor)
 
 The goal of techfactor is to provide tools that calculate technical
 factors efficiently.
@@ -15,7 +14,7 @@ factors efficiently.
 
 ``` r
 (Sys.time())
-#> [1] "2020-04-04 17:17:27 CST"
+#> [1] "2020-04-04 17:42:49 CST"
 library(techfactor)
 data(tf_quote)
 qt <- tf_quote_xptr(tf_quote)
@@ -58,13 +57,13 @@ sessioninfo::session_info()
 #>  package     * version    date       lib source                            
 #>  anytime       0.3.7      2020-01-20 [1] CRAN (R 3.6.0)                    
 #>  assertthat    0.2.1      2019-03-21 [1] CRAN (R 3.6.0)                    
-#>  cli           2.0.1      2020-01-08 [1] CRAN (R 3.6.0)                    
+#>  cli           2.0.2      2020-02-28 [1] CRAN (R 3.6.0)                    
 #>  crayon        1.3.4      2017-09-16 [1] CRAN (R 3.6.0)                    
 #>  data.table    1.12.9     2020-03-29 [1] local                             
-#>  digest        0.6.23     2019-11-23 [1] CRAN (R 3.6.0)                    
+#>  digest        0.6.25     2020-02-23 [1] CRAN (R 3.6.0)                    
 #>  evaluate      0.14       2019-05-28 [1] CRAN (R 3.6.0)                    
 #>  fansi         0.4.1      2020-01-08 [1] CRAN (R 3.6.0)                    
-#>  glue          1.3.1      2019-03-12 [1] CRAN (R 3.6.0)                    
+#>  glue          1.3.2      2020-03-12 [1] CRAN (R 3.6.0)                    
 #>  htmltools     0.4.0.9002 2020-01-27 [1] Github (rstudio/htmltools@e07546c)
 #>  knitr         1.28.2     2020-03-11 [1] local                             
 #>  lattice       0.20-38    2018-11-04 [1] CRAN (R 3.6.2)                    
