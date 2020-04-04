@@ -4,9 +4,7 @@
 \name{reexports}
 \alias{reexports}
 \alias{\%>\%}
-\alias{reexports}
 \alias{anydate}
-\alias{reexports}
 \alias{index}
 \title{Objects exported from other packages}
 \keyword{internal}

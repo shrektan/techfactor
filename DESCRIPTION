@@ -16,7 +16,7 @@ LazyData: true
 URL: https://github.com/shrektan/techfactor
 BugReports: https://github.com/shrektan/techfactor/issues
 Roxygen: list(markdown = TRUE)   
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
 SystemRequirements: C++11
 Depends:
     R (>= 2.10)

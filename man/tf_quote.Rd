@@ -13,6 +13,8 @@ The Gildata database
 data(tf_quote)
 
 data(tf_quotes)
+
+data(tf_quotes)
 }
 \description{
 We include some small chunck of sample data \code{tf_quote} and
@@ -21,14 +23,14 @@ are expected and they are used in the tests as well.
 }
 \details{
 \itemize{
-\item \code{tf_quote} is a China-A security \code{000002.SZ} (Wanke-A)'s
+\item \code{tf_quote} is a China-A security \verb{000002.SZ} (Wanke-A)'s
 quote of 81 days in total, from 2018-01-02 ~ 2018-05-07.
 \item \code{tf_quotes} is a list of quotes from 20140101 ~ 20180430,
-containing \code{300333.SZ},\code{601158.SH},\code{002788.SZ},\code{603101.SH},
-\code{600020.SH},\code{601668.SH},\code{600615.SH},\code{002721.SZ},\code{300517.SZ},
-\code{601567.SH},\code{603477.SH},\code{002297.SZ},\code{600537.SH},\code{603906.SH},
-\code{603183.SH},\code{002884.SZ},\code{300531.SZ},\code{002641.SZ},
-\code{002851.SZ},\code{600719.SH}.
+containing \verb{300333.SZ},\verb{601158.SH},\verb{002788.SZ},\verb{603101.SH},
+\verb{600020.SH},\verb{601668.SH},\verb{600615.SH},\verb{002721.SZ},\verb{300517.SZ},
+\verb{601567.SH},\verb{603477.SH},\verb{002297.SZ},\verb{600537.SH},\verb{603906.SH},
+\verb{603183.SH},\verb{002884.SZ},\verb{300531.SZ},\verb{002641.SZ},
+\verb{002851.SZ},\verb{600719.SH}.
 \item The column \code{VWAP}
 equals to \code{AMOUNT} / \code{VOLUME}. The columns \code{BMK_CLOSE} and
 \code{BMK_OPEN} is the close and open price data of the index

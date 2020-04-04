@@ -7,6 +7,6 @@
 tf_hardware_cores()
 }
 \description{
-Use \code{std::thread::hardware_concurrency()} to detect the core number on
+Use \verb{std::thread::hardware_concurrency()} to detect the core number on
 your compture.
 }
