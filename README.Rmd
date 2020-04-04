@@ -23,20 +23,27 @@ The goal of techfactor is to provide tools that calculate technical factors effi
 ## Example
 
 ```{r example}
-(Sys.time())
 library(techfactor)
 data(tf_quote)
-qt <- tf_quote_xptr(tf_quote)
+head(tf_quote)
+(from_to <- range(tail(tf_quote$DATE)))
+
 factors <- tf_reg_factors()
 str(factors)
-(factor <- attr(factors, "normal")[1])
-(from_to <- range(tail(tf_quote$DATE)))
-tf_qt_cal(qt, factor, from_to)
+(normal_factor <- attr(factors, "normal")[1])
+(panel_factor <- attr(factors, "panel")[1])
+
+qt <- tf_quote_xptr(tf_quote)
+tf_qt_cal(qt, normal_factor, from_to)
+
+qts <- tf_quotes_xptr(tf_quotes)
+tf_qts_cal(qts, normal_factor, from_to)
+tf_qts_cal(qts, panel_factor, from_to)
 ```
 
 ## session info
 
 ```{r session_info}
-sessioninfo::session_info()
+xfun::session_info(packages = 'techfactor')
 ```
 
