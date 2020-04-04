@@ -29,9 +29,9 @@ data(tf_quote)
 qt <- tf_quote_xptr(tf_quote)
 factors <- tf_reg_factors()
 str(factors)
-(factor <- factors[1])
+(factor <- attr(factors, "normal")[1])
 (from_to <- range(tail(tf_quote$DATE)))
-tf_cal(qt, factor, from_to)
+tf_qt_cal(qt, factor, from_to)
 ```
 
 ## session info
