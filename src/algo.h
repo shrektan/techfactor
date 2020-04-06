@@ -133,7 +133,7 @@ struct Quote_raw {
 
 class Quote {
 public:
-  Quote() = default;
+  // Quote() = default;
   explicit Quote (const Quote_raw& raw, const RDate today)
     : raw_ { raw }, today_index_ { match_(today) } { }
 
@@ -422,7 +422,7 @@ struct Quotes_raw {
 
 class Quotes {
 public:
-  Quotes() = default;
+  // Quotes() = default;
   explicit Quotes(const Quotes_raw& raw, const RDate today)
     : raw_ (raw),
       qts_ (gen_qts_(raw, today)) { }
