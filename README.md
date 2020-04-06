@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![R build
-status](https://github.com/shrektan/techfactor/workflows/r-cmd-check/badge.svg)](https://github.com/shrektan/techfactor/actions)
+status](https://github.com/shrektan/techfactor/workflows/R-CMD-check/badge.svg)](https://github.com/shrektan/techfactor/actions)
 [![codecov](https://codecov.io/gh/shrektan/techfactor/branch/master/graph/badge.svg)](https://codecov.io/gh/shrektan/techfactor)
 <!-- badges: end -->
 
@@ -218,6 +218,6 @@ xfun::session_info(packages = 'techfactor')
 #> Package version:
 #>   anytime_0.3.7     BH_1.72.0.3       data.table_1.12.9 graphics_3.6.2   
 #>   grDevices_3.6.2   grid_3.6.2        lattice_0.20.38   magrittr_1.5     
-#>   methods_3.6.2     Rcpp_1.0.4.5      stats_3.6.2       techfactor_0.1.1 
+#>   methods_3.6.2     Rcpp_1.0.4.5      stats_3.6.2       techfactor_0.2.0 
 #>   utils_3.6.2       xts_0.12.0        zoo_1.8.7
 ```
