@@ -19,4 +19,3 @@
 * Implemented the concurrency calculating.
 * Implemented all the 191 alpha factors.
 * Added `near()` to do the zero comparision.
-
