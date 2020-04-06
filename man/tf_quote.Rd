@@ -5,16 +5,11 @@
 \alias{tf_quote}
 \alias{tf_quotes}
 \title{The sample quote data}
-\format{An object of class \code{list} of length 20.}
-\source{
-The Gildata database
-}
+\format{An object of class \code{data.table} (inherits from \code{data.frame}) with 81 rows and 11 columns.}
 \usage{
-data(tf_quote)
+tf_quote
 
-data(tf_quotes)
-
-data(tf_quotes)
+tf_quotes
 }
 \description{
 We include some small chunck of sample data \code{tf_quote} and

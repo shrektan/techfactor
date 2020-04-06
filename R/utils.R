@@ -43,17 +43,10 @@ zoo::index
 #' `BMK_OPEN` is the close and open price data of the index
 #' _China-A All Shares_.
 #'
-#' @name tf_quote
-#' @source The Gildata database
 #' @docType data
 #' @keywords data
-#' @usage data(tf_quote)
-#' @usage data(tf_quotes)
-NULL
-
+"tf_quote"
 
 #' @rdname tf_quote
-#' @usage data(tf_quotes)
 "tf_quotes"
-
 
