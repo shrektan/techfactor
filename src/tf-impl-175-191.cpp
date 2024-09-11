@@ -254,24 +254,24 @@ Alpha_fun alpha189 = [](const Quote& qt) -> double {
 Alpha_fun alpha190 = [](const Quote& qt) -> double {
   auto count_fun1 = [] (const Quote& qt) {
     auto left = qt.close() / qt.close(1) - 1.0;
-    auto right = std::pow(qt.close() / qt.close(19), 1/20) - 1.0;
+    auto right = std::pow(qt.close() / qt.close(19), 1.0/20.0) - 1.0;
     return left > right;
   };
   double param1 = count(qt.ts<bool>(20, count_fun1)) - 1.0;
 
   auto double_muti_p = [](const Quote& qt) {
     auto param1 = qt.close() / qt.close(1) - 1.0;
-    auto param2 = std::pow(qt.close() - qt.close(19), 1/20) - 1.0;
+    auto param2 = std::pow(qt.close() - qt.close(19), 1.0/20.0) - 1.0;
     return std::pow(param1 - param2, 2.0);
   };
   auto bool_muti_p1 = [](const Quote& qt) {
     auto left = qt.close() / qt.close(1) - 1.0;
-    auto right = std::pow(qt.close() / qt.close(19), 1/20) - 1.0;
+    auto right = std::pow(qt.close() / qt.close(19), 1.0/20.0) - 1.0;
     return left < right;
   };
   auto bool_muti_p2 = [](const Quote& qt) {
     auto left = qt.close() / qt.close(1) - 1.0;
-    auto right = std::pow(qt.close() / qt.close(19), 1/20) - 1.0;
+    auto right = std::pow(qt.close() / qt.close(19), 1.0/20.0) - 1.0;
     return left > right;
   };
   double param2 = sum(filter(
@@ -281,7 +281,7 @@ Alpha_fun alpha190 = [](const Quote& qt) -> double {
 
   auto count_fun2 = [] (const Quote& qt) {
     auto left = qt.close() / qt.close(1) - 1.0;
-    auto right = pow(qt.close() / qt.close(19), 1/20) - 1.0;
+    auto right = std::pow(qt.close() / qt.close(19), 1.0/20.0) - 1.0;
     return left < right;
   };
   double param3 = count(qt.ts<bool>(20, count_fun2));

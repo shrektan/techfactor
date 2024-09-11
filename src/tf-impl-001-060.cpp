@@ -473,7 +473,7 @@ Alpha_mfun alpha035 = [](const Quotes& qts) -> Timeseries {
   auto rk_decay1 = rank(qts.apply(base_fun1));
   auto rk_decay2 = rank(qts.apply(base_fun2));
 
-  return std::min(rk_decay1, rk_decay2) * -1.0;
+  return pmin(rk_decay1, rk_decay2) * -1.0;
 };
 
 
